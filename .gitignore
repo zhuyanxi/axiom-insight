@@ -12,6 +12,8 @@
 *.prof
 /vendor/
 /*/vendor/
+*.coverprofile
+/bin/
 
 # ---------------------------------------------------------------------------
 # Rust (Compiler Frontend, Tauri)
