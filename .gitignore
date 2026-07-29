@@ -67,6 +67,7 @@ src-tauri/WixTools/
 # Protocol Buffers (IR, gRPC)
 # ---------------------------------------------------------------------------
 *.pb.go
+!ir/v1/*.pb.go
 *.pb.cc
 *.pb.h
 *_grpc.pb.go

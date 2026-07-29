@@ -1,0 +1,143 @@
+syntax = "proto3";
+
+package axiom.insight.ir.v1;
+
+option go_package = "github.com/pingli/axiom-insight/ir/v1;observabilityv1";
+
+// ObservabilityDocument is the language-neutral compiler output.
+message ObservabilityDocument {
+  string schema_version = 1;
+  Service service = 2;
+  repeated Package packages = 3;
+  repeated Function functions = 4;
+  repeated Endpoint endpoints = 5;
+  repeated Dependency dependencies = 6;
+  repeated CallEdge call_edges = 7;
+  repeated Diagnostic diagnostics = 8;
+}
+
+// Service identifies analyzed source and its language frontend.
+message Service {
+  string name = 1;
+  string source_root = 2;
+  string language = 3;
+  string module_path = 4;
+  string version = 5;
+  repeated string package_ids = 6;
+}
+
+// Package describes one analyzed source package.
+message Package {
+  string id = 1;
+  string name = 2;
+  string import_path = 3;
+  repeated string files = 4;
+}
+
+// Function describes a source function and its statically known relationships.
+message Function {
+  string id = 1;
+  string name = 2;
+  string qualified_name = 3;
+  string package_id = 4;
+  string package_path = 5;
+  string receiver = 6;
+  string signature = 7;
+  SourceLocation source_location = 8;
+  bool exported = 9;
+  repeated string input_endpoint_ids = 10;
+  repeated string output_endpoint_ids = 11;
+  repeated string dependency_ids = 12;
+  repeated string caller_function_ids = 13;
+  repeated string callee_function_ids = 14;
+}
+
+// Endpoint describes a service entrypoint registered by source code.
+message Endpoint {
+  string id = 1;
+  EndpointKind kind = 2;
+  string name = 3;
+  string function_id = 4;
+  SourceLocation source_location = 5;
+  string http_method = 6;
+  string http_path = 7;
+  string grpc_service = 8;
+  string grpc_method = 9;
+  string cron_schedule = 10;
+}
+
+// Dependency describes an external system or client used by a function.
+message Dependency {
+  string id = 1;
+  DependencyKind kind = 2;
+  string name = 3;
+  string function_id = 4;
+  SourceLocation source_location = 5;
+  string operation = 6;
+  string target_service = 7;
+  string target_url = 8;
+  string target_package = 9;
+  string resource = 10;
+  string value = 11;
+  bool value_is_static = 12;
+}
+
+// CallEdge describes one statically analyzed function call.
+message CallEdge {
+  string id = 1;
+  string caller_function_id = 2;
+  string callee_function_id = 3;
+  SourceLocation source_location = 4;
+  CallResolution resolution = 5;
+}
+
+// Diagnostic preserves analysis information that needs user attention.
+message Diagnostic {
+  DiagnosticSeverity severity = 1;
+  string code = 2;
+  string message = 3;
+  SourceLocation source_location = 4;
+}
+
+// SourceLocation is relative to the scan source root.
+message SourceLocation {
+  string relative_path = 1;
+  int32 start_line = 2;
+  int32 start_column = 3;
+  int32 end_line = 4;
+  int32 end_column = 5;
+}
+
+// EndpointKind identifies supported service entrypoint categories.
+enum EndpointKind {
+  ENDPOINT_KIND_UNSPECIFIED = 0;
+  HTTP_HANDLER = 1;
+  GRPC_HANDLER = 2;
+  CRON_JOB = 3;
+}
+
+// DependencyKind identifies supported external dependency categories.
+enum DependencyKind {
+  DEPENDENCY_KIND_UNSPECIFIED = 0;
+  KAFKA_PRODUCER = 1;
+  KAFKA_CONSUMER = 2;
+  SQL = 3;
+  REDIS = 4;
+  HTTP_CLIENT = 5;
+  RPC_CLIENT = 6;
+}
+
+// CallResolution describes whether a call target was statically resolved.
+enum CallResolution {
+  CALL_RESOLUTION_UNSPECIFIED = 0;
+  RESOLVED = 1;
+  UNRESOLVED = 2;
+}
+
+// DiagnosticSeverity controls how an analysis diagnostic is presented.
+enum DiagnosticSeverity {
+  DIAGNOSTIC_SEVERITY_UNSPECIFIED = 0;
+  INFO = 1;
+  WARNING = 2;
+  ERROR = 3;
+}

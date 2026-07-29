@@ -10,4 +10,8 @@ lint:
 	go vet ./...
 
 generate:
-	@echo "No generated sources yet."
+	PATH="$(HOME)/go/bin:$(PATH)" protoc \
+		--proto_path=. \
+		--go_out=. \
+		--go_opt=paths=source_relative \
+		ir/v1/observability.proto
