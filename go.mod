@@ -1,4 +1,4 @@
-module github.com/pingli/axiom-insight
+module github.com/zhuyanxi/axiom-insight
 
 go 1.26.1
 

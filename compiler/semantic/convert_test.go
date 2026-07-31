@@ -3,7 +3,7 @@ package semantic
 import (
 	"testing"
 
-	observabilityv1 "github.com/pingli/axiom-insight/ir/v1"
+	observabilityv1 "github.com/zhuyanxi/axiom-insight/ir/v1"
 	"google.golang.org/protobuf/proto"
 )
 

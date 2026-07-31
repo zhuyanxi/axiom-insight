@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package axiom.insight.ir.v1;
 
-option go_package = "github.com/pingli/axiom-insight/ir/v1;observabilityv1";
+option go_package = "github.com/zhuyanxi/axiom-insight/ir/v1;observabilityv1";
 
 // ObservabilityDocument is the language-neutral compiler output.
 message ObservabilityDocument {
