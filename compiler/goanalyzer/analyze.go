@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pingli/axiom-insight/compiler/semantic"
+	"github.com/zhuyanxi/axiom-insight/compiler/semantic"
 	"golang.org/x/mod/modfile"
 	"golang.org/x/tools/go/packages"
 	"gopkg.in/yaml.v3"
@@ -75,11 +75,28 @@ func Analyze(ctx context.Context, sourceRoot string, options Options) (semantic.
 		document.Service.PackageIDs = append(document.Service.PackageIDs, semantic.PackageID(pkg))
 	}
 	sort.Strings(document.Service.PackageIDs)
+	packageIDs := make(map[string]string, len(document.Packages))
+	for _, pkg := range document.Packages {
+		packageIDs[pkg.ImportPath] = semantic.PackageID(pkg)
+	}
+	functionAnalysis := analyzeFunctions(root, loaded, packageIDs, options.IncludeTests)
+	document.Functions = append(document.Functions, functionAnalysis.functions...)
+	document.CallEdges = append(document.CallEdges, functionAnalysis.callEdges...)
+	document.Diagnostics = append(document.Diagnostics, functionAnalysis.diagnostics...)
 	sort.SliceStable(document.Diagnostics, func(left, right int) bool {
 		if document.Diagnostics[left].Code != document.Diagnostics[right].Code {
 			return document.Diagnostics[left].Code < document.Diagnostics[right].Code
 		}
-		return document.Diagnostics[left].Message < document.Diagnostics[right].Message
+		if document.Diagnostics[left].Message != document.Diagnostics[right].Message {
+			return document.Diagnostics[left].Message < document.Diagnostics[right].Message
+		}
+		if document.Diagnostics[left].SourceLocation.RelativePath != document.Diagnostics[right].SourceLocation.RelativePath {
+			return document.Diagnostics[left].SourceLocation.RelativePath < document.Diagnostics[right].SourceLocation.RelativePath
+		}
+		if document.Diagnostics[left].SourceLocation.StartLine != document.Diagnostics[right].SourceLocation.StartLine {
+			return document.Diagnostics[left].SourceLocation.StartLine < document.Diagnostics[right].SourceLocation.StartLine
+		}
+		return document.Diagnostics[left].SourceLocation.StartColumn < document.Diagnostics[right].SourceLocation.StartColumn
 	})
 
 	return document, nil

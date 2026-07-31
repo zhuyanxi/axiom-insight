@@ -4,9 +4,10 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
-	"github.com/pingli/axiom-insight/compiler/semantic"
+	"github.com/zhuyanxi/axiom-insight/compiler/semantic"
 )
 
 func TestAnalyzeLoadsMultiplePackagesAndResolvesService(t *testing.T) {
@@ -94,6 +95,12 @@ func TestAnalyzeIncludesTestFilesWhenRequested(t *testing.T) {
 	if !hasPackageFile(withTests, "run_test.go") {
 		t.Fatal("test file missing when IncludeTests is true")
 	}
+	if hasFunction(withoutTests, "TestRun") {
+		t.Fatal("test function included by default")
+	}
+	if !hasFunction(withTests, "TestRun") {
+		t.Fatal("test function missing when IncludeTests is true")
+	}
 }
 
 func TestAnalyzeReportsGoParseErrors(t *testing.T) {
@@ -135,6 +142,98 @@ func TestAnalyzeRejectsInvalidSourceRoot(t *testing.T) {
 	}
 }
 
+func TestAnalyzeBuildsFunctionDirectoryAndCallGraph(t *testing.T) {
+	root := writeProject(t, map[string]string{
+		"go.mod": "module example.com/graph\n\ngo 1.26.1\n",
+		"graph.go": `package graph
+
+type Runner interface {
+	Run()
+}
+
+type worker struct{}
+
+func (worker) Run() {}
+
+func A() {
+	B()
+}
+
+func B() {
+	C()
+}
+
+func C() {
+	A()
+}
+
+func UseInterface(r Runner) {
+	r.Run()
+}
+
+func UseFunctionValue() {
+	var callback func()
+	callback()
+}
+
+func WithClosure() {
+	func() {
+		C()
+	}()
+}
+`,
+	})
+
+	document, err := Analyze(context.Background(), root, Options{})
+	if err != nil {
+		t.Fatalf("analyze graph fixture: %v", err)
+	}
+	a := functionNamed(t, document, "A")
+	b := functionNamed(t, document, "B")
+	c := functionNamed(t, document, "C")
+	useInterface := functionNamed(t, document, "UseInterface")
+	useFunctionValue := functionNamed(t, document, "UseFunctionValue")
+	withClosure := functionNamed(t, document, "WithClosure")
+	method := functionNamed(t, document, "Run")
+	var anonymous semantic.Function
+	for _, function := range document.Functions {
+		if function.Name == "<anonymous>" && strings.Contains(function.ID, withClosure.ID+":anonymous:") {
+			anonymous = function
+			break
+		}
+	}
+	if anonymous.ID == "" {
+		t.Fatalf("anonymous closure not found for %s", withClosure.ID)
+	}
+
+	assertHasCall(t, document, a.ID, b.ID, semantic.CallResolutionResolved)
+	assertHasCall(t, document, b.ID, c.ID, semantic.CallResolutionResolved)
+	assertHasCall(t, document, c.ID, a.ID, semantic.CallResolutionResolved)
+	assertHasCall(t, document, useInterface.ID, "", semantic.CallResolutionUnresolved)
+	assertHasCall(t, document, useFunctionValue.ID, "", semantic.CallResolutionUnresolved)
+	assertHasCall(t, document, withClosure.ID, anonymous.ID, semantic.CallResolutionResolved)
+	if len(method.CallerFunctionIDs) != 0 {
+		t.Fatalf("interface method unexpectedly has callers: %+v", method.CallerFunctionIDs)
+	}
+	if method.Receiver != "worker" {
+		t.Fatalf("method receiver = %q, want worker", method.Receiver)
+	}
+	if len(IncomingCalls(document, c.ID)) != 2 {
+		t.Fatalf("incoming calls for C = %d, want 2", len(IncomingCalls(document, c.ID)))
+	}
+	if len(OutgoingCalls(document, a.ID)) != 1 {
+		t.Fatalf("outgoing calls for A = %d, want 1", len(OutgoingCalls(document, a.ID)))
+	}
+	if !hasDiagnostic(document, "UNRESOLVED_CALL") {
+		t.Fatalf("missing unresolved call diagnostic: %+v", document.Diagnostics)
+	}
+	for _, function := range document.Functions {
+		if function.Name == "<anonymous>" && !strings.Contains(function.ID, withClosure.ID+":anonymous:") {
+			t.Fatalf("anonymous function ID = %q does not include parent %q", function.ID, withClosure.ID)
+		}
+	}
+}
+
 func writeProject(t *testing.T, files map[string]string) string {
 	t.Helper()
 	root := t.TempDir()
@@ -168,4 +267,34 @@ func hasDiagnostic(document semantic.Document, wanted string) bool {
 		}
 	}
 	return false
+}
+
+func hasFunction(document semantic.Document, wanted string) bool {
+	for _, function := range document.Functions {
+		if function.Name == wanted {
+			return true
+		}
+	}
+	return false
+}
+
+func functionNamed(t *testing.T, document semantic.Document, name string) semantic.Function {
+	t.Helper()
+	for _, function := range document.Functions {
+		if function.Name == name {
+			return function
+		}
+	}
+	t.Fatalf("function %q not found: %+v", name, document.Functions)
+	return semantic.Function{}
+}
+
+func assertHasCall(t *testing.T, document semantic.Document, callerID, calleeID string, resolution semantic.CallResolution) {
+	t.Helper()
+	for _, edge := range document.CallEdges {
+		if edge.CallerFunctionID == callerID && edge.CalleeFunctionID == calleeID && edge.Resolution == resolution {
+			return
+		}
+	}
+	t.Fatalf("call edge %s -> %s (%s) not found: %+v", callerID, calleeID, resolution, document.CallEdges)
 }
