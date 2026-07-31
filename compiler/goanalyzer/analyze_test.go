@@ -234,6 +234,230 @@ func WithClosure() {
 	}
 }
 
+func TestAnalyzeRecognizesStandardHTTPHandlers(t *testing.T) {
+	root := writeProject(t, map[string]string{
+		"go.mod": "module example.com/httpfixture\n\ngo 1.26.1\n",
+		"http.go": `package httpfixture
+
+import "net/http"
+
+func Orders(http.ResponseWriter, *http.Request) {}
+
+func register(pattern string, handler http.HandlerFunc) {
+	http.HandleFunc("GET /orders", Orders)
+	http.HandleFunc(pattern, handler)
+	mux := http.NewServeMux()
+	mux.Handle("/users", http.HandlerFunc(Orders))
+}
+`,
+	})
+
+	document, err := Analyze(context.Background(), root, Options{})
+	if err != nil {
+		t.Fatalf("analyze HTTP fixture: %v", err)
+	}
+	orders := functionNamed(t, document, "Orders")
+	endpoints := endpointsForKind(document, semantic.EndpointKindHTTPHandler)
+	if len(endpoints) != 2 {
+		t.Fatalf("HTTP endpoint count = %d, want 2: %+v", len(endpoints), endpoints)
+	}
+	if !hasEndpoint(endpoints, orders.ID, "GET", "/orders") {
+		t.Fatalf("missing GET /orders endpoint: %+v", endpoints)
+	}
+	if !hasEndpoint(endpoints, orders.ID, "", "/users") {
+		t.Fatalf("missing ServeMux /users endpoint: %+v", endpoints)
+	}
+	if !hasDiagnostic(document, "DYNAMIC_HTTP_PATTERN") {
+		t.Fatalf("missing dynamic HTTP pattern diagnostic: %+v", document.Diagnostics)
+	}
+	if !hasDiagnostic(document, "UNRESOLVED_HTTP_HANDLER") {
+		t.Fatalf("missing unresolved HTTP handler diagnostic: %+v", document.Diagnostics)
+	}
+}
+
+func TestAnalyzeRecognizesSupportedHTTPRouter(t *testing.T) {
+	root := writeProject(t, map[string]string{
+		"go.mod": `module example.com/routerfixture
+
+go 1.26.1
+
+require github.com/gorilla/mux v1.8.1
+
+replace github.com/gorilla/mux => ./stubs/mux
+`,
+		"stubs/mux/go.mod": "module github.com/gorilla/mux\n\ngo 1.26.1\n",
+		"stubs/mux/mux.go": `package mux
+
+import "net/http"
+
+type Router struct{}
+type Route struct{}
+
+func (router *Router) HandleFunc(string, func(http.ResponseWriter, *http.Request)) *Route { return &Route{} }
+func (route *Route) Methods(...string) *Route { return route }
+`,
+		"router.go": `package routerfixture
+
+import (
+	"net/http"
+
+	"github.com/gorilla/mux"
+)
+
+func Health(http.ResponseWriter, *http.Request) {}
+
+func Register(router *mux.Router) {
+	router.HandleFunc("/health", Health).Methods("POST")
+}
+`,
+	})
+
+	document, err := Analyze(context.Background(), root, Options{})
+	if err != nil {
+		t.Fatalf("analyze router fixture: %v", err)
+	}
+	health := functionNamed(t, document, "Health")
+	endpoints := endpointsForKind(document, semantic.EndpointKindHTTPHandler)
+	if !hasEndpoint(endpoints, health.ID, "POST", "/health") {
+		t.Fatalf("missing gorilla/mux endpoint: %+v", endpoints)
+	}
+}
+
+func TestAnalyzeReportsUnsupportedHTTPRouter(t *testing.T) {
+	root := writeProject(t, map[string]string{
+		"go.mod": "module example.com/unknownrouter\n\ngo 1.26.1\n",
+		"router.go": `package unknownrouter
+
+import "net/http"
+
+type Router struct{}
+
+func (router *Router) HandleFunc(string, func(http.ResponseWriter, *http.Request)) {}
+
+func Health(http.ResponseWriter, *http.Request) {}
+
+func Register(router *Router) {
+	router.HandleFunc("/health", Health)
+}
+`,
+	})
+
+	document, err := Analyze(context.Background(), root, Options{})
+	if err != nil {
+		t.Fatalf("analyze unsupported router fixture: %v", err)
+	}
+	if endpoints := endpointsForKind(document, semantic.EndpointKindHTTPHandler); len(endpoints) != 0 {
+		t.Fatalf("unsupported router produced endpoints: %+v", endpoints)
+	}
+	if !hasDiagnostic(document, "UNSUPPORTED_HTTP_ROUTER") {
+		t.Fatalf("missing unsupported router diagnostic: %+v", document.Diagnostics)
+	}
+}
+
+func TestAnalyzeRecognizesGRPCRegistration(t *testing.T) {
+	root := writeProject(t, map[string]string{
+		"go.mod": `module example.com/grpcfixture
+
+go 1.26.1
+
+require example.com/api v0.0.0
+
+replace example.com/api => ./stubs/api
+`,
+		"stubs/api/go.mod": "module example.com/api\n\ngo 1.26.1\n",
+		"stubs/api/api.go": `package api
+
+type Registrar interface{}
+type GreeterServer interface {
+	SayHello()
+}
+
+func RegisterGreeterServer(Registrar, GreeterServer) {}
+`,
+		"server.go": `package grpcfixture
+
+import "example.com/api"
+
+type server struct{}
+
+func (server) SayHello() {}
+
+func register() {
+	api.RegisterGreeterServer(nil, &server{})
+}
+`,
+	})
+
+	document, err := Analyze(context.Background(), root, Options{})
+	if err != nil {
+		t.Fatalf("analyze gRPC fixture: %v", err)
+	}
+	sayHello := functionNamed(t, document, "SayHello")
+	endpoints := endpointsForKind(document, semantic.EndpointKindGRPCHandler)
+	if len(endpoints) != 1 {
+		t.Fatalf("gRPC endpoint count = %d, want 1: %+v", len(endpoints), endpoints)
+	}
+	endpoint := endpoints[0]
+	if endpoint.FunctionID != sayHello.ID || endpoint.GRPCService != "Greeter" || endpoint.GRPCMethod != "SayHello" {
+		t.Fatalf("gRPC endpoint = %+v", endpoint)
+	}
+}
+
+func TestAnalyzeRecognizesCronRegistration(t *testing.T) {
+	root := writeProject(t, map[string]string{
+		"go.mod": `module example.com/cronfixture
+
+go 1.26.1
+
+require github.com/robfig/cron/v3 v3.0.0
+
+replace github.com/robfig/cron/v3 => ./stubs/cron
+`,
+		"stubs/cron/go.mod": "module github.com/robfig/cron/v3\n\ngo 1.26.1\n",
+		"stubs/cron/cron.go": `package cron
+
+type Cron struct{}
+type Job interface {
+	Run()
+}
+
+func (cron *Cron) AddFunc(string, func()) {}
+func (cron *Cron) AddJob(string, Job) {}
+`,
+		"jobs.go": `package cronfixture
+
+import "github.com/robfig/cron/v3"
+
+func Cleanup() {}
+
+func register(cron *cron.Cron, schedule string, job cron.Job) {
+	cron.AddFunc("@hourly", Cleanup)
+	cron.AddFunc(schedule, Cleanup)
+	cron.AddJob("@daily", job)
+}
+`,
+	})
+
+	document, err := Analyze(context.Background(), root, Options{})
+	if err != nil {
+		t.Fatalf("analyze cron fixture: %v", err)
+	}
+	cleanup := functionNamed(t, document, "Cleanup")
+	endpoints := endpointsForKind(document, semantic.EndpointKindCronJob)
+	if len(endpoints) != 2 {
+		t.Fatalf("cron endpoint count = %d, want 2: %+v", len(endpoints), endpoints)
+	}
+	if !hasCronEndpoint(endpoints, cleanup.ID, "@hourly") || !hasCronEndpoint(endpoints, cleanup.ID, "") {
+		t.Fatalf("cron endpoints missing static/dynamic schedules: %+v", endpoints)
+	}
+	if !hasDiagnostic(document, "DYNAMIC_CRON_SCHEDULE") {
+		t.Fatalf("missing dynamic cron schedule diagnostic: %+v", document.Diagnostics)
+	}
+	if !hasDiagnostic(document, "UNRESOLVED_CRON_CALLBACK") {
+		t.Fatalf("missing unresolved cron callback diagnostic: %+v", document.Diagnostics)
+	}
+}
+
 func writeProject(t *testing.T, files map[string]string) string {
 	t.Helper()
 	root := t.TempDir()
@@ -272,6 +496,34 @@ func hasDiagnostic(document semantic.Document, wanted string) bool {
 func hasFunction(document semantic.Document, wanted string) bool {
 	for _, function := range document.Functions {
 		if function.Name == wanted {
+			return true
+		}
+	}
+	return false
+}
+
+func endpointsForKind(document semantic.Document, kind semantic.EndpointKind) []semantic.Endpoint {
+	result := make([]semantic.Endpoint, 0)
+	for _, endpoint := range document.Endpoints {
+		if endpoint.Kind == kind {
+			result = append(result, endpoint)
+		}
+	}
+	return result
+}
+
+func hasEndpoint(endpoints []semantic.Endpoint, functionID, method, path string) bool {
+	for _, endpoint := range endpoints {
+		if endpoint.FunctionID == functionID && endpoint.HTTPMethod == method && endpoint.HTTPPath == path {
+			return true
+		}
+	}
+	return false
+}
+
+func hasCronEndpoint(endpoints []semantic.Endpoint, functionID, schedule string) bool {
+	for _, endpoint := range endpoints {
+		if endpoint.FunctionID == functionID && endpoint.CronSchedule == schedule {
 			return true
 		}
 	}

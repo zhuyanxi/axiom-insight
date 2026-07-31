@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.6
 // 	protoc        v5.29.3
-// source: observability.proto
+// source: ir/v1/observability.proto
 
 package observabilityv1
 
@@ -58,11 +58,11 @@ func (x EndpointKind) String() string {
 }
 
 func (EndpointKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_observability_proto_enumTypes[0].Descriptor()
+	return file_ir_v1_observability_proto_enumTypes[0].Descriptor()
 }
 
 func (EndpointKind) Type() protoreflect.EnumType {
-	return &file_observability_proto_enumTypes[0]
+	return &file_ir_v1_observability_proto_enumTypes[0]
 }
 
 func (x EndpointKind) Number() protoreflect.EnumNumber {
@@ -71,7 +71,7 @@ func (x EndpointKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use EndpointKind.Descriptor instead.
 func (EndpointKind) EnumDescriptor() ([]byte, []int) {
-	return file_observability_proto_rawDescGZIP(), []int{0}
+	return file_ir_v1_observability_proto_rawDescGZIP(), []int{0}
 }
 
 // DependencyKind identifies supported external dependency categories.
@@ -120,11 +120,11 @@ func (x DependencyKind) String() string {
 }
 
 func (DependencyKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_observability_proto_enumTypes[1].Descriptor()
+	return file_ir_v1_observability_proto_enumTypes[1].Descriptor()
 }
 
 func (DependencyKind) Type() protoreflect.EnumType {
-	return &file_observability_proto_enumTypes[1]
+	return &file_ir_v1_observability_proto_enumTypes[1]
 }
 
 func (x DependencyKind) Number() protoreflect.EnumNumber {
@@ -133,7 +133,7 @@ func (x DependencyKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use DependencyKind.Descriptor instead.
 func (DependencyKind) EnumDescriptor() ([]byte, []int) {
-	return file_observability_proto_rawDescGZIP(), []int{1}
+	return file_ir_v1_observability_proto_rawDescGZIP(), []int{1}
 }
 
 // CallResolution describes whether a call target was statically resolved.
@@ -170,11 +170,11 @@ func (x CallResolution) String() string {
 }
 
 func (CallResolution) Descriptor() protoreflect.EnumDescriptor {
-	return file_observability_proto_enumTypes[2].Descriptor()
+	return file_ir_v1_observability_proto_enumTypes[2].Descriptor()
 }
 
 func (CallResolution) Type() protoreflect.EnumType {
-	return &file_observability_proto_enumTypes[2]
+	return &file_ir_v1_observability_proto_enumTypes[2]
 }
 
 func (x CallResolution) Number() protoreflect.EnumNumber {
@@ -183,7 +183,7 @@ func (x CallResolution) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use CallResolution.Descriptor instead.
 func (CallResolution) EnumDescriptor() ([]byte, []int) {
-	return file_observability_proto_rawDescGZIP(), []int{2}
+	return file_ir_v1_observability_proto_rawDescGZIP(), []int{2}
 }
 
 // DiagnosticSeverity controls how an analysis diagnostic is presented.
@@ -223,11 +223,11 @@ func (x DiagnosticSeverity) String() string {
 }
 
 func (DiagnosticSeverity) Descriptor() protoreflect.EnumDescriptor {
-	return file_observability_proto_enumTypes[3].Descriptor()
+	return file_ir_v1_observability_proto_enumTypes[3].Descriptor()
 }
 
 func (DiagnosticSeverity) Type() protoreflect.EnumType {
-	return &file_observability_proto_enumTypes[3]
+	return &file_ir_v1_observability_proto_enumTypes[3]
 }
 
 func (x DiagnosticSeverity) Number() protoreflect.EnumNumber {
@@ -236,7 +236,7 @@ func (x DiagnosticSeverity) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use DiagnosticSeverity.Descriptor instead.
 func (DiagnosticSeverity) EnumDescriptor() ([]byte, []int) {
-	return file_observability_proto_rawDescGZIP(), []int{3}
+	return file_ir_v1_observability_proto_rawDescGZIP(), []int{3}
 }
 
 // ObservabilityDocument is the language-neutral compiler output.
@@ -256,7 +256,7 @@ type ObservabilityDocument struct {
 
 func (x *ObservabilityDocument) Reset() {
 	*x = ObservabilityDocument{}
-	mi := &file_observability_proto_msgTypes[0]
+	mi := &file_ir_v1_observability_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -268,7 +268,7 @@ func (x *ObservabilityDocument) String() string {
 func (*ObservabilityDocument) ProtoMessage() {}
 
 func (x *ObservabilityDocument) ProtoReflect() protoreflect.Message {
-	mi := &file_observability_proto_msgTypes[0]
+	mi := &file_ir_v1_observability_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -281,7 +281,7 @@ func (x *ObservabilityDocument) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ObservabilityDocument.ProtoReflect.Descriptor instead.
 func (*ObservabilityDocument) Descriptor() ([]byte, []int) {
-	return file_observability_proto_rawDescGZIP(), []int{0}
+	return file_ir_v1_observability_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ObservabilityDocument) GetSchemaVersion() string {
@@ -355,7 +355,7 @@ type Service struct {
 
 func (x *Service) Reset() {
 	*x = Service{}
-	mi := &file_observability_proto_msgTypes[1]
+	mi := &file_ir_v1_observability_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -367,7 +367,7 @@ func (x *Service) String() string {
 func (*Service) ProtoMessage() {}
 
 func (x *Service) ProtoReflect() protoreflect.Message {
-	mi := &file_observability_proto_msgTypes[1]
+	mi := &file_ir_v1_observability_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -380,7 +380,7 @@ func (x *Service) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Service.ProtoReflect.Descriptor instead.
 func (*Service) Descriptor() ([]byte, []int) {
-	return file_observability_proto_rawDescGZIP(), []int{1}
+	return file_ir_v1_observability_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Service) GetName() string {
@@ -438,7 +438,7 @@ type Package struct {
 
 func (x *Package) Reset() {
 	*x = Package{}
-	mi := &file_observability_proto_msgTypes[2]
+	mi := &file_ir_v1_observability_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -450,7 +450,7 @@ func (x *Package) String() string {
 func (*Package) ProtoMessage() {}
 
 func (x *Package) ProtoReflect() protoreflect.Message {
-	mi := &file_observability_proto_msgTypes[2]
+	mi := &file_ir_v1_observability_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -463,7 +463,7 @@ func (x *Package) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Package.ProtoReflect.Descriptor instead.
 func (*Package) Descriptor() ([]byte, []int) {
-	return file_observability_proto_rawDescGZIP(), []int{2}
+	return file_ir_v1_observability_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Package) GetId() string {
@@ -517,7 +517,7 @@ type Function struct {
 
 func (x *Function) Reset() {
 	*x = Function{}
-	mi := &file_observability_proto_msgTypes[3]
+	mi := &file_ir_v1_observability_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -529,7 +529,7 @@ func (x *Function) String() string {
 func (*Function) ProtoMessage() {}
 
 func (x *Function) ProtoReflect() protoreflect.Message {
-	mi := &file_observability_proto_msgTypes[3]
+	mi := &file_ir_v1_observability_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -542,7 +542,7 @@ func (x *Function) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Function.ProtoReflect.Descriptor instead.
 func (*Function) Descriptor() ([]byte, []int) {
-	return file_observability_proto_rawDescGZIP(), []int{3}
+	return file_ir_v1_observability_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Function) GetId() string {
@@ -662,7 +662,7 @@ type Endpoint struct {
 
 func (x *Endpoint) Reset() {
 	*x = Endpoint{}
-	mi := &file_observability_proto_msgTypes[4]
+	mi := &file_ir_v1_observability_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -674,7 +674,7 @@ func (x *Endpoint) String() string {
 func (*Endpoint) ProtoMessage() {}
 
 func (x *Endpoint) ProtoReflect() protoreflect.Message {
-	mi := &file_observability_proto_msgTypes[4]
+	mi := &file_ir_v1_observability_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -687,7 +687,7 @@ func (x *Endpoint) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Endpoint.ProtoReflect.Descriptor instead.
 func (*Endpoint) Descriptor() ([]byte, []int) {
-	return file_observability_proto_rawDescGZIP(), []int{4}
+	return file_ir_v1_observability_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Endpoint) GetId() string {
@@ -781,7 +781,7 @@ type Dependency struct {
 
 func (x *Dependency) Reset() {
 	*x = Dependency{}
-	mi := &file_observability_proto_msgTypes[5]
+	mi := &file_ir_v1_observability_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -793,7 +793,7 @@ func (x *Dependency) String() string {
 func (*Dependency) ProtoMessage() {}
 
 func (x *Dependency) ProtoReflect() protoreflect.Message {
-	mi := &file_observability_proto_msgTypes[5]
+	mi := &file_ir_v1_observability_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -806,7 +806,7 @@ func (x *Dependency) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Dependency.ProtoReflect.Descriptor instead.
 func (*Dependency) Descriptor() ([]byte, []int) {
-	return file_observability_proto_rawDescGZIP(), []int{5}
+	return file_ir_v1_observability_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Dependency) GetId() string {
@@ -907,7 +907,7 @@ type CallEdge struct {
 
 func (x *CallEdge) Reset() {
 	*x = CallEdge{}
-	mi := &file_observability_proto_msgTypes[6]
+	mi := &file_ir_v1_observability_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -919,7 +919,7 @@ func (x *CallEdge) String() string {
 func (*CallEdge) ProtoMessage() {}
 
 func (x *CallEdge) ProtoReflect() protoreflect.Message {
-	mi := &file_observability_proto_msgTypes[6]
+	mi := &file_ir_v1_observability_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -932,7 +932,7 @@ func (x *CallEdge) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CallEdge.ProtoReflect.Descriptor instead.
 func (*CallEdge) Descriptor() ([]byte, []int) {
-	return file_observability_proto_rawDescGZIP(), []int{6}
+	return file_ir_v1_observability_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *CallEdge) GetId() string {
@@ -983,7 +983,7 @@ type Diagnostic struct {
 
 func (x *Diagnostic) Reset() {
 	*x = Diagnostic{}
-	mi := &file_observability_proto_msgTypes[7]
+	mi := &file_ir_v1_observability_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -995,7 +995,7 @@ func (x *Diagnostic) String() string {
 func (*Diagnostic) ProtoMessage() {}
 
 func (x *Diagnostic) ProtoReflect() protoreflect.Message {
-	mi := &file_observability_proto_msgTypes[7]
+	mi := &file_ir_v1_observability_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1008,7 +1008,7 @@ func (x *Diagnostic) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Diagnostic.ProtoReflect.Descriptor instead.
 func (*Diagnostic) Descriptor() ([]byte, []int) {
-	return file_observability_proto_rawDescGZIP(), []int{7}
+	return file_ir_v1_observability_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Diagnostic) GetSeverity() DiagnosticSeverity {
@@ -1053,7 +1053,7 @@ type SourceLocation struct {
 
 func (x *SourceLocation) Reset() {
 	*x = SourceLocation{}
-	mi := &file_observability_proto_msgTypes[8]
+	mi := &file_ir_v1_observability_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1065,7 +1065,7 @@ func (x *SourceLocation) String() string {
 func (*SourceLocation) ProtoMessage() {}
 
 func (x *SourceLocation) ProtoReflect() protoreflect.Message {
-	mi := &file_observability_proto_msgTypes[8]
+	mi := &file_ir_v1_observability_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1078,7 +1078,7 @@ func (x *SourceLocation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SourceLocation.ProtoReflect.Descriptor instead.
 func (*SourceLocation) Descriptor() ([]byte, []int) {
-	return file_observability_proto_rawDescGZIP(), []int{8}
+	return file_ir_v1_observability_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *SourceLocation) GetRelativePath() string {
@@ -1116,11 +1116,11 @@ func (x *SourceLocation) GetEndColumn() int32 {
 	return 0
 }
 
-var File_observability_proto protoreflect.FileDescriptor
+var File_ir_v1_observability_proto protoreflect.FileDescriptor
 
-const file_observability_proto_rawDesc = "" +
+const file_ir_v1_observability_proto_rawDesc = "" +
 	"\n" +
-	"\x13observability.proto\x12\x13axiom.insight.ir.v1\"\xf0\x03\n" +
+	"\x19ir/v1/observability.proto\x12\x13axiom.insight.ir.v1\"\xf0\x03\n" +
 	"\x15ObservabilityDocument\x12%\n" +
 	"\x0eschema_version\x18\x01 \x01(\tR\rschemaVersion\x126\n" +
 	"\aservice\x18\x02 \x01(\v2\x1c.axiom.insight.ir.v1.ServiceR\aservice\x128\n" +
@@ -1244,20 +1244,20 @@ const file_observability_proto_rawDesc = "" +
 	"\x05ERROR\x10\x03B9Z7github.com/zhuyanxi/axiom-insight/ir/v1;observabilityv1b\x06proto3"
 
 var (
-	file_observability_proto_rawDescOnce sync.Once
-	file_observability_proto_rawDescData []byte
+	file_ir_v1_observability_proto_rawDescOnce sync.Once
+	file_ir_v1_observability_proto_rawDescData []byte
 )
 
-func file_observability_proto_rawDescGZIP() []byte {
-	file_observability_proto_rawDescOnce.Do(func() {
-		file_observability_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_observability_proto_rawDesc), len(file_observability_proto_rawDesc)))
+func file_ir_v1_observability_proto_rawDescGZIP() []byte {
+	file_ir_v1_observability_proto_rawDescOnce.Do(func() {
+		file_ir_v1_observability_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_ir_v1_observability_proto_rawDesc), len(file_ir_v1_observability_proto_rawDesc)))
 	})
-	return file_observability_proto_rawDescData
+	return file_ir_v1_observability_proto_rawDescData
 }
 
-var file_observability_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_observability_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_observability_proto_goTypes = []any{
+var file_ir_v1_observability_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_ir_v1_observability_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_ir_v1_observability_proto_goTypes = []any{
 	(EndpointKind)(0),             // 0: axiom.insight.ir.v1.EndpointKind
 	(DependencyKind)(0),           // 1: axiom.insight.ir.v1.DependencyKind
 	(CallResolution)(0),           // 2: axiom.insight.ir.v1.CallResolution
@@ -1272,7 +1272,7 @@ var file_observability_proto_goTypes = []any{
 	(*Diagnostic)(nil),            // 11: axiom.insight.ir.v1.Diagnostic
 	(*SourceLocation)(nil),        // 12: axiom.insight.ir.v1.SourceLocation
 }
-var file_observability_proto_depIdxs = []int32{
+var file_ir_v1_observability_proto_depIdxs = []int32{
 	5,  // 0: axiom.insight.ir.v1.ObservabilityDocument.service:type_name -> axiom.insight.ir.v1.Service
 	6,  // 1: axiom.insight.ir.v1.ObservabilityDocument.packages:type_name -> axiom.insight.ir.v1.Package
 	7,  // 2: axiom.insight.ir.v1.ObservabilityDocument.functions:type_name -> axiom.insight.ir.v1.Function
@@ -1296,27 +1296,27 @@ var file_observability_proto_depIdxs = []int32{
 	0,  // [0:16] is the sub-list for field type_name
 }
 
-func init() { file_observability_proto_init() }
-func file_observability_proto_init() {
-	if File_observability_proto != nil {
+func init() { file_ir_v1_observability_proto_init() }
+func file_ir_v1_observability_proto_init() {
+	if File_ir_v1_observability_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_observability_proto_rawDesc), len(file_observability_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ir_v1_observability_proto_rawDesc), len(file_ir_v1_observability_proto_rawDesc)),
 			NumEnums:      4,
 			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_observability_proto_goTypes,
-		DependencyIndexes: file_observability_proto_depIdxs,
-		EnumInfos:         file_observability_proto_enumTypes,
-		MessageInfos:      file_observability_proto_msgTypes,
+		GoTypes:           file_ir_v1_observability_proto_goTypes,
+		DependencyIndexes: file_ir_v1_observability_proto_depIdxs,
+		EnumInfos:         file_ir_v1_observability_proto_enumTypes,
+		MessageInfos:      file_ir_v1_observability_proto_msgTypes,
 	}.Build()
-	File_observability_proto = out.File
-	file_observability_proto_goTypes = nil
-	file_observability_proto_depIdxs = nil
+	File_ir_v1_observability_proto = out.File
+	file_ir_v1_observability_proto_goTypes = nil
+	file_ir_v1_observability_proto_depIdxs = nil
 }

@@ -15,6 +15,7 @@ import (
 
 type functionAnalysis struct {
 	functions   []semantic.Function
+	endpoints   []semantic.Endpoint
 	callEdges   []semantic.CallEdge
 	diagnostics []semantic.Diagnostic
 }
@@ -42,11 +43,12 @@ type functionAnalyzer struct {
 	functionIndex    map[string]int
 	functionObjects  map[*types.Func]string
 	functionLiterals map[*ast.FuncLit]string
+	endpoints        []semantic.Endpoint
 	callEdges        []semantic.CallEdge
 	diagnostics      []semantic.Diagnostic
 }
 
-func analyzeFunctions(root string, loaded []*packages.Package, packageIDs map[string]string, includeTests bool) functionAnalysis {
+func analyzeFunctions(root string, loaded []*packages.Package, packageIDs map[string]string, includeTests bool, adapters []EndpointAdapter) functionAnalysis {
 	analyzer := &functionAnalyzer{
 		root:             root,
 		includeTests:     includeTests,
@@ -69,9 +71,11 @@ func analyzeFunctions(root string, loaded []*packages.Package, packageIDs map[st
 		analyzer.collectPackage(pkg)
 	}
 	analyzer.collectCalls()
+	analyzer.collectEndpoints(adapters)
 	analyzer.sortResults()
 	return functionAnalysis{
 		functions:   analyzer.functions,
+		endpoints:   analyzer.endpoints,
 		callEdges:   analyzer.callEdges,
 		diagnostics: analyzer.diagnostics,
 	}
@@ -262,6 +266,9 @@ func (analyzer *functionAnalyzer) sortResults() {
 		sort.Strings(analyzer.functions[index].CallerFunctionIDs)
 		sort.Strings(analyzer.functions[index].CalleeFunctionIDs)
 	}
+	sort.Slice(analyzer.endpoints, func(left, right int) bool {
+		return semantic.EndpointID(analyzer.endpoints[left]) < semantic.EndpointID(analyzer.endpoints[right])
+	})
 	sort.Slice(analyzer.callEdges, func(left, right int) bool {
 		leftID := semantic.CallEdgeID(analyzer.callEdges[left])
 		rightID := semantic.CallEdgeID(analyzer.callEdges[right])

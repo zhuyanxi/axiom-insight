@@ -18,11 +18,12 @@ import (
 const schemaVersion = "v1"
 
 type Options struct {
-	IncludeTests bool
-	ServiceName  string
-	ConfigPath   string
-	Env          []string
-	BuildFlags   []string
+	IncludeTests     bool
+	ServiceName      string
+	ConfigPath       string
+	Env              []string
+	BuildFlags       []string
+	EndpointAdapters []EndpointAdapter
 }
 
 func Analyze(ctx context.Context, sourceRoot string, options Options) (semantic.Document, error) {
@@ -79,8 +80,9 @@ func Analyze(ctx context.Context, sourceRoot string, options Options) (semantic.
 	for _, pkg := range document.Packages {
 		packageIDs[pkg.ImportPath] = semantic.PackageID(pkg)
 	}
-	functionAnalysis := analyzeFunctions(root, loaded, packageIDs, options.IncludeTests)
+	functionAnalysis := analyzeFunctions(root, loaded, packageIDs, options.IncludeTests, options.EndpointAdapters)
 	document.Functions = append(document.Functions, functionAnalysis.functions...)
+	document.Endpoints = append(document.Endpoints, functionAnalysis.endpoints...)
 	document.CallEdges = append(document.CallEdges, functionAnalysis.callEdges...)
 	document.Diagnostics = append(document.Diagnostics, functionAnalysis.diagnostics...)
 	sort.SliceStable(document.Diagnostics, func(left, right int) bool {
