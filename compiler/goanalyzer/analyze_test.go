@@ -458,6 +458,185 @@ func register(cron *cron.Cron, schedule string, job cron.Job) {
 	}
 }
 
+func TestAnalyzeRecognizesSQLDependencies(t *testing.T) {
+	root := writeProject(t, map[string]string{
+		"go.mod": "module example.com/sqlfixture\n\ngo 1.26.1\n",
+		"sql.go": `package sqlfixture
+
+import (
+	"context"
+	"database/sql"
+)
+
+func Run(db *sql.DB, tx *sql.Tx, stmt *sql.Stmt, conn *sql.Conn, query string) {
+	db.Query("SELECT id FROM orders")
+	db.QueryContext(context.Background(), "SELECT id FROM users")
+	db.Exec(query)
+	tx.Prepare("UPDATE orders SET status = 1")
+	stmt.Query("SELECT 1")
+	db.Begin()
+	conn.BeginTx(context.Background(), nil)
+}
+`,
+	})
+
+	document, err := Analyze(context.Background(), root, Options{})
+	if err != nil {
+		t.Fatalf("analyze SQL fixture: %v", err)
+	}
+	run := functionNamed(t, document, "Run")
+	dependencies := dependenciesForKind(document, semantic.DependencyKindSQL)
+	if len(dependencies) != 7 {
+		t.Fatalf("SQL dependency count = %d, want 7: %+v", len(dependencies), dependencies)
+	}
+	if len(run.DependencyIDs) != len(dependencies) {
+		t.Fatalf("Run dependency IDs = %d, want %d: %+v", len(run.DependencyIDs), len(dependencies), run.DependencyIDs)
+	}
+	if !hasDependencyValue(dependencies, "SELECT id FROM orders", true) ||
+		!hasDependencyValue(dependencies, "SELECT id FROM users", true) ||
+		!hasDependencyValue(dependencies, "UPDATE orders SET status = 1", true) ||
+		!hasDependencyValue(dependencies, "SELECT 1", true) {
+		t.Fatalf("missing static SQL dependency: %+v", dependencies)
+	}
+	if !hasDependencyValue(dependencies, "", false) || !hasDiagnostic(document, "DYNAMIC_SQL") {
+		t.Fatalf("missing dynamic SQL dependency or diagnostic: %+v / %+v", dependencies, document.Diagnostics)
+	}
+	for _, dependency := range dependencies {
+		if dependency.FunctionID != run.ID {
+			t.Fatalf("SQL dependency caller = %q, want %q", dependency.FunctionID, run.ID)
+		}
+	}
+}
+
+func TestAnalyzeRecognizesRedisDependenciesByPackageAndType(t *testing.T) {
+	root := writeProject(t, map[string]string{
+		"go.mod": `module example.com/redisfixture
+
+go 1.26.1
+
+require github.com/redis/go-redis/v9 v9.0.0
+
+replace github.com/redis/go-redis/v9 => ./stubs/redis
+`,
+		"stubs/redis/go.mod": "module github.com/redis/go-redis/v9\n\ngo 1.26.1\n",
+		"stubs/redis/redis.go": `package redis
+
+import (
+	"context"
+	"time"
+)
+
+type Client struct{}
+type Cmd struct{}
+
+func (*Client) Get(context.Context, string) *Cmd { return nil }
+func (*Client) Set(context.Context, string, interface{}, time.Duration) *Cmd { return nil }
+`,
+		"redis.go": `package redisfixture
+
+import (
+	"context"
+	"time"
+
+	"github.com/redis/go-redis/v9"
+)
+
+type localClient struct{}
+
+func (localClient) Get(context.Context, string) {}
+
+func Run(client *redis.Client, key string) {
+	client.Get(context.Background(), "orders")
+	client.Set(context.Background(), "orders", "value", time.Minute)
+	client.Get(context.Background(), key)
+	localClient{}.Get(context.Background(), "not-redis")
+}
+`,
+	})
+
+	document, err := Analyze(context.Background(), root, Options{})
+	if err != nil {
+		t.Fatalf("analyze Redis fixture: %v", err)
+	}
+	dependencies := dependenciesForKind(document, semantic.DependencyKindRedis)
+	if len(dependencies) != 3 {
+		t.Fatalf("Redis dependency count = %d, want 3: %+v", len(dependencies), dependencies)
+	}
+	if !hasDependencyValue(dependencies, "orders", true) || !hasDependencyValue(dependencies, "", false) {
+		t.Fatalf("missing static/dynamic Redis dependency: %+v", dependencies)
+	}
+	if hasDependencyValue(dependencies, "not-redis", true) || !hasDiagnostic(document, "DYNAMIC_REDIS_KEY") {
+		t.Fatalf("local same-name method was recognized or dynamic diagnostic missing: %+v / %+v", dependencies, document.Diagnostics)
+	}
+}
+
+func TestAnalyzeRecognizesSaramaKafkaDependencies(t *testing.T) {
+	root := writeProject(t, map[string]string{
+		"go.mod": `module example.com/kafkafixture
+
+go 1.26.1
+
+require github.com/IBM/sarama v0.0.0
+
+replace github.com/IBM/sarama => ./stubs/sarama
+`,
+		"stubs/sarama/go.mod": "module github.com/IBM/sarama\n\ngo 1.26.1\n",
+		"stubs/sarama/sarama.go": `package sarama
+
+import "context"
+
+type ProducerMessage struct { Topic string }
+type SyncProducer interface { SendMessage(*ProducerMessage) (int32, int64, error) }
+type Consumer interface { ConsumePartition(string, int32, int64) (PartitionConsumer, error) }
+type PartitionConsumer interface{}
+type ConsumerGroup interface { Consume(context.Context, []string, ConsumerGroupHandler) error }
+type ConsumerGroupHandler interface{}
+type Config struct{}
+
+func NewConsumerGroup([]string, string, *Config) (ConsumerGroup, error) { return nil, nil }
+`,
+		"kafka.go": `package kafkafixture
+
+import (
+	"context"
+
+	"github.com/IBM/sarama"
+)
+
+func Run(producer sarama.SyncProducer, consumer sarama.Consumer, group sarama.ConsumerGroup, topic, groupName string) {
+	producer.SendMessage(&sarama.ProducerMessage{Topic: "orders"})
+	producer.SendMessage(&sarama.ProducerMessage{Topic: topic})
+	consumer.ConsumePartition("payments", 0, 0)
+	consumer.ConsumePartition(topic, 0, 0)
+	group.Consume(context.Background(), []string{"orders"}, nil)
+	sarama.NewConsumerGroup(nil, "billing", nil)
+	sarama.NewConsumerGroup(nil, groupName, nil)
+}
+`,
+	})
+
+	document, err := Analyze(context.Background(), root, Options{})
+	if err != nil {
+		t.Fatalf("analyze Kafka fixture: %v", err)
+	}
+	producers := dependenciesForKind(document, semantic.DependencyKindKafkaProducer)
+	consumers := dependenciesForKind(document, semantic.DependencyKindKafkaConsumer)
+	if len(producers) != 2 {
+		t.Fatalf("Kafka producer dependency count = %d, want 2: %+v", len(producers), producers)
+	}
+	if len(consumers) != 5 {
+		t.Fatalf("Kafka consumer dependency count = %d, want 5: %+v", len(consumers), consumers)
+	}
+	if !hasDependencyValue(producers, "orders", true) || !hasDependencyValue(producers, "", false) ||
+		!hasDependencyValue(consumers, "payments", true) || !hasDependencyValue(consumers, "billing", true) ||
+		!hasDependencyValue(consumers, "", false) {
+		t.Fatalf("missing Kafka static/dynamic values: producers=%+v consumers=%+v", producers, consumers)
+	}
+	if !hasDiagnostic(document, "DYNAMIC_KAFKA_VALUE") {
+		t.Fatalf("missing dynamic Kafka diagnostic: %+v", document.Diagnostics)
+	}
+}
+
 func writeProject(t *testing.T, files map[string]string) string {
 	t.Helper()
 	root := t.TempDir()
@@ -524,6 +703,25 @@ func hasEndpoint(endpoints []semantic.Endpoint, functionID, method, path string)
 func hasCronEndpoint(endpoints []semantic.Endpoint, functionID, schedule string) bool {
 	for _, endpoint := range endpoints {
 		if endpoint.FunctionID == functionID && endpoint.CronSchedule == schedule {
+			return true
+		}
+	}
+	return false
+}
+
+func dependenciesForKind(document semantic.Document, kind semantic.DependencyKind) []semantic.Dependency {
+	result := make([]semantic.Dependency, 0)
+	for _, dependency := range document.Dependencies {
+		if dependency.Kind == kind {
+			result = append(result, dependency)
+		}
+	}
+	return result
+}
+
+func hasDependencyValue(dependencies []semantic.Dependency, value string, static bool) bool {
+	for _, dependency := range dependencies {
+		if dependency.Value == value && dependency.ValueIsStatic == static {
 			return true
 		}
 	}

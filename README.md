@@ -46,3 +46,15 @@ The initial endpoint adapters recognize:
 Typed `Handle` or `HandleFunc` calls from unsupported router packages produce
 `UNSUPPORTED_HTTP_ROUTER` diagnostics and no guessed endpoint. Custom adapters
 can be passed through `goanalyzer.Options.EndpointAdapters`.
+
+## Dependency Adapter Scope
+
+The initial dependency rules recognize:
+
+- `database/sql` `DB`, `Tx`, `Stmt`, and `Conn` query, execution, preparation, and transaction methods.
+- `github.com/redis/go-redis/v9` `Client`, `Ring`, and `ClusterClient` cache methods.
+- `github.com/IBM/sarama` and `github.com/Shopify/sarama` producer, consumer, and consumer group calls.
+
+Static SQL, Redis keys, Kafka topics, and consumer groups are recorded as values.
+Dynamic values are retained as dependency instances with `ValueIsStatic=false`
+and an analyzer diagnostic.

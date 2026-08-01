@@ -24,6 +24,7 @@ type Options struct {
 	Env              []string
 	BuildFlags       []string
 	EndpointAdapters []EndpointAdapter
+	DependencyRules  []DependencyRule
 }
 
 func Analyze(ctx context.Context, sourceRoot string, options Options) (semantic.Document, error) {
@@ -80,9 +81,10 @@ func Analyze(ctx context.Context, sourceRoot string, options Options) (semantic.
 	for _, pkg := range document.Packages {
 		packageIDs[pkg.ImportPath] = semantic.PackageID(pkg)
 	}
-	functionAnalysis := analyzeFunctions(root, loaded, packageIDs, options.IncludeTests, options.EndpointAdapters)
+	functionAnalysis := analyzeFunctions(root, loaded, packageIDs, options.IncludeTests, options.EndpointAdapters, options.DependencyRules)
 	document.Functions = append(document.Functions, functionAnalysis.functions...)
 	document.Endpoints = append(document.Endpoints, functionAnalysis.endpoints...)
+	document.Dependencies = append(document.Dependencies, functionAnalysis.dependencies...)
 	document.CallEdges = append(document.CallEdges, functionAnalysis.callEdges...)
 	document.Diagnostics = append(document.Diagnostics, functionAnalysis.diagnostics...)
 	sort.SliceStable(document.Diagnostics, func(left, right int) bool {

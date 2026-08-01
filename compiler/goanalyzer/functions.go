@@ -14,10 +14,11 @@ import (
 )
 
 type functionAnalysis struct {
-	functions   []semantic.Function
-	endpoints   []semantic.Endpoint
-	callEdges   []semantic.CallEdge
-	diagnostics []semantic.Diagnostic
+	functions    []semantic.Function
+	endpoints    []semantic.Endpoint
+	dependencies []semantic.Dependency
+	callEdges    []semantic.CallEdge
+	diagnostics  []semantic.Diagnostic
 }
 
 type syntaxFile struct {
@@ -44,11 +45,12 @@ type functionAnalyzer struct {
 	functionObjects  map[*types.Func]string
 	functionLiterals map[*ast.FuncLit]string
 	endpoints        []semantic.Endpoint
+	dependencies     []semantic.Dependency
 	callEdges        []semantic.CallEdge
 	diagnostics      []semantic.Diagnostic
 }
 
-func analyzeFunctions(root string, loaded []*packages.Package, packageIDs map[string]string, includeTests bool, adapters []EndpointAdapter) functionAnalysis {
+func analyzeFunctions(root string, loaded []*packages.Package, packageIDs map[string]string, includeTests bool, adapters []EndpointAdapter, dependencyRules []DependencyRule) functionAnalysis {
 	analyzer := &functionAnalyzer{
 		root:             root,
 		includeTests:     includeTests,
@@ -72,12 +74,14 @@ func analyzeFunctions(root string, loaded []*packages.Package, packageIDs map[st
 	}
 	analyzer.collectCalls()
 	analyzer.collectEndpoints(adapters)
+	analyzer.collectDependencies(dependencyRules)
 	analyzer.sortResults()
 	return functionAnalysis{
-		functions:   analyzer.functions,
-		endpoints:   analyzer.endpoints,
-		callEdges:   analyzer.callEdges,
-		diagnostics: analyzer.diagnostics,
+		functions:    analyzer.functions,
+		endpoints:    analyzer.endpoints,
+		dependencies: analyzer.dependencies,
+		callEdges:    analyzer.callEdges,
+		diagnostics:  analyzer.diagnostics,
 	}
 }
 
@@ -268,6 +272,9 @@ func (analyzer *functionAnalyzer) sortResults() {
 	}
 	sort.Slice(analyzer.endpoints, func(left, right int) bool {
 		return semantic.EndpointID(analyzer.endpoints[left]) < semantic.EndpointID(analyzer.endpoints[right])
+	})
+	sort.Slice(analyzer.dependencies, func(left, right int) bool {
+		return semantic.DependencyID(analyzer.dependencies[left]) < semantic.DependencyID(analyzer.dependencies[right])
 	})
 	sort.Slice(analyzer.callEdges, func(left, right int) bool {
 		leftID := semantic.CallEdgeID(analyzer.callEdges[left])
