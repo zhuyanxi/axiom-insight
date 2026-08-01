@@ -8,6 +8,7 @@ establishes the Go compiler foundation and package boundaries.
 - Go 1.26.1 or compatible newer Go release
 - Protocol Buffers compiler 29.3 or compatible newer release
 - `protoc-gen-go` v1.36.6
+- `protoc-gen-go-grpc` v1.5.1
 
 ## Local Development
 
@@ -22,6 +23,7 @@ Install the Go Protobuf generator before `make generate`:
 
 ```sh
 go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.6
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
 ```
 
 Build the CLI directly:
@@ -77,3 +79,25 @@ handlers, Cron jobs, Kafka consumers, Kafka producers, SQL, Redis, HTTP
 clients, RPC clients, and diagnostics. `goanalyzer.AnalyzeSummary` returns this
 summary with the semantic document; CLI layers should consume it instead of
 revisiting Go AST data.
+
+## Plugin Protocol
+
+`ir/v1/language_analyzer.proto` defines `LanguageAnalyzer.GetMetadata` and
+`LanguageAnalyzer.Analyze`. Metadata reports language, plugin version,
+capabilities, and supported IR schema range. Current Go frontend supports
+schema `v1` only.
+
+`AnalyzeRequest` carries local `source_root`, package `include`/`exclude`
+patterns, inline YAML `config`, schema version, and `include_tests`. Response
+contains `ObservabilityDocument`; top-level `diagnostics` mirrors document
+diagnostics for transport consumers. Diagnostics remain non-fatal when
+analysis can continue.
+
+CLI integration uses `plugins.NewInProcessTransport(nil)` by default; the same
+`Analyzer` contract can move behind gRPC or HashiCorp go-plugin transport.
+No network or external process is required for in-process scans.
+
+Protocol errors use gRPC status codes: `InvalidArgument` for malformed request
+or unusable source root, `FailedPrecondition` for incompatible schema version,
+and `Internal` for semantic-to-IR conversion failure. Schema mismatch is
+checked before analysis.

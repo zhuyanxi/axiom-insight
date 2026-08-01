@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package axiom.insight.ir.v1;
+
+option go_package = "github.com/zhuyanxi/axiom-insight/ir/v1;observabilityv1";
+
+import "ir/v1/observability.proto";
+
+// LanguageAnalyzer exposes a language frontend through a stable protocol.
+service LanguageAnalyzer {
+  // GetMetadata performs optional schema-version handshake.
+  rpc GetMetadata(GetMetadataRequest) returns (LanguageAnalyzerMetadata);
+
+  // Analyze scans source and returns language-neutral IR.
+  rpc Analyze(AnalyzeRequest) returns (AnalyzeResponse);
+}
+
+// GetMetadataRequest optionally constrains the schema version requested by a client.
+message GetMetadataRequest {
+  string schema_version = 1;
+}
+
+// LanguageAnalyzerMetadata describes frontend capabilities and compatible IR versions.
+message LanguageAnalyzerMetadata {
+  string language = 1;
+  string plugin_version = 2;
+  repeated string capabilities = 3;
+  string min_schema_version = 4;
+  string max_schema_version = 5;
+}
+
+// AnalyzeRequest contains offline source-scan inputs.
+message AnalyzeRequest {
+  string source_root = 1;
+  repeated string include = 2;
+  repeated string exclude = 3;
+  string config = 4;
+  string schema_version = 5;
+  bool include_tests = 6;
+}
+
+// AnalyzeResponse contains IR and diagnostics produced by frontend.
+message AnalyzeResponse {
+  ObservabilityDocument document = 1;
+  repeated Diagnostic diagnostics = 2;
+}

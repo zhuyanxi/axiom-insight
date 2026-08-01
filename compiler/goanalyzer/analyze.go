@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -19,8 +20,11 @@ const schemaVersion = "v1"
 
 type Options struct {
 	IncludeTests     bool
+	Include          []string
+	Exclude          []string
 	ServiceName      string
 	ConfigPath       string
+	ConfigYAML       string
 	Env              []string
 	BuildFlags       []string
 	EndpointAdapters []EndpointAdapter
@@ -128,11 +132,73 @@ func loadPackages(ctx context.Context, root string, options Options) ([]*package
 			packages.NeedImports |
 			packages.NeedDeps,
 	}
-	loaded, err := packages.Load(config, "./...")
+	loaded, err := packages.Load(config, packagePatterns(options.Include)...)
 	if err != nil {
 		return nil, fmt.Errorf("load Go packages: %w", err)
 	}
-	return loaded, nil
+	return filterPackages(root, loaded, options.Exclude), nil
+}
+
+func packagePatterns(patterns []string) []string {
+	if len(patterns) == 0 {
+		return []string{"./..."}
+	}
+	result := make([]string, 0, len(patterns))
+	for _, pattern := range patterns {
+		pattern = strings.TrimSpace(pattern)
+		if pattern != "" {
+			result = append(result, pattern)
+		}
+	}
+	if len(result) == 0 {
+		return []string{"./..."}
+	}
+	return result
+}
+
+func filterPackages(root string, loaded []*packages.Package, excludes []string) []*packages.Package {
+	if len(excludes) == 0 {
+		return loaded
+	}
+	filtered := make([]*packages.Package, 0, len(loaded))
+	for _, pkg := range loaded {
+		if !packageMatchesAny(pkg, root, excludes) {
+			filtered = append(filtered, pkg)
+		}
+	}
+	return filtered
+}
+
+func packageMatchesAny(pkg *packages.Package, root string, patterns []string) bool {
+	for _, pattern := range patterns {
+		pattern = strings.TrimSpace(filepath.ToSlash(pattern))
+		pattern = strings.TrimPrefix(pattern, "./")
+		if pattern == "" {
+			continue
+		}
+		if packagePathMatches(pkg.PkgPath, pattern) {
+			return true
+		}
+		for _, file := range append(append([]string{}, pkg.GoFiles...), pkg.CompiledGoFiles...) {
+			relative, err := filepath.Rel(root, file)
+			if err == nil && packagePathMatches(filepath.ToSlash(relative), pattern) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func packagePathMatches(value, pattern string) bool {
+	value = strings.TrimPrefix(filepath.ToSlash(value), "./")
+	if strings.HasSuffix(pattern, "/...") {
+		prefix := strings.TrimSuffix(pattern, "/...")
+		return value == prefix || strings.HasPrefix(value, prefix+"/")
+	}
+	if matched, err := path.Match(pattern, value); err == nil && matched {
+		return true
+	}
+	return value == pattern || strings.HasPrefix(value, pattern+"/")
 }
 
 func packageEnv(root string, extra []string) []string {
@@ -183,7 +249,7 @@ func resolveService(root string, options Options) (string, string, []semantic.Di
 	if configPath == "" {
 		configPath = filepath.Join(root, "si.yaml")
 	}
-	config, diagnostics := readScanConfig(root, configPath)
+	config, diagnostics := readScanConfig(root, configPath, options.ConfigYAML)
 	serviceName := config.Service.Name
 	if serviceName == "" {
 		serviceName = config.ServiceName
@@ -215,23 +281,31 @@ func readModulePath(path string) string {
 	return file.Module.Mod.Path
 }
 
-func readScanConfig(root, path string) (scanConfig, []semantic.Diagnostic) {
-	if !filepath.IsAbs(path) {
-		path = filepath.Join(root, path)
-	}
-	contents, err := os.ReadFile(path)
-	if os.IsNotExist(err) {
-		return scanConfig{}, nil
-	}
-	if err != nil {
-		return scanConfig{}, []semantic.Diagnostic{{
-			Severity: semantic.DiagnosticSeverityWarning,
-			Code:     "CONFIG_READ_ERROR",
-			Message:  fmt.Sprintf("read scan config: %v", err),
-			SourceLocation: semantic.SourceLocation{
-				RelativePath: filepath.Base(path),
-			},
-		}}
+func readScanConfig(root, configPath, inlineConfig string) (scanConfig, []semantic.Diagnostic) {
+	path := configPath
+	var contents []byte
+	if inlineConfig != "" {
+		contents = []byte(inlineConfig)
+		path = "<request config>"
+	} else {
+		if !filepath.IsAbs(path) {
+			path = filepath.Join(root, path)
+		}
+		var err error
+		contents, err = os.ReadFile(path)
+		if os.IsNotExist(err) {
+			return scanConfig{}, nil
+		}
+		if err != nil {
+			return scanConfig{}, []semantic.Diagnostic{{
+				Severity: semantic.DiagnosticSeverityWarning,
+				Code:     "CONFIG_READ_ERROR",
+				Message:  fmt.Sprintf("read scan config: %v", err),
+				SourceLocation: semantic.SourceLocation{
+					RelativePath: filepath.Base(path),
+				},
+			}}
+		}
 	}
 	var config scanConfig
 	if err := yaml.Unmarshal(contents, &config); err != nil {
