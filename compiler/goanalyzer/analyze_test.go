@@ -637,6 +637,158 @@ func Run(producer sarama.SyncProducer, consumer sarama.Consumer, group sarama.Co
 	}
 }
 
+func TestAnalyzeRecognizesHTTPClientDependencies(t *testing.T) {
+	root := writeProject(t, map[string]string{
+		"go.mod": "module example.com/httpclientfixture\n\ngo 1.26.1\n",
+		"http.go": `package httpclientfixture
+
+import (
+	"context"
+	"net/http"
+)
+
+func Handler(http.ResponseWriter, *http.Request) {}
+
+func Run(client *http.Client, target, method string) {
+	http.Get("https://orders.example.test/orders")
+	http.Post(target, "application/json", nil)
+	client.Get("https://users.example.test/users")
+	request, _ := http.NewRequest("POST", "https://billing.example.test/payments", nil)
+	client.Do(request)
+	dynamicRequest, _ := http.NewRequestWithContext(context.Background(), method, target, nil)
+	client.Do(dynamicRequest)
+	http.HandleFunc("/orders", Handler)
+}
+`,
+	})
+
+	document, err := Analyze(context.Background(), root, Options{})
+	if err != nil {
+		t.Fatalf("analyze HTTP client fixture: %v", err)
+	}
+	dependencies := dependenciesForKind(document, semantic.DependencyKindHTTPClient)
+	if len(dependencies) != 5 {
+		t.Fatalf("HTTP client dependency count = %d, want 5: %+v", len(dependencies), dependencies)
+	}
+	if !hasDependencyURL(dependencies, "https://orders.example.test/orders", "get", true) ||
+		!hasDependencyURL(dependencies, "https://users.example.test/users", "get", true) ||
+		!hasDependencyURL(dependencies, "https://billing.example.test/payments", "post", true) {
+		t.Fatalf("missing static HTTP client dependency: %+v", dependencies)
+	}
+	if !hasDependencyURL(dependencies, "", "post", false) || !hasDependencyURL(dependencies, "", "do", false) {
+		t.Fatalf("missing dynamic HTTP URL/method dependency: %+v", dependencies)
+	}
+	for _, dependency := range dependencies {
+		if dependency.TargetPackage != "net/http" {
+			t.Fatalf("HTTP target package = %q, want net/http", dependency.TargetPackage)
+		}
+	}
+	if hasDiagnostic(document, "UNSUPPORTED_HTTP_ROUTER") {
+		t.Fatalf("standard HTTP handler was treated as unsupported router: %+v", document.Diagnostics)
+	}
+	if !hasDiagnostic(document, "DYNAMIC_HTTP_URL") || !hasDiagnostic(document, "DYNAMIC_HTTP_METHOD") {
+		t.Fatalf("missing dynamic HTTP diagnostics: %+v", document.Diagnostics)
+	}
+}
+
+func TestAnalyzeRecognizesGRPCClientDependencies(t *testing.T) {
+	root := writeProject(t, map[string]string{
+		"go.mod": `module example.com/grpcclientfixture
+
+go 1.26.1
+
+require (
+	google.golang.org/grpc v0.0.0
+	example.com/api v0.0.0
+)
+
+replace google.golang.org/grpc => ./stubs/grpc
+replace example.com/api => ./stubs/api
+`,
+		"stubs/grpc/go.mod": "module google.golang.org/grpc\n\ngo 1.26.1\n",
+		"stubs/grpc/grpc.go": `package grpc
+
+import "context"
+
+type ClientConn struct{}
+type CallOption struct{}
+type DialOption struct{}
+
+func Dial(target string, options ...DialOption) (*ClientConn, error) { return nil, nil }
+func DialContext(context.Context, string, ...DialOption) (*ClientConn, error) { return nil, nil }
+`,
+		"stubs/api/go.mod": "module example.com/api\n\ngo 1.26.1\n\nrequire google.golang.org/grpc v0.0.0\n\nreplace google.golang.org/grpc => ../grpc\n",
+		"stubs/api/api.go": `package api
+
+import (
+	"context"
+	"google.golang.org/grpc"
+)
+
+type HelloRequest struct{}
+type HelloReply struct{}
+type GreeterClient interface {
+	SayHello(context.Context, *HelloRequest, ...grpc.CallOption) (*HelloReply, error)
+}
+
+type greeterClient struct{}
+
+func (*greeterClient) SayHello(context.Context, *HelloRequest, ...grpc.CallOption) (*HelloReply, error) {
+	return nil, nil
+}
+
+func NewGreeterClient(*grpc.ClientConn) GreeterClient { return &greeterClient{} }
+`,
+		"client.go": `package grpcclientfixture
+
+import (
+	"context"
+
+	"example.com/api"
+	"google.golang.org/grpc"
+)
+
+type localClient struct{}
+
+func (localClient) SayHello(context.Context, *api.HelloRequest, ...grpc.CallOption) (*api.HelloReply, error) {
+	return nil, nil
+}
+
+func Run(target string) {
+	dynamicConn, _ := grpc.Dial(target)
+	dynamicClient := api.NewGreeterClient(dynamicConn)
+	dynamicClient.SayHello(context.Background(), &api.HelloRequest{})
+
+	staticConn, _ := grpc.Dial("dns:///orders")
+	staticClient := api.NewGreeterClient(staticConn)
+	staticClient.SayHello(context.Background(), &api.HelloRequest{})
+
+	localClient{}.SayHello(context.Background(), &api.HelloRequest{})
+}
+`,
+	})
+
+	document, err := Analyze(context.Background(), root, Options{})
+	if err != nil {
+		t.Fatalf("analyze gRPC client fixture: %v", err)
+	}
+	dependencies := dependenciesForKind(document, semantic.DependencyKindRPCClient)
+	if len(dependencies) != 2 {
+		t.Fatalf("RPC client dependency count = %d, want 2: %+v", len(dependencies), dependencies)
+	}
+	if !hasDependencyTarget(dependencies, "dns:///orders", true) || !hasDependencyTarget(dependencies, "", false) {
+		t.Fatalf("missing static/dynamic gRPC targets: %+v", dependencies)
+	}
+	for _, dependency := range dependencies {
+		if dependency.TargetPackage != "example.com/api" || dependency.Resource != "GreeterClient" {
+			t.Fatalf("RPC dependency identity = %+v", dependency)
+		}
+	}
+	if !hasDiagnostic(document, "DYNAMIC_GRPC_TARGET") {
+		t.Fatalf("missing dynamic gRPC target diagnostic: %+v", document.Diagnostics)
+	}
+}
+
 func writeProject(t *testing.T, files map[string]string) string {
 	t.Helper()
 	root := t.TempDir()
@@ -722,6 +874,24 @@ func dependenciesForKind(document semantic.Document, kind semantic.DependencyKin
 func hasDependencyValue(dependencies []semantic.Dependency, value string, static bool) bool {
 	for _, dependency := range dependencies {
 		if dependency.Value == value && dependency.ValueIsStatic == static {
+			return true
+		}
+	}
+	return false
+}
+
+func hasDependencyURL(dependencies []semantic.Dependency, targetURL, operation string, static bool) bool {
+	for _, dependency := range dependencies {
+		if dependency.TargetURL == targetURL && dependency.Operation == operation && dependency.ValueIsStatic == static {
+			return true
+		}
+	}
+	return false
+}
+
+func hasDependencyTarget(dependencies []semantic.Dependency, target string, static bool) bool {
+	for _, dependency := range dependencies {
+		if dependency.TargetService == target && dependency.ValueIsStatic == static {
 			return true
 		}
 	}

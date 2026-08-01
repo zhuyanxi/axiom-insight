@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/token"
 	"go/types"
+	"net/url"
 	"strings"
 
 	"github.com/zhuyanxi/axiom-insight/compiler/semantic"
@@ -17,16 +18,32 @@ type DependencyRule interface {
 
 // DependencyContext contains typed call information for a dependency rule.
 type DependencyContext struct {
-	Caller         semantic.Function
-	Call           *ast.CallExpr
-	Callee         *types.Func
-	Selection      *types.Selection
-	Info           *types.Info
-	FileSet        *token.FileSet
-	SourceLocation semantic.SourceLocation
-	Receiver       ast.Expr
-	TypeOf         func(ast.Expr) types.Type
-	StaticString   func(ast.Expr) (string, bool)
+	Caller             semantic.Function
+	Call               *ast.CallExpr
+	Callee             *types.Func
+	Selection          *types.Selection
+	Info               *types.Info
+	FileSet            *token.FileSet
+	SourceLocation     semantic.SourceLocation
+	Receiver           ast.Expr
+	TypeOf             func(ast.Expr) types.Type
+	StaticString       func(ast.Expr) (string, bool)
+	ResolveHTTPRequest func(ast.Expr) (HTTPRequest, bool)
+	ResolveGRPCTarget  func(ast.Expr) (GRPCTarget, bool)
+	IsProjectPackage   func(string) bool
+}
+
+type HTTPRequest struct {
+	Method         string
+	URL            string
+	MethodIsStatic bool
+	URLIsStatic    bool
+}
+
+type GRPCTarget struct {
+	Value    string
+	IsStatic bool
+	Known    bool
 }
 
 // DefaultDependencyRules returns built-in SQL, Redis, and Kafka recognizers.
@@ -35,6 +52,8 @@ func DefaultDependencyRules() []DependencyRule {
 		databaseSQLRule{},
 		redisRule{},
 		saramaKafkaRule{},
+		netHTTPClientRule{},
+		grpcClientRule{},
 	}
 }
 
@@ -47,6 +66,8 @@ func (analyzer *functionAnalyzer) collectDependencies(rules []DependencyRule) {
 		if record.body == nil {
 			continue
 		}
+		httpRequests := newHTTPRequestResolver(record.body, record.info)
+		grpcTargets := newGRPCTargetResolver(record.body, record.info)
 		ast.Inspect(record.body, func(node ast.Node) bool {
 			if _, ok := node.(*ast.FuncLit); ok {
 				return false
@@ -73,6 +94,12 @@ func (analyzer *functionAnalyzer) collectDependencies(rules []DependencyRule) {
 				},
 				StaticString: func(expression ast.Expr) (string, bool) {
 					return staticString(record.info, expression)
+				},
+				ResolveHTTPRequest: httpRequests.Resolve,
+				ResolveGRPCTarget:  grpcTargets.Resolve,
+				IsProjectPackage: func(packagePath string) bool {
+					_, exists := analyzer.projectPackages[packagePath]
+					return exists
 				},
 			}
 			for _, rule := range rules {
@@ -428,4 +455,372 @@ func staticStringSlice(context DependencyContext, expression ast.Expr) (string, 
 		values = append(values, value)
 	}
 	return strings.Join(values, ","), true
+}
+
+type httpRequestResolver struct {
+	info     *types.Info
+	bindings map[*types.Var]HTTPRequest
+}
+
+func newHTTPRequestResolver(body *ast.BlockStmt, info *types.Info) *httpRequestResolver {
+	resolver := &httpRequestResolver{info: info, bindings: make(map[*types.Var]HTTPRequest)}
+	if body == nil {
+		return resolver
+	}
+	ast.Inspect(body, func(node ast.Node) bool {
+		if _, ok := node.(*ast.FuncLit); ok {
+			return false
+		}
+		switch current := node.(type) {
+		case *ast.AssignStmt:
+			resolver.bindAssignments(current.Lhs, current.Rhs)
+		case *ast.ValueSpec:
+			left := make([]ast.Expr, len(current.Names))
+			for index, name := range current.Names {
+				left[index] = name
+			}
+			resolver.bindAssignments(left, current.Values)
+		}
+		return true
+	})
+	return resolver
+}
+
+func (resolver *httpRequestResolver) bindAssignments(left []ast.Expr, right []ast.Expr) {
+	if len(right) == 1 && len(left) > 0 {
+		resolver.bind(left[0], right[0])
+		return
+	}
+	for index := 0; index < len(left) && index < len(right); index++ {
+		resolver.bind(left[index], right[index])
+	}
+}
+
+func (resolver *httpRequestResolver) bind(left ast.Expr, right ast.Expr) {
+	variable := variableObject(left, resolver.info)
+	if variable == nil {
+		return
+	}
+	request, ok := resolver.resolve(right)
+	if ok {
+		resolver.bindings[variable] = request
+	}
+}
+
+func (resolver *httpRequestResolver) Resolve(expression ast.Expr) (HTTPRequest, bool) {
+	return resolver.resolve(expression)
+}
+
+func (resolver *httpRequestResolver) resolve(expression ast.Expr) (HTTPRequest, bool) {
+	for {
+		switch current := expression.(type) {
+		case *ast.ParenExpr:
+			expression = current.X
+		case *ast.UnaryExpr:
+			expression = current.X
+		default:
+			goto unwrapped
+		}
+	}
+
+unwrapped:
+	switch current := expression.(type) {
+	case *ast.Ident:
+		if variable := variableObject(current, resolver.info); variable != nil {
+			request, ok := resolver.bindings[variable]
+			return request, ok
+		}
+	case *ast.CallExpr:
+		return httpRequestFromCall(current, resolver.info)
+	}
+	return HTTPRequest{}, false
+}
+
+func httpRequestFromCall(call *ast.CallExpr, info *types.Info) (HTTPRequest, bool) {
+	callee, _ := callTarget(call, info)
+	if callee == nil || functionPackagePath(callee) != "net/http" {
+		return HTTPRequest{}, false
+	}
+	methodIndex, urlIndex := -1, -1
+	switch callee.Name() {
+	case "NewRequest":
+		methodIndex, urlIndex = 0, 1
+	case "NewRequestWithContext":
+		methodIndex, urlIndex = 1, 2
+	default:
+		return HTTPRequest{}, false
+	}
+	if len(call.Args) <= urlIndex {
+		return HTTPRequest{}, false
+	}
+	method, methodStatic := staticString(info, call.Args[methodIndex])
+	targetURL, urlStatic := staticString(info, call.Args[urlIndex])
+	return HTTPRequest{
+		Method:         method,
+		URL:            targetURL,
+		MethodIsStatic: methodStatic,
+		URLIsStatic:    urlStatic,
+	}, true
+}
+
+type grpcTargetResolver struct {
+	info     *types.Info
+	bindings map[*types.Var]GRPCTarget
+}
+
+func newGRPCTargetResolver(body *ast.BlockStmt, info *types.Info) *grpcTargetResolver {
+	resolver := &grpcTargetResolver{info: info, bindings: make(map[*types.Var]GRPCTarget)}
+	if body == nil {
+		return resolver
+	}
+	ast.Inspect(body, func(node ast.Node) bool {
+		if _, ok := node.(*ast.FuncLit); ok {
+			return false
+		}
+		switch current := node.(type) {
+		case *ast.AssignStmt:
+			resolver.bindAssignments(current.Lhs, current.Rhs)
+		case *ast.ValueSpec:
+			left := make([]ast.Expr, len(current.Names))
+			for index, name := range current.Names {
+				left[index] = name
+			}
+			resolver.bindAssignments(left, current.Values)
+		}
+		return true
+	})
+	return resolver
+}
+
+func (resolver *grpcTargetResolver) bindAssignments(left []ast.Expr, right []ast.Expr) {
+	if len(right) == 1 && len(left) > 0 {
+		resolver.bind(left[0], right[0])
+		return
+	}
+	for index := 0; index < len(left) && index < len(right); index++ {
+		resolver.bind(left[index], right[index])
+	}
+}
+
+func (resolver *grpcTargetResolver) bind(left ast.Expr, right ast.Expr) {
+	variable := variableObject(left, resolver.info)
+	if variable == nil {
+		return
+	}
+	target, ok := resolver.resolve(right)
+	if ok {
+		resolver.bindings[variable] = target
+	}
+}
+
+func (resolver *grpcTargetResolver) Resolve(expression ast.Expr) (GRPCTarget, bool) {
+	return resolver.resolve(expression)
+}
+
+func (resolver *grpcTargetResolver) resolve(expression ast.Expr) (GRPCTarget, bool) {
+	for {
+		switch current := expression.(type) {
+		case *ast.ParenExpr:
+			expression = current.X
+		case *ast.UnaryExpr:
+			expression = current.X
+		default:
+			goto unwrapped
+		}
+	}
+
+unwrapped:
+	switch current := expression.(type) {
+	case *ast.Ident:
+		if variable := variableObject(current, resolver.info); variable != nil {
+			target, ok := resolver.bindings[variable]
+			return target, ok
+		}
+	case *ast.CallExpr:
+		return grpcTargetFromCall(current, resolver.info, resolver)
+	}
+	return GRPCTarget{}, false
+}
+
+func grpcTargetFromCall(call *ast.CallExpr, info *types.Info, resolver *grpcTargetResolver) (GRPCTarget, bool) {
+	callee, _ := callTarget(call, info)
+	if callee == nil {
+		return GRPCTarget{}, false
+	}
+	if functionPackagePath(callee) == "google.golang.org/grpc" {
+		argumentIndex := -1
+		switch callee.Name() {
+		case "Dial", "NewClient":
+			argumentIndex = 0
+		case "DialContext":
+			argumentIndex = 1
+		}
+		if argumentIndex >= 0 && len(call.Args) > argumentIndex {
+			value, static := staticString(info, call.Args[argumentIndex])
+			return GRPCTarget{Value: value, IsStatic: static, Known: true}, true
+		}
+	}
+	if strings.HasPrefix(callee.Name(), "New") && strings.HasSuffix(callee.Name(), "Client") && len(call.Args) > 0 {
+		return resolver.resolve(call.Args[0])
+	}
+	return GRPCTarget{}, false
+}
+
+func variableObject(expression ast.Expr, info *types.Info) *types.Var {
+	if info == nil {
+		return nil
+	}
+	identifier, ok := expression.(*ast.Ident)
+	if !ok {
+		return nil
+	}
+	if variable, ok := info.Defs[identifier].(*types.Var); ok {
+		return variable
+	}
+	variable, _ := info.Uses[identifier].(*types.Var)
+	return variable
+}
+
+type netHTTPClientRule struct{}
+
+func (netHTTPClientRule) Name() string { return "net/http-client" }
+
+func (netHTTPClientRule) MatchDependency(context DependencyContext) ([]semantic.Dependency, []semantic.Diagnostic, bool) {
+	if context.Callee == nil || functionPackagePath(context.Callee) != "net/http" {
+		return nil, nil, false
+	}
+	method := context.Callee.Name()
+	receiver := ""
+	if context.Selection == nil {
+		if method != "Get" && method != "Post" {
+			return nil, nil, false
+		}
+	} else {
+		var packagePath string
+		receiver, packagePath = receiverIdentity(context.Selection.Recv())
+		if packagePath != "net/http" || receiver != "Client" || (method != "Do" && method != "Get" && method != "Post") {
+			return nil, nil, false
+		}
+	}
+
+	request, diagnostics := httpClientRequest(context, method)
+	dependency := semantic.Dependency{
+		Kind:           semantic.DependencyKindHTTPClient,
+		Name:           dependencyName("net/http", receiver, method),
+		Operation:      strings.ToLower(request.Method),
+		TargetPackage:  "net/http",
+		TargetURL:      request.URL,
+		TargetService:  httpTargetService(request.URL),
+		Resource:       "url",
+		ValueIsStatic:  request.MethodIsStatic && request.URLIsStatic,
+		SourceLocation: context.SourceLocation,
+	}
+	if dependency.Operation == "" {
+		dependency.Operation = strings.ToLower(method)
+	}
+	if !request.URLIsStatic {
+		diagnostics = append(diagnostics, dependencyDiagnostic("DYNAMIC_HTTP_URL", "HTTP client URL is not a static string", context.SourceLocation))
+	}
+	if !request.MethodIsStatic {
+		diagnostics = append(diagnostics, dependencyDiagnostic("DYNAMIC_HTTP_METHOD", "HTTP client method is not a static string", context.SourceLocation))
+	}
+	return []semantic.Dependency{dependency}, diagnostics, true
+}
+
+func httpClientRequest(context DependencyContext, method string) (HTTPRequest, []semantic.Diagnostic) {
+	if method == "Get" || method == "Post" {
+		request := HTTPRequest{Method: method, MethodIsStatic: true}
+		if len(context.Call.Args) == 0 {
+			request.URLIsStatic = false
+			return request, []semantic.Diagnostic{dependencyDiagnostic("INVALID_HTTP_CLIENT_CALL", "HTTP client call has no URL argument", context.SourceLocation)}
+		}
+		request.URL, request.URLIsStatic = context.StaticString(context.Call.Args[0])
+		return request, nil
+	}
+	if method == "Do" && len(context.Call.Args) > 0 && context.ResolveHTTPRequest != nil {
+		if request, ok := context.ResolveHTTPRequest(context.Call.Args[0]); ok {
+			return request, nil
+		}
+	}
+	return HTTPRequest{Method: "do", MethodIsStatic: false, URLIsStatic: false}, nil
+}
+
+func httpTargetService(targetURL string) string {
+	parsed, err := url.Parse(targetURL)
+	if err != nil {
+		return ""
+	}
+	return parsed.Host
+}
+
+type grpcClientRule struct{}
+
+func (grpcClientRule) Name() string { return "grpc-client" }
+
+func (grpcClientRule) MatchDependency(context DependencyContext) ([]semantic.Dependency, []semantic.Diagnostic, bool) {
+	if context.Callee == nil || context.Selection == nil {
+		return nil, nil, false
+	}
+	packagePath := functionPackagePath(context.Callee)
+	if packagePath == "" || (context.IsProjectPackage != nil && context.IsProjectPackage(packagePath)) {
+		return nil, nil, false
+	}
+	receiver, receiverPackage := receiverIdentity(context.Selection.Recv())
+	if receiverPackage != packagePath || !isGeneratedGRPCClient(context.Callee, receiver) {
+		return nil, nil, false
+	}
+	target := GRPCTarget{}
+	knownTarget := false
+	if context.ResolveGRPCTarget != nil {
+		target, knownTarget = context.ResolveGRPCTarget(context.Receiver)
+	}
+	dependency := semantic.Dependency{
+		Kind:           semantic.DependencyKindRPCClient,
+		Name:           dependencyName(packagePath, receiver, context.Callee.Name()),
+		Operation:      strings.ToLower(context.Callee.Name()),
+		TargetService:  target.Value,
+		TargetPackage:  packagePath,
+		Resource:       receiver,
+		ValueIsStatic:  knownTarget && target.IsStatic,
+		SourceLocation: context.SourceLocation,
+	}
+	var diagnostics []semantic.Diagnostic
+	if knownTarget && !target.IsStatic {
+		diagnostics = append(diagnostics, dependencyDiagnostic("DYNAMIC_GRPC_TARGET", "gRPC client target is not a static string", context.SourceLocation))
+	}
+	return []semantic.Dependency{dependency}, diagnostics, true
+}
+
+func isGeneratedGRPCClient(function *types.Func, receiver string) bool {
+	if function == nil || !strings.HasSuffix(receiver, "Client") {
+		return false
+	}
+	signature, ok := function.Type().(*types.Signature)
+	if !ok || signature.Params().Len() == 0 || signature.Results().Len() < 2 {
+		return false
+	}
+	if !isContextType(signature.Params().At(0).Type()) {
+		return false
+	}
+	return isErrorType(signature.Results().At(signature.Results().Len() - 1).Type())
+}
+
+func isContextType(typ types.Type) bool {
+	named, ok := types.Unalias(typ).(*types.Named)
+	if !ok || named.Obj() == nil || named.Obj().Pkg() == nil {
+		return false
+	}
+	return named.Obj().Pkg().Path() == "context" && named.Obj().Name() == "Context"
+}
+
+func isErrorType(typ types.Type) bool {
+	errorObject := types.Universe.Lookup("error")
+	if errorObject == nil {
+		return false
+	}
+	errorInterface, ok := types.Unalias(errorObject.Type()).Underlying().(*types.Interface)
+	if !ok {
+		return false
+	}
+	return types.Implements(types.Unalias(typ), errorInterface)
 }

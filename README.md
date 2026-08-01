@@ -58,3 +58,14 @@ The initial dependency rules recognize:
 Static SQL, Redis keys, Kafka topics, and consumer groups are recorded as values.
 Dynamic values are retained as dependency instances with `ValueIsStatic=false`
 and an analyzer diagnostic.
+
+## External Client Scope
+
+The initial external client rules recognize:
+
+- Standard library `net/http` package-level `Get`/`Post`, `http.Client` `Do`/`Get`/`Post`, and static request data from `NewRequest` assignments.
+- Generated-style external gRPC client methods with a `*Client` or `Client` receiver, `context.Context` input, and `error` result. Static targets from local `grpc.Dial` bindings are stored in `TargetService`.
+
+Dynamic HTTP URLs, HTTP methods, and gRPC targets remain dependencies with empty
+unknown fields and analyzer diagnostics. Server registration calls are not
+classified as client dependencies.
