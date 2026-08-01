@@ -1,0 +1,32 @@
+{
+  "summary": {
+    "http_handlers": 0,
+    "grpc_handlers": 0,
+    "cron_jobs": 0,
+    "kafka_consumers": 0,
+    "kafka_producers": 0,
+    "sql": 0,
+    "redis": 0,
+    "http_clients": 0,
+    "rpc_clients": 0,
+    "diagnostics": 1
+  },
+  "functions": [
+	{"name": "AddFunc", "receiver": "localCron"},
+	{"name": "SayHello", "receiver": "fakeServer"},
+	{"name": "Job", "receiver": ""},
+    {"name": "Exercise", "receiver": ""},
+    {"name": "Get", "receiver": "localHTTPClient"},
+    {"name": "Get", "receiver": "localRedisClient"},
+    {"name": "HandleFunc", "receiver": "Router"},
+    {"name": "Handler", "receiver": ""},
+    {"name": "SendMessage", "receiver": "localProducer"},
+    {"name": "ConsumePartition", "receiver": "localConsumer"},
+    {"name": "Query", "receiver": "localDB"},
+    {"name": "SayHello", "receiver": "localRPCClient"},
+    {"name": "RegisterFake", "receiver": ""}
+  ],
+  "endpoints": [],
+  "dependencies": [],
+  "diagnostic_codes": ["UNSUPPORTED_HTTP_ROUTER"]
+}

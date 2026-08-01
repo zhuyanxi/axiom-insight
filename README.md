@@ -133,3 +133,18 @@ supported adapters are `net/http`, `github.com/gorilla/mux`, `grpc`, and
 Exit codes: `0` successful scan, including non-fatal diagnostics; `1` scan or
 output failure; `2` invalid path, arguments, format, or configuration. Module
 resolution uses `GOPROXY=off` and `GOSUMDB=off`; scanner makes no network request.
+
+## Offline Fixture Tests
+
+Persistent Phase 0 fixtures live under `testdata/fixtures/`. Each fixture is
+an isolated Go module with local replacement stubs where third-party types are
+needed, plus an `expected.json` semantic snapshot. Run one fixture or all
+fixtures with:
+
+```sh
+go test ./cmd/si-cli -run 'TestScanFixtures/http$'
+go test ./cmd/si-cli -run TestScanFixtures
+```
+
+Recognizer changes must include a positive fixture, a negative non-match case,
+and snapshot updates. Fixture tests do not access network or external services.

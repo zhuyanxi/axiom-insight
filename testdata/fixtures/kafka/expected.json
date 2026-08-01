@@ -1,0 +1,23 @@
+{
+  "summary": {
+    "http_handlers": 0,
+    "grpc_handlers": 0,
+    "cron_jobs": 0,
+    "kafka_consumers": 1,
+    "kafka_producers": 1,
+    "sql": 0,
+    "redis": 0,
+    "http_clients": 0,
+    "rpc_clients": 0,
+    "diagnostics": 4
+  },
+  "functions": [
+    {"name": "Run", "receiver": ""}
+  ],
+  "endpoints": [],
+  "dependencies": [
+    {"kind": "KAFKA_CONSUMER", "name": "github.com/IBM/sarama.Consumer.ConsumePartition", "function": "Run", "operation": "consumepartition", "target_service": "", "target_url": "", "target_package": "github.com/IBM/sarama", "resource": "topic", "value": "payments", "value_is_static": true},
+    {"kind": "KAFKA_PRODUCER", "name": "github.com/IBM/sarama.SyncProducer.SendMessage", "function": "Run", "operation": "sendmessage", "target_service": "", "target_url": "", "target_package": "github.com/IBM/sarama", "resource": "topic", "value": "orders", "value_is_static": true}
+  ],
+  "diagnostic_codes": ["UNRESOLVED_CALL", "UNRESOLVED_CALL", "UNRESOLVED_CALL", "UNRESOLVED_CALL"]
+}

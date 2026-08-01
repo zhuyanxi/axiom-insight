@@ -1,0 +1,22 @@
+{
+  "summary": {
+    "http_handlers": 0,
+    "grpc_handlers": 0,
+    "cron_jobs": 0,
+    "kafka_consumers": 0,
+    "kafka_producers": 0,
+    "sql": 0,
+    "redis": 0,
+    "http_clients": 0,
+    "rpc_clients": 1,
+    "diagnostics": 2
+  },
+  "functions": [
+    {"name": "Run", "receiver": ""}
+  ],
+  "endpoints": [],
+  "dependencies": [
+    {"kind": "RPC_CLIENT", "name": "example.com/api.GreeterClient.SayHello", "function": "Run", "operation": "sayhello", "target_service": "dns:///orders", "target_url": "", "target_package": "example.com/api", "resource": "GreeterClient", "value": "", "value_is_static": true}
+  ],
+  "diagnostic_codes": ["UNRESOLVED_CALL", "UNRESOLVED_CALL"]
+}

@@ -1,0 +1,24 @@
+{
+  "summary": {
+    "http_handlers": 0,
+    "grpc_handlers": 0,
+    "cron_jobs": 0,
+    "kafka_consumers": 0,
+    "kafka_producers": 0,
+    "sql": 0,
+    "redis": 0,
+    "http_clients": 3,
+    "rpc_clients": 0,
+    "diagnostics": 0
+  },
+  "functions": [
+    {"name": "Run", "receiver": ""}
+  ],
+  "endpoints": [],
+  "dependencies": [
+    {"kind": "HTTP_CLIENT", "name": "net/http.Client.Do", "function": "Run", "operation": "post", "target_service": "billing.example.test", "target_url": "https://billing.example.test/payments", "target_package": "net/http", "resource": "url", "value": "", "value_is_static": true},
+    {"kind": "HTTP_CLIENT", "name": "net/http.Client.Get", "function": "Run", "operation": "get", "target_service": "users.example.test", "target_url": "https://users.example.test/users", "target_package": "net/http", "resource": "url", "value": "", "value_is_static": true},
+    {"kind": "HTTP_CLIENT", "name": "net/http.Get", "function": "Run", "operation": "get", "target_service": "orders.example.test", "target_url": "https://orders.example.test/orders", "target_package": "net/http", "resource": "url", "value": "", "value_is_static": true}
+  ],
+  "diagnostic_codes": []
+}

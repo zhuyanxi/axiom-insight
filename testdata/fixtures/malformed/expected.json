@@ -1,0 +1,20 @@
+{
+  "summary": {
+    "http_handlers": 0,
+    "grpc_handlers": 0,
+    "cron_jobs": 0,
+    "kafka_consumers": 0,
+    "kafka_producers": 0,
+    "sql": 0,
+    "redis": 0,
+    "http_clients": 0,
+    "rpc_clients": 0,
+    "diagnostics": 4
+  },
+  "functions": [
+    {"name": "Broken", "receiver": ""}
+  ],
+  "endpoints": [],
+  "dependencies": [],
+  "diagnostic_codes": ["GO_PARSE_ERROR", "GO_PARSE_ERROR", "GO_PARSE_ERROR", "GO_PARSE_ERROR"]
+}

@@ -1,0 +1,23 @@
+{
+  "summary": {
+    "http_handlers": 0,
+    "grpc_handlers": 0,
+    "cron_jobs": 1,
+    "kafka_consumers": 0,
+    "kafka_producers": 0,
+    "sql": 0,
+    "redis": 0,
+    "http_clients": 0,
+    "rpc_clients": 0,
+    "diagnostics": 0
+  },
+  "functions": [
+    {"name": "Cleanup", "receiver": ""},
+    {"name": "Register", "receiver": ""}
+  ],
+  "endpoints": [
+    {"kind": "CRON_JOB", "name": "Cleanup", "function": "Cleanup", "http_method": "", "http_path": "", "grpc_service": "", "grpc_method": "", "cron_schedule": "@hourly"}
+  ],
+  "dependencies": [],
+  "diagnostic_codes": []
+}

@@ -1,0 +1,24 @@
+{
+  "summary": {
+    "http_handlers": 2,
+    "grpc_handlers": 0,
+    "cron_jobs": 0,
+    "kafka_consumers": 0,
+    "kafka_producers": 0,
+    "sql": 0,
+    "redis": 0,
+    "http_clients": 0,
+    "rpc_clients": 0,
+    "diagnostics": 0
+  },
+  "functions": [
+    {"name": "Orders", "receiver": ""},
+    {"name": "Register", "receiver": ""}
+  ],
+  "endpoints": [
+    {"kind": "HTTP_HANDLER", "name": "Orders", "function": "Orders", "http_method": "", "http_path": "/users", "grpc_service": "", "grpc_method": "", "cron_schedule": ""},
+    {"kind": "HTTP_HANDLER", "name": "Orders", "function": "Orders", "http_method": "GET", "http_path": "/orders", "grpc_service": "", "grpc_method": "", "cron_schedule": ""}
+  ],
+  "dependencies": [],
+  "diagnostic_codes": []
+}

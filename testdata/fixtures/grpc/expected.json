@@ -1,0 +1,23 @@
+{
+  "summary": {
+    "http_handlers": 0,
+    "grpc_handlers": 1,
+    "cron_jobs": 0,
+    "kafka_consumers": 0,
+    "kafka_producers": 0,
+    "sql": 0,
+    "redis": 0,
+    "http_clients": 0,
+    "rpc_clients": 0,
+    "diagnostics": 0
+  },
+  "functions": [
+    {"name": "Register", "receiver": ""},
+    {"name": "SayHello", "receiver": "server"}
+  ],
+  "endpoints": [
+    {"kind": "GRPC_HANDLER", "name": "Greeter.SayHello", "function": "server.SayHello", "http_method": "", "http_path": "", "grpc_service": "Greeter", "grpc_method": "SayHello", "cron_schedule": ""}
+  ],
+  "dependencies": [],
+  "diagnostic_codes": []
+}
