@@ -135,4 +135,6 @@ coverage.out
 *.cpu.out
 *.mem.out
 
-docs/
+!docs/
+docs/*
+!docs/phase-0-release-checklist.md

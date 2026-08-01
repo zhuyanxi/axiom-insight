@@ -18,17 +18,24 @@ import (
 )
 
 const (
-	exitScanError  = 1
-	exitUsageError = 2
+	exitScanError          = 1
+	exitUsageError         = 2
+	defaultCLIVersion      = "v0.1.0"
+	cliUsageMessageCode    = "CLI_INVALID_ARGUMENT"
+	cliScanMessageCode     = "CLI_SCAN_ERROR"
+	cliInternalMessageCode = "CLI_INTERNAL_ERROR"
 )
 
+var cliVersion = defaultCLIVersion
+
 type commandError struct {
-	code int
-	err  error
+	exitCode    int
+	messageCode string
+	err         error
 }
 
 func (failure *commandError) Error() string {
-	return failure.err.Error()
+	return fmt.Sprintf("%s: %v", failure.messageCode, failure.err)
 }
 
 func (failure *commandError) Unwrap() error {
@@ -42,6 +49,7 @@ type scanOptions struct {
 	include      []string
 	exclude      []string
 	includeTests bool
+	version      bool
 }
 
 type scanConfig struct {
@@ -90,12 +98,11 @@ func run(args []string, stdout, stderr io.Writer) int {
 	command.SetArgs(args)
 	if err := command.Execute(); err != nil {
 		var failure *commandError
-		code := exitUsageError
-		if errors.As(err, &failure) {
-			code = failure.code
+		if !errors.As(err, &failure) {
+			failure = internalFailure(err)
 		}
-		fmt.Fprintln(stderr, err)
-		return code
+		fmt.Fprintln(stderr, failure)
+		return failure.exitCode
 	}
 	return 0
 }
@@ -139,11 +146,16 @@ func newRootCommand(stdout, stderr io.Writer) *cobra.Command {
 	scan.Flags().StringSliceVar(&options.include, "include", nil, "package patterns to include")
 	scan.Flags().StringSliceVar(&options.exclude, "exclude", nil, "package patterns to exclude")
 	scan.Flags().BoolVar(&options.includeTests, "include-tests", false, "include Go test files")
+	scan.Flags().BoolVar(&options.version, "version", false, "print CLI and IR schema versions")
 	root.AddCommand(scan)
 	return root
 }
 
 func executeScan(command *cobra.Command, args []string, options scanOptions) error {
+	if options.version {
+		fmt.Fprintf(command.OutOrStdout(), "si version: %s\nir_schema_version: %s\n", cliVersion, plugins.CurrentSchemaVersion)
+		return nil
+	}
 	format := strings.ToLower(strings.TrimSpace(options.format))
 	if format != "text" && format != "json" {
 		return usageFailure(fmt.Errorf("unsupported format %q; use text or json", options.format))
@@ -377,9 +389,13 @@ func jsonSummaryItems(summary semantic.ScanSummary) []jsonSummaryItem {
 }
 
 func usageFailure(err error) error {
-	return &commandError{code: exitUsageError, err: err}
+	return &commandError{exitCode: exitUsageError, messageCode: cliUsageMessageCode, err: err}
 }
 
 func scanFailure(err error) error {
-	return &commandError{code: exitScanError, err: err}
+	return &commandError{exitCode: exitScanError, messageCode: cliScanMessageCode, err: err}
+}
+
+func internalFailure(err error) *commandError {
+	return &commandError{exitCode: exitScanError, messageCode: cliInternalMessageCode, err: err}
 }

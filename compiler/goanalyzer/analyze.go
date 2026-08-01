@@ -62,7 +62,7 @@ func Analyze(ctx context.Context, sourceRoot string, options Options) (semantic.
 		if adapterErr != nil {
 			document.Diagnostics = append(document.Diagnostics, semantic.Diagnostic{
 				Severity: semantic.DiagnosticSeverityError,
-				Code:     "INVALID_CONFIG",
+				Code:     semantic.DiagnosticCodeInvalidConfig,
 				Message:  adapterErr.Error(),
 			})
 			endpointAdapters = []EndpointAdapter{}
@@ -377,7 +377,7 @@ func readScanConfig(root, configPath, inlineConfig string) (scanConfig, []semant
 		if err != nil {
 			return scanConfig{}, []semantic.Diagnostic{{
 				Severity: semantic.DiagnosticSeverityWarning,
-				Code:     "CONFIG_READ_ERROR",
+				Code:     semantic.DiagnosticCodeConfigReadError,
 				Message:  fmt.Sprintf("read scan config: %v", err),
 				SourceLocation: semantic.SourceLocation{
 					RelativePath: filepath.Base(path),
@@ -389,7 +389,7 @@ func readScanConfig(root, configPath, inlineConfig string) (scanConfig, []semant
 	if err := yaml.Unmarshal(contents, &config); err != nil {
 		return scanConfig{}, []semantic.Diagnostic{{
 			Severity: semantic.DiagnosticSeverityError,
-			Code:     "INVALID_CONFIG",
+			Code:     semantic.DiagnosticCodeInvalidConfig,
 			Message:  fmt.Sprintf("parse scan config: %v", err),
 			SourceLocation: semantic.SourceLocation{
 				RelativePath: filepath.Base(path),
@@ -443,9 +443,9 @@ func isExcludedPath(path string) bool {
 func packageDiagnostics(root string, pkg *packages.Package) []semantic.Diagnostic {
 	diagnostics := make([]semantic.Diagnostic, 0, len(pkg.Errors))
 	for _, packageError := range pkg.Errors {
-		code := "PACKAGE_LOAD_ERROR"
+		code := semantic.DiagnosticCodePackageLoadError
 		if packageError.Kind == packages.ParseError {
-			code = "GO_PARSE_ERROR"
+			code = semantic.DiagnosticCodeGoParseError
 		}
 		diagnostics = append(diagnostics, semantic.Diagnostic{
 			Severity:       semantic.DiagnosticSeverityError,

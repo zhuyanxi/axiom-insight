@@ -101,7 +101,7 @@ func ToIR(document Document) (*observabilityv1.ObservabilityDocument, error) {
 		if !known {
 			diagnostics = append(diagnostics, Diagnostic{
 				Severity:       DiagnosticSeverityWarning,
-				Code:           "UNKNOWN_ENDPOINT_KIND",
+				Code:           DiagnosticCodeUnknownEndpointKind,
 				Message:        fmt.Sprintf("endpoint %q has unsupported kind %q", endpoint.Name, endpoint.Kind),
 				SourceLocation: endpoint.SourceLocation,
 			})
@@ -128,7 +128,7 @@ func ToIR(document Document) (*observabilityv1.ObservabilityDocument, error) {
 		if !known {
 			diagnostics = append(diagnostics, Diagnostic{
 				Severity:       DiagnosticSeverityWarning,
-				Code:           "UNKNOWN_DEPENDENCY_KIND",
+				Code:           DiagnosticCodeUnknownDependencyKind,
 				Message:        fmt.Sprintf("dependency %q has unsupported kind %q", dependency.Name, dependency.Kind),
 				SourceLocation: dependency.SourceLocation,
 			})
@@ -157,7 +157,7 @@ func ToIR(document Document) (*observabilityv1.ObservabilityDocument, error) {
 		if !known {
 			diagnostics = append(diagnostics, Diagnostic{
 				Severity:       DiagnosticSeverityWarning,
-				Code:           "UNKNOWN_CALL_RESOLUTION",
+				Code:           DiagnosticCodeUnknownCallResolution,
 				Message:        fmt.Sprintf("call edge %q has unsupported resolution %q", edge.ID, edge.Resolution),
 				SourceLocation: edge.SourceLocation,
 			})
@@ -165,7 +165,7 @@ func ToIR(document Document) (*observabilityv1.ObservabilityDocument, error) {
 		if edge.CalleeFunctionID == "" || edge.Resolution == CallResolutionUnresolved {
 			diagnostics = append(diagnostics, Diagnostic{
 				Severity:       DiagnosticSeverityWarning,
-				Code:           "UNRESOLVED_CALL",
+				Code:           DiagnosticCodeUnresolvedCall,
 				Message:        "call target could not be resolved statically",
 				SourceLocation: edge.SourceLocation,
 			})
@@ -241,7 +241,7 @@ func convertLocation(location SourceLocation, sourceRoot string, diagnostics *[]
 		if diagnostics != nil {
 			*diagnostics = append(*diagnostics, Diagnostic{
 				Severity: DiagnosticSeverityWarning,
-				Code:     "MISSING_SOURCE_LOCATION",
+				Code:     DiagnosticCodeMissingSourceLocation,
 				Message:  owner + " has no source location",
 			})
 		}
@@ -253,7 +253,7 @@ func convertLocation(location SourceLocation, sourceRoot string, diagnostics *[]
 		if diagnostics != nil {
 			*diagnostics = append(*diagnostics, Diagnostic{
 				Severity:       DiagnosticSeverityError,
-				Code:           "INVALID_SOURCE_PATH",
+				Code:           DiagnosticCodeInvalidSourcePath,
 				Message:        owner + " source path must be relative to source root",
 				SourceLocation: SourceLocation{RelativePath: ""},
 			})

@@ -3,16 +3,24 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
 
+func TestCommandErrorIncludesStableMessageCode(t *testing.T) {
+	err := internalFailure(errors.New("unexpected failure"))
+	if got, want := err.Error(), cliInternalMessageCode+": unexpected failure"; got != want {
+		t.Fatalf("error = %q, want %q", got, want)
+	}
+}
+
 func TestRunScanPrintsStableTextSummary(t *testing.T) {
 	root := writeCLIProject(t, map[string]string{
-		"go.mod": "module example.com/cli-text\n\ngo 1.26.1\n",
-		"run.go": "package clitext\n\nfunc Run() {}\n",
+		"go.mod":  "module example.com/cli-text\n\ngo 1.26.1\n",
+		"run.go":  "package clitext\n\nfunc Run() {}\n",
 		"si.yaml": "service:\n  name: cli-text-service\n",
 	})
 
@@ -43,6 +51,21 @@ func TestRunScanPrintsStableTextSummary(t *testing.T) {
 		if !strings.Contains(output, name+": 0") {
 			t.Fatalf("text output missing zero summary %q: %s", name, output)
 		}
+	}
+}
+
+func TestRunScanVersionPrintsCLIVersionAndIRSchemaVersion(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	code := run([]string{"scan", "--version"}, &stdout, &stderr)
+	if code != 0 {
+		t.Fatalf("exit code = %d, want 0; stderr = %s", code, stderr.String())
+	}
+	if stderr.Len() != 0 {
+		t.Fatalf("stderr = %q, want empty", stderr.String())
+	}
+	want := "si version: " + defaultCLIVersion + "\nir_schema_version: v1\n"
+	if stdout.String() != want {
+		t.Fatalf("version output = %q, want %q", stdout.String(), want)
 	}
 }
 
@@ -136,6 +159,9 @@ func TestRunScanRejectsInvalidPathWithUsageExitCode(t *testing.T) {
 	if !strings.Contains(stderr.String(), "invalid source path") {
 		t.Fatalf("stderr = %q, want invalid source path", stderr.String())
 	}
+	if !strings.Contains(stderr.String(), cliUsageMessageCode) {
+		t.Fatalf("stderr = %q, want message code %s", stderr.String(), cliUsageMessageCode)
+	}
 }
 
 func TestRunScanRejectsInvalidConfigWithUsageExitCode(t *testing.T) {
@@ -153,6 +179,9 @@ func TestRunScanRejectsInvalidConfigWithUsageExitCode(t *testing.T) {
 	if !strings.Contains(stderr.String(), "only go is available") {
 		t.Fatalf("stderr = %q, want language validation error", stderr.String())
 	}
+	if !strings.Contains(stderr.String(), cliUsageMessageCode) {
+		t.Fatalf("stderr = %q, want message code %s", stderr.String(), cliUsageMessageCode)
+	}
 }
 
 func TestRunScanOutputWriteFailureUsesScanExitCode(t *testing.T) {
@@ -168,6 +197,9 @@ func TestRunScanOutputWriteFailureUsesScanExitCode(t *testing.T) {
 	}
 	if !strings.Contains(stderr.String(), "write scan result") {
 		t.Fatalf("stderr = %q, want write failure", stderr.String())
+	}
+	if !strings.Contains(stderr.String(), cliScanMessageCode) {
+		t.Fatalf("stderr = %q, want message code %s", stderr.String(), cliScanMessageCode)
 	}
 }
 

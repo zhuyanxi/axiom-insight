@@ -210,13 +210,13 @@ func (databaseSQLRule) MatchDependency(context DependencyContext) ([]semantic.De
 	}
 	if argumentIndex >= 0 {
 		if len(context.Call.Args) <= argumentIndex {
-			return []semantic.Dependency{dependency}, []semantic.Diagnostic{dependencyDiagnostic("MISSING_SQL_QUERY", "SQL call has no query argument", context.SourceLocation)}, true
+			return []semantic.Dependency{dependency}, []semantic.Diagnostic{dependencyDiagnostic(semantic.DiagnosticCodeMissingSQLQuery, "SQL call has no query argument", context.SourceLocation)}, true
 		}
 		value, static := context.StaticString(context.Call.Args[argumentIndex])
 		dependency.Value = value
 		dependency.ValueIsStatic = static
 		if !static {
-			return []semantic.Dependency{dependency}, []semantic.Diagnostic{dependencyDiagnostic("DYNAMIC_SQL", "SQL text is not a static string", context.SourceLocation)}, true
+			return []semantic.Dependency{dependency}, []semantic.Diagnostic{dependencyDiagnostic(semantic.DiagnosticCodeDynamicSQL, "SQL text is not a static string", context.SourceLocation)}, true
 		}
 	}
 	return []semantic.Dependency{dependency}, nil, true
@@ -268,7 +268,7 @@ func (redisRule) MatchDependency(context DependencyContext) ([]semantic.Dependen
 	dependency.Value = key
 	dependency.ValueIsStatic = static
 	if !static {
-		return []semantic.Dependency{dependency}, []semantic.Diagnostic{dependencyDiagnostic("DYNAMIC_REDIS_KEY", "Redis key is not a static string", context.SourceLocation)}, true
+		return []semantic.Dependency{dependency}, []semantic.Diagnostic{dependencyDiagnostic(semantic.DiagnosticCodeDynamicRedisKey, "Redis key is not a static string", context.SourceLocation)}, true
 	}
 	return []semantic.Dependency{dependency}, nil, true
 }
@@ -351,7 +351,7 @@ func (saramaKafkaRule) MatchDependency(context DependencyContext) ([]semantic.De
 		SourceLocation: context.SourceLocation,
 	}
 	if !static {
-		return []semantic.Dependency{dependency}, []semantic.Diagnostic{dependencyDiagnostic("DYNAMIC_KAFKA_VALUE", "Kafka topic or consumer group is not a static string", context.SourceLocation)}, true
+		return []semantic.Dependency{dependency}, []semantic.Diagnostic{dependencyDiagnostic(semantic.DiagnosticCodeDynamicKafkaValue, "Kafka topic or consumer group is not a static string", context.SourceLocation)}, true
 	}
 	return []semantic.Dependency{dependency}, nil, true
 }
@@ -372,7 +372,7 @@ func saramaFactoryDependency(context DependencyContext, packagePath string) ([]s
 		SourceLocation: context.SourceLocation,
 	}
 	if !static {
-		return []semantic.Dependency{dependency}, []semantic.Diagnostic{dependencyDiagnostic("DYNAMIC_KAFKA_VALUE", "Kafka consumer group is not a static string", context.SourceLocation)}, true
+		return []semantic.Dependency{dependency}, []semantic.Diagnostic{dependencyDiagnostic(semantic.DiagnosticCodeDynamicKafkaValue, "Kafka consumer group is not a static string", context.SourceLocation)}, true
 	}
 	return []semantic.Dependency{dependency}, nil, true
 }
@@ -719,10 +719,10 @@ func (netHTTPClientRule) MatchDependency(context DependencyContext) ([]semantic.
 		dependency.Operation = strings.ToLower(method)
 	}
 	if !request.URLIsStatic {
-		diagnostics = append(diagnostics, dependencyDiagnostic("DYNAMIC_HTTP_URL", "HTTP client URL is not a static string", context.SourceLocation))
+		diagnostics = append(diagnostics, dependencyDiagnostic(semantic.DiagnosticCodeDynamicHTTPURL, "HTTP client URL is not a static string", context.SourceLocation))
 	}
 	if !request.MethodIsStatic {
-		diagnostics = append(diagnostics, dependencyDiagnostic("DYNAMIC_HTTP_METHOD", "HTTP client method is not a static string", context.SourceLocation))
+		diagnostics = append(diagnostics, dependencyDiagnostic(semantic.DiagnosticCodeDynamicHTTPMethod, "HTTP client method is not a static string", context.SourceLocation))
 	}
 	return []semantic.Dependency{dependency}, diagnostics, true
 }
@@ -732,7 +732,7 @@ func httpClientRequest(context DependencyContext, method string) (HTTPRequest, [
 		request := HTTPRequest{Method: method, MethodIsStatic: true}
 		if len(context.Call.Args) == 0 {
 			request.URLIsStatic = false
-			return request, []semantic.Diagnostic{dependencyDiagnostic("INVALID_HTTP_CLIENT_CALL", "HTTP client call has no URL argument", context.SourceLocation)}
+			return request, []semantic.Diagnostic{dependencyDiagnostic(semantic.DiagnosticCodeInvalidHTTPClientCall, "HTTP client call has no URL argument", context.SourceLocation)}
 		}
 		request.URL, request.URLIsStatic = context.StaticString(context.Call.Args[0])
 		return request, nil
@@ -786,7 +786,7 @@ func (grpcClientRule) MatchDependency(context DependencyContext) ([]semantic.Dep
 	}
 	var diagnostics []semantic.Diagnostic
 	if knownTarget && !target.IsStatic {
-		diagnostics = append(diagnostics, dependencyDiagnostic("DYNAMIC_GRPC_TARGET", "gRPC client target is not a static string", context.SourceLocation))
+		diagnostics = append(diagnostics, dependencyDiagnostic(semantic.DiagnosticCodeDynamicGRPCTarget, "gRPC client target is not a static string", context.SourceLocation))
 	}
 	return []semantic.Dependency{dependency}, diagnostics, true
 }

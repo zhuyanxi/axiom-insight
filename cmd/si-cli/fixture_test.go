@@ -242,7 +242,7 @@ func fixtureDependencyKey(dependency fixtureDependencySnapshot) string {
 	return dependency.Kind + ":" + dependency.Function + ":" + dependency.Name + ":" + dependency.Operation + ":" + dependency.TargetService + ":" + dependency.TargetURL + ":" + dependency.TargetPackage + ":" + dependency.Resource + ":" + dependency.Value
 }
 
-func phase0FixturesRoot(t *testing.T) string {
+func phase0FixturesRoot(t testing.TB) string {
 	t.Helper()
 	_, file, _, ok := runtime.Caller(0)
 	if !ok {

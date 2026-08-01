@@ -276,16 +276,16 @@ func (netHTTPAdapter) MatchEndpoint(context EndpointContext) ([]semantic.Endpoin
 		return nil, nil, false
 	}
 	if len(context.Call.Args) < 2 {
-		return nil, []semantic.Diagnostic{endpointDiagnostic("INVALID_HTTP_REGISTRATION", "HTTP registration requires pattern and handler", context.SourceLocation)}, true
+		return nil, []semantic.Diagnostic{endpointDiagnostic(semantic.DiagnosticCodeInvalidHTTPRegistration, "HTTP registration requires pattern and handler", context.SourceLocation)}, true
 	}
 	pattern, static := context.StaticString(context.Call.Args[0])
 	var diagnostics []semantic.Diagnostic
 	if !static {
-		diagnostics = append(diagnostics, endpointDiagnostic("DYNAMIC_HTTP_PATTERN", "HTTP pattern is not a static string", context.SourceLocation))
+		diagnostics = append(diagnostics, endpointDiagnostic(semantic.DiagnosticCodeDynamicHTTPPattern, "HTTP pattern is not a static string", context.SourceLocation))
 	}
 	function, ok := resolveHTTPHandler(context, context.Call.Args[1])
 	if !ok {
-		diagnostics = append(diagnostics, endpointDiagnostic("UNRESOLVED_HTTP_HANDLER", "HTTP handler could not be resolved statically", context.SourceLocation))
+		diagnostics = append(diagnostics, endpointDiagnostic(semantic.DiagnosticCodeUnresolvedHTTPHandler, "HTTP handler could not be resolved statically", context.SourceLocation))
 		return nil, diagnostics, true
 	}
 	method, path := parseHTTPPattern(pattern)
@@ -309,16 +309,16 @@ func (gorillaMuxAdapter) MatchEndpoint(context EndpointContext) ([]semantic.Endp
 		return nil, nil, false
 	}
 	if len(context.Call.Args) < 2 {
-		return nil, []semantic.Diagnostic{endpointDiagnostic("INVALID_HTTP_REGISTRATION", "HTTP registration requires pattern and handler", context.SourceLocation)}, true
+		return nil, []semantic.Diagnostic{endpointDiagnostic(semantic.DiagnosticCodeInvalidHTTPRegistration, "HTTP registration requires pattern and handler", context.SourceLocation)}, true
 	}
 	pattern, static := context.StaticString(context.Call.Args[0])
 	var diagnostics []semantic.Diagnostic
 	if !static {
-		diagnostics = append(diagnostics, endpointDiagnostic("DYNAMIC_HTTP_PATTERN", "HTTP pattern is not a static string", context.SourceLocation))
+		diagnostics = append(diagnostics, endpointDiagnostic(semantic.DiagnosticCodeDynamicHTTPPattern, "HTTP pattern is not a static string", context.SourceLocation))
 	}
 	function, ok := resolveHTTPHandler(context, context.Call.Args[1])
 	if !ok {
-		diagnostics = append(diagnostics, endpointDiagnostic("UNRESOLVED_HTTP_HANDLER", "HTTP handler could not be resolved statically", context.SourceLocation))
+		diagnostics = append(diagnostics, endpointDiagnostic(semantic.DiagnosticCodeUnresolvedHTTPHandler, "HTTP handler could not be resolved statically", context.SourceLocation))
 		return nil, diagnostics, true
 	}
 	method := gorillaMethod(context)
@@ -352,12 +352,12 @@ func (grpcAdapter) MatchEndpoint(context EndpointContext) ([]semantic.Endpoint, 
 		return nil, nil, false
 	}
 	if len(context.Call.Args) < 2 {
-		return nil, []semantic.Diagnostic{endpointDiagnostic("INVALID_GRPC_REGISTRATION", "gRPC registration requires registrar and server", context.SourceLocation)}, true
+		return nil, []semantic.Diagnostic{endpointDiagnostic(semantic.DiagnosticCodeInvalidGRPCRegistration, "gRPC registration requires registrar and server", context.SourceLocation)}, true
 	}
 	serverType := context.TypeOf(context.Call.Args[1])
 	serverInterface := types.Unalias(serverType)
 	if serverInterface == nil || isInterfaceType(serverInterface) {
-		return nil, []semantic.Diagnostic{endpointDiagnostic("UNRESOLVED_GRPC_SERVER", "gRPC server implementation could not be resolved statically", context.SourceLocation)}, true
+		return nil, []semantic.Diagnostic{endpointDiagnostic(semantic.DiagnosticCodeUnresolvedGRPCServer, "gRPC server implementation could not be resolved statically", context.SourceLocation)}, true
 	}
 	interfaceType := types.Unalias(signature.Params().At(1).Type()).Underlying().(*types.Interface)
 	endpoints := make([]semantic.Endpoint, 0, interfaceType.NumMethods())
@@ -366,7 +366,7 @@ func (grpcAdapter) MatchEndpoint(context EndpointContext) ([]semantic.Endpoint, 
 		method := interfaceType.Method(index)
 		function, found := context.FunctionForMethod(serverType, method.Name())
 		if !found {
-			diagnostics = append(diagnostics, endpointDiagnostic("UNRESOLVED_GRPC_METHOD", "gRPC server method could not be resolved statically: "+method.Name(), context.SourceLocation))
+			diagnostics = append(diagnostics, endpointDiagnostic(semantic.DiagnosticCodeUnresolvedGRPCMethod, "gRPC server method could not be resolved statically: "+method.Name(), context.SourceLocation))
 			continue
 		}
 		endpoints = append(endpoints, semantic.Endpoint{
@@ -379,7 +379,7 @@ func (grpcAdapter) MatchEndpoint(context EndpointContext) ([]semantic.Endpoint, 
 		})
 	}
 	if len(endpoints) == 0 && len(diagnostics) == 0 {
-		diagnostics = append(diagnostics, endpointDiagnostic("UNRESOLVED_GRPC_SERVER", "gRPC server implementation has no resolvable methods", context.SourceLocation))
+		diagnostics = append(diagnostics, endpointDiagnostic(semantic.DiagnosticCodeUnresolvedGRPCServer, "gRPC server implementation has no resolvable methods", context.SourceLocation))
 	}
 	return endpoints, diagnostics, true
 }
@@ -397,11 +397,11 @@ func (robfigCronAdapter) MatchEndpoint(context EndpointContext) ([]semantic.Endp
 		return nil, nil, false
 	}
 	if len(context.Call.Args) < 2 {
-		return nil, []semantic.Diagnostic{endpointDiagnostic("INVALID_CRON_REGISTRATION", "cron registration requires schedule and callback", context.SourceLocation)}, true
+		return nil, []semantic.Diagnostic{endpointDiagnostic(semantic.DiagnosticCodeInvalidCronRegistration, "cron registration requires schedule and callback", context.SourceLocation)}, true
 	}
 	function, ok := resolveCronCallback(context, context.Call.Args[1])
 	if !ok {
-		return nil, []semantic.Diagnostic{endpointDiagnostic("UNRESOLVED_CRON_CALLBACK", "cron callback could not be resolved statically", context.SourceLocation)}, true
+		return nil, []semantic.Diagnostic{endpointDiagnostic(semantic.DiagnosticCodeUnresolvedCronCallback, "cron callback could not be resolved statically", context.SourceLocation)}, true
 	}
 	schedule, static := context.StaticString(context.Call.Args[0])
 	endpoint := semantic.Endpoint{
@@ -413,7 +413,7 @@ func (robfigCronAdapter) MatchEndpoint(context EndpointContext) ([]semantic.Endp
 	}
 	var diagnostics []semantic.Diagnostic
 	if !static {
-		diagnostics = append(diagnostics, endpointDiagnostic("DYNAMIC_CRON_SCHEDULE", "cron schedule is not a static string", context.SourceLocation))
+		diagnostics = append(diagnostics, endpointDiagnostic(semantic.DiagnosticCodeDynamicCronSchedule, "cron schedule is not a static string", context.SourceLocation))
 	}
 	return []semantic.Endpoint{endpoint}, diagnostics, true
 }
@@ -430,7 +430,7 @@ func (unknownHTTPRouterAdapter) MatchEndpoint(context EndpointContext) ([]semant
 	if packagePath == "" || packagePath == "net/http" || packagePath == "github.com/gorilla/mux" || !looksLikeHTTPRegistration(context.Callee.Type()) {
 		return nil, nil, false
 	}
-	return nil, []semantic.Diagnostic{endpointDiagnostic("UNSUPPORTED_HTTP_ROUTER", "HTTP router is not supported by configured adapters: "+packagePath, context.SourceLocation)}, true
+	return nil, []semantic.Diagnostic{endpointDiagnostic(semantic.DiagnosticCodeUnsupportedHTTPRouter, "HTTP router is not supported by configured adapters: "+packagePath, context.SourceLocation)}, true
 }
 
 func isFunction(function *types.Func, packagePath, name string) bool {

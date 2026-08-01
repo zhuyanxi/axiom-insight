@@ -191,7 +191,7 @@ func (analyzer *functionAnalyzer) collectCalls() {
 			if unresolved {
 				analyzer.diagnostics = append(analyzer.diagnostics, semantic.Diagnostic{
 					Severity:       semantic.DiagnosticSeverityWarning,
-					Code:           "UNRESOLVED_CALL",
+					Code:           semantic.DiagnosticCodeUnresolvedCall,
 					Message:        "call target could not be resolved statically",
 					SourceLocation: edge.SourceLocation,
 				})

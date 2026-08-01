@@ -117,6 +117,7 @@ bin/si scan
 bin/si scan ./path/to/service
 bin/si scan ./path/to/service --format json
 bin/si scan ./path/to/service --format json --output scan.json
+bin/si scan --version
 ```
 
 Default output lists service, schema version, and every fixed summary category.
@@ -134,6 +135,23 @@ Exit codes: `0` successful scan, including non-fatal diagnostics; `1` scan or
 output failure; `2` invalid path, arguments, format, or configuration. Module
 resolution uses `GOPROXY=off` and `GOSUMDB=off`; scanner makes no network request.
 
+Version output includes CLI and IR schema versions:
+
+```text
+si version: v0.1.0
+ir_schema_version: v1
+```
+
+CLI failures use stable message codes at the start of stderr output:
+
+- `CLI_INVALID_ARGUMENT`: invalid path, flag, format, or configuration; exit `2`.
+- `CLI_SCAN_ERROR`: scan or output failure; exit `1`.
+- `CLI_INTERNAL_ERROR`: unexpected command failure; exit `1`.
+
+IR diagnostics use stable codes such as `GO_PARSE_ERROR`,
+`PACKAGE_LOAD_ERROR`, `INVALID_CONFIG`, and `UNRESOLVED_CALL`. Diagnostics are
+preserved in JSON output and do not fail a scan when analysis can continue.
+
 ## Offline Fixture Tests
 
 Persistent Phase 0 fixtures live under `testdata/fixtures/`. Each fixture is
@@ -148,3 +166,15 @@ go test ./cmd/si-cli -run TestScanFixtures
 
 Recognizer changes must include a positive fixture, a negative non-match case,
 and snapshot updates. Fixture tests do not access network or external services.
+
+## Phase 0 Quality
+
+Run all local quality gates with:
+
+```sh
+make quality
+```
+
+This runs tests, vet, fixture E2E tests, race detection, protobuf generation
+consistency, and the small-fixture performance budget. Release verification
+steps are documented in [the Phase 0 release checklist](docs/phase-0-release-checklist.md).
