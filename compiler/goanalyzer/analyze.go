@@ -106,6 +106,12 @@ func Analyze(ctx context.Context, sourceRoot string, options Options) (semantic.
 	return document, nil
 }
 
+// AnalyzeSummary returns the semantic document and its derived scan summary.
+func AnalyzeSummary(ctx context.Context, sourceRoot string, options Options) (semantic.Document, semantic.ScanSummary, error) {
+	document, err := Analyze(ctx, sourceRoot, options)
+	return document, semantic.Summarize(document), err
+}
+
 func loadPackages(ctx context.Context, root string, options Options) ([]*packages.Package, error) {
 	config := &packages.Config{
 		Context:    ctx,

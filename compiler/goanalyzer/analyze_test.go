@@ -135,6 +135,32 @@ func TestAnalyzeLoadsProjectWithoutGoModule(t *testing.T) {
 	}
 }
 
+func TestAnalyzeSummaryReturnsStableZeroCategories(t *testing.T) {
+	root := writeProject(t, map[string]string{
+		"go.mod": "module example.com/summaryfixture\n\ngo 1.26.1\n",
+		"run.go": "package summaryfixture\n\nfunc Run() {}\n",
+	})
+
+	document, summary, err := AnalyzeSummary(context.Background(), root, Options{})
+	if err != nil {
+		t.Fatalf("analyze summary fixture: %v", err)
+	}
+	if len(document.Functions) != 1 {
+		t.Fatalf("function count = %d, want 1", len(document.Functions))
+	}
+	for _, item := range summary.Items() {
+		if item.Name == semantic.SummaryDiagnostics {
+			if item.Count != len(document.Diagnostics) {
+				t.Fatalf("diagnostic summary = %d, want %d", item.Count, len(document.Diagnostics))
+			}
+			continue
+		}
+		if item.Count != 0 {
+			t.Fatalf("summary item %q = %d, want 0", item.Name, item.Count)
+		}
+	}
+}
+
 func TestAnalyzeRejectsInvalidSourceRoot(t *testing.T) {
 	_, err := Analyze(context.Background(), filepath.Join(t.TempDir(), "missing"), Options{})
 	if err == nil {

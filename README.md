@@ -69,3 +69,11 @@ The initial external client rules recognize:
 Dynamic HTTP URLs, HTTP methods, and gRPC targets remain dependencies with empty
 unknown fields and analyzer diagnostics. Server registration calls are not
 classified as client dependencies.
+
+## Scan Summary
+
+`semantic.Summarize` derives fixed-order counts for HTTP handlers, gRPC
+handlers, Cron jobs, Kafka consumers, Kafka producers, SQL, Redis, HTTP
+clients, RPC clients, and diagnostics. `goanalyzer.AnalyzeSummary` returns this
+summary with the semantic document; CLI layers should consume it instead of
+revisiting Go AST data.
