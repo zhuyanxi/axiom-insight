@@ -101,3 +101,35 @@ Protocol errors use gRPC status codes: `InvalidArgument` for malformed request
 or unusable source root, `FailedPrecondition` for incompatible schema version,
 and `Internal` for semantic-to-IR conversion failure. Schema mismatch is
 checked before analysis.
+
+## CLI Scan
+
+Build scanner with:
+
+```sh
+go build -o bin/si ./cmd/si-cli
+```
+
+Run offline scan with current directory or explicit path:
+
+```sh
+bin/si scan
+bin/si scan ./path/to/service
+bin/si scan ./path/to/service --format json
+bin/si scan ./path/to/service --format json --output scan.json
+```
+
+Default output lists service, schema version, and every fixed summary category.
+JSON output contains `schema_version`, ordered `summary`, full `document`, and
+top-level `diagnostics`. `--output` is valid only with `--format json`; without
+it, scan does not create files.
+
+Optional `si.yaml` is read from scan root. Supported keys include
+`service.name` or `service_name`, `language`/`languages`, `include_tests`,
+`include`, `exclude`, and `framework_adapters`. Current language is `go`;
+supported adapters are `net/http`, `github.com/gorilla/mux`, `grpc`, and
+`github.com/robfig/cron`.
+
+Exit codes: `0` successful scan, including non-fatal diagnostics; `1` scan or
+output failure; `2` invalid path, arguments, format, or configuration. Module
+resolution uses `GOPROXY=off` and `GOSUMDB=off`; scanner makes no network request.

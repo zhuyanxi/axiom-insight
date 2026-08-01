@@ -10,6 +10,22 @@ import (
 	"github.com/zhuyanxi/axiom-insight/compiler/semantic"
 )
 
+func TestEndpointAdaptersByNameSelectsSupportedAdapters(t *testing.T) {
+	adapters, err := endpointAdaptersByName([]string{"net/http", "grpc"})
+	if err != nil {
+		t.Fatalf("select endpoint adapters: %v", err)
+	}
+	if len(adapters) != 3 {
+		t.Fatalf("adapter count = %d, want 3 including unsupported-router diagnostics", len(adapters))
+	}
+	if adapters[0].Name() != "net/http" || adapters[1].Name() != "grpc" || adapters[2].Name() != "unknown-http-router" {
+		t.Fatalf("selected adapters = %q, %q, %q", adapters[0].Name(), adapters[1].Name(), adapters[2].Name())
+	}
+	if _, err := endpointAdaptersByName([]string{"missing-router"}); err == nil {
+		t.Fatal("unsupported adapter was accepted")
+	}
+}
+
 func TestAnalyzeLoadsMultiplePackagesAndResolvesService(t *testing.T) {
 	root := writeProject(t, map[string]string{
 		"go.mod":                          "module example.com/orders\n\ngo 1.26.1\n",

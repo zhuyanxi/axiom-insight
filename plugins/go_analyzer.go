@@ -40,6 +40,7 @@ func (analyzer *GoAnalyzer) Analyze(ctx context.Context, request *observabilityv
 		Include:      append([]string(nil), request.GetInclude()...),
 		Exclude:      append([]string(nil), request.GetExclude()...),
 		ConfigYAML:   request.GetConfig(),
+		Env:          []string{"GOPROXY=off", "GOSUMDB=off"},
 	})
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("analyze source root %q: %v", root, err))

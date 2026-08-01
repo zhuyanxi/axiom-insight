@@ -44,7 +44,7 @@ func Analyze(ctx context.Context, sourceRoot string, options Options) (semantic.
 		return semantic.Document{}, fmt.Errorf("source root %q is not a directory", sourceRoot)
 	}
 
-	serviceName, modulePath, configDiagnostics := resolveService(root, options)
+	serviceName, modulePath, config, configDiagnostics := resolveService(root, options)
 	document := semantic.Document{
 		SchemaVersion: schemaVersion,
 		Service: semantic.Service{
@@ -54,6 +54,19 @@ func Analyze(ctx context.Context, sourceRoot string, options Options) (semantic.
 			ModulePath: modulePath,
 		},
 		Diagnostics: configDiagnostics,
+	}
+	endpointAdapters := options.EndpointAdapters
+	if endpointAdapters == nil && len(config.FrameworkAdapters) > 0 {
+		var adapterErr error
+		endpointAdapters, adapterErr = endpointAdaptersByName(config.FrameworkAdapters)
+		if adapterErr != nil {
+			document.Diagnostics = append(document.Diagnostics, semantic.Diagnostic{
+				Severity: semantic.DiagnosticSeverityError,
+				Code:     "INVALID_CONFIG",
+				Message:  adapterErr.Error(),
+			})
+			endpointAdapters = []EndpointAdapter{}
+		}
 	}
 
 	loaded, loadErr := loadPackages(ctx, root, options)
@@ -85,7 +98,7 @@ func Analyze(ctx context.Context, sourceRoot string, options Options) (semantic.
 	for _, pkg := range document.Packages {
 		packageIDs[pkg.ImportPath] = semantic.PackageID(pkg)
 	}
-	functionAnalysis := analyzeFunctions(root, loaded, packageIDs, options.IncludeTests, options.EndpointAdapters, options.DependencyRules)
+	functionAnalysis := analyzeFunctions(root, loaded, packageIDs, options.IncludeTests, endpointAdapters, options.DependencyRules)
 	document.Functions = append(document.Functions, functionAnalysis.functions...)
 	document.Endpoints = append(document.Endpoints, functionAnalysis.endpoints...)
 	document.Dependencies = append(document.Dependencies, functionAnalysis.dependencies...)
@@ -136,7 +149,38 @@ func loadPackages(ctx context.Context, root string, options Options) ([]*package
 	if err != nil {
 		return nil, fmt.Errorf("load Go packages: %w", err)
 	}
-	return filterPackages(root, loaded, options.Exclude), nil
+	return filterPackages(root, deduplicatePackages(loaded), options.Exclude), nil
+}
+
+func deduplicatePackages(loaded []*packages.Package) []*packages.Package {
+	result := make([]*packages.Package, 0, len(loaded))
+	indexes := make(map[string]int, len(loaded))
+	for _, pkg := range loaded {
+		if pkg == nil {
+			continue
+		}
+		key := pkg.PkgPath
+		if key == "" {
+			key = pkg.ID
+		}
+		index, exists := indexes[key]
+		if !exists {
+			indexes[key] = len(result)
+			result = append(result, pkg)
+			continue
+		}
+		if packageVariantScore(pkg) > packageVariantScore(result[index]) {
+			result[index] = pkg
+		}
+	}
+	return result
+}
+
+func packageVariantScore(pkg *packages.Package) int {
+	if pkg == nil {
+		return 0
+	}
+	return len(pkg.Syntax)*4 + len(pkg.CompiledGoFiles)*2 + len(pkg.GoFiles)
 }
 
 func packagePatterns(patterns []string) []string {
@@ -236,14 +280,16 @@ func replaceEnv(env []string, key, value string) []string {
 }
 
 type scanConfig struct {
-	Name        string `yaml:"name"`
-	ServiceName string `yaml:"service_name"`
-	Service     struct {
+	Name              string   `yaml:"name"`
+	ServiceName       string   `yaml:"service_name"`
+	FrameworkAdapters []string `yaml:"framework_adapters"`
+	Frameworks        []string `yaml:"frameworks"`
+	Service           struct {
 		Name string `yaml:"name"`
 	} `yaml:"service"`
 }
 
-func resolveService(root string, options Options) (string, string, []semantic.Diagnostic) {
+func resolveService(root string, options Options) (string, string, scanConfig, []semantic.Diagnostic) {
 	modulePath := readModulePath(filepath.Join(root, "go.mod"))
 	configPath := options.ConfigPath
 	if configPath == "" {
@@ -266,7 +312,39 @@ func resolveService(root string, options Options) (string, string, []semantic.Di
 	if serviceName == "" {
 		serviceName = filepath.Base(root)
 	}
-	return serviceName, modulePath, diagnostics
+	config.FrameworkAdapters = append(config.FrameworkAdapters, config.Frameworks...)
+	return serviceName, modulePath, config, diagnostics
+}
+
+func endpointAdaptersByName(names []string) ([]EndpointAdapter, error) {
+	available := make(map[string]EndpointAdapter)
+	for _, adapter := range DefaultEndpointAdapters() {
+		available[adapter.Name()] = adapter
+	}
+	selected := make([]EndpointAdapter, 0, len(names)+1)
+	seen := make(map[string]struct{}, len(names)+1)
+	for _, name := range names {
+		name = strings.TrimSpace(name)
+		if name == "" {
+			continue
+		}
+		adapter, ok := available[name]
+		if !ok || name == "unknown-http-router" {
+			if name == "unknown-http-router" {
+				continue
+			}
+			return nil, fmt.Errorf("unsupported framework adapter %q", name)
+		}
+		if _, exists := seen[name]; exists {
+			continue
+		}
+		seen[name] = struct{}{}
+		selected = append(selected, adapter)
+	}
+	if _, exists := seen["unknown-http-router"]; !exists {
+		selected = append(selected, available["unknown-http-router"])
+	}
+	return selected, nil
 }
 
 func readModulePath(path string) string {
