@@ -1,0 +1,194 @@
+{
+  "schema_version":  "v1",
+  "service":  {
+    "name":  "orders",
+    "source_root":  "./",
+    "language":  "go",
+    "module_path":  "example.com/orders",
+    "version":  "1.0.0",
+    "package_ids":  [
+      "pkg:orders"
+    ]
+  },
+  "packages":  [
+    {
+      "id":  "pkg:orders",
+      "name":  "orders",
+      "import_path":  "example.com/orders",
+      "files":  [
+        "handler.go",
+        "store.go"
+      ]
+    }
+  ],
+  "functions":  [
+    {
+      "id":  "fn:orders.CreateOrder",
+      "name":  "CreateOrder",
+      "qualified_name":  "orders.CreateOrder",
+      "package_id":  "pkg:orders",
+      "package_path":  "example.com/orders",
+      "receiver":  "Orders",
+      "signature":  "func() error",
+      "source_location":  {
+        "relative_path":  "handler.go",
+        "start_line":  10,
+        "start_column":  1,
+        "end_line":  12,
+        "end_column":  2
+      },
+      "exported":  true,
+      "input_endpoint_ids":  [
+        "endpoint:http:create-order",
+        "endpoint:grpc:create-order",
+        "endpoint:cron:cleanup"
+      ],
+      "dependency_ids":  [
+        "dependency:redis",
+        "dependency:sql"
+      ],
+      "callee_function_ids":  [
+        "fn:orders.StoreOrder"
+      ]
+    },
+    {
+      "id":  "fn:orders.StoreOrder",
+      "name":  "StoreOrder",
+      "qualified_name":  "orders.StoreOrder",
+      "package_id":  "pkg:orders",
+      "package_path":  "example.com/orders",
+      "signature":  "func() error",
+      "source_location":  {
+        "relative_path":  "store.go",
+        "start_line":  3,
+        "start_column":  1,
+        "end_line":  9,
+        "end_column":  2
+      },
+      "exported":  true,
+      "input_endpoint_ids":  [
+        "endpoint:cron:cleanup"
+      ],
+      "output_endpoint_ids":  [
+        "endpoint:cron:cleanup"
+      ],
+      "dependency_ids":  [
+        "dependency:sql"
+      ],
+      "caller_function_ids":  [
+        "fn:orders.CreateOrder"
+      ]
+    }
+  ],
+  "endpoints":  [
+    {
+      "id":  "endpoint:http:create-order",
+      "kind":  "HTTP_HANDLER",
+      "name":  "CreateOrder",
+      "function_id":  "fn:orders.CreateOrder",
+      "source_location":  {
+        "relative_path":  "handler.go",
+        "start_line":  11,
+        "start_column":  2,
+        "end_line":  11,
+        "end_column":  33
+      },
+      "http_method":  "POST",
+      "http_path":  "/orders"
+    },
+    {
+      "id":  "endpoint:grpc:create-order",
+      "kind":  "GRPC_HANDLER",
+      "name":  "CreateOrder",
+      "function_id":  "fn:orders.CreateOrder",
+      "source_location":  {
+        "relative_path":  "handler.go",
+        "start_line":  15,
+        "start_column":  2,
+        "end_line":  15,
+        "end_column":  60
+      },
+      "grpc_service":  "orders.OrderService",
+      "grpc_method":  "CreateOrder"
+    },
+    {
+      "id":  "endpoint:cron:cleanup",
+      "kind":  "CRON_JOB",
+      "name":  "cleanup",
+      "function_id":  "fn:orders.StoreOrder",
+      "source_location":  {
+        "relative_path":  "store.go",
+        "start_line":  5,
+        "start_column":  2,
+        "end_line":  5,
+        "end_column":  31
+      },
+      "cron_schedule":  "0 3 * * *"
+    }
+  ],
+  "dependencies":  [
+    {
+      "id":  "dependency:redis",
+      "kind":  "REDIS",
+      "name":  "redis.Client.Get",
+      "function_id":  "fn:orders.CreateOrder",
+      "source_location":  {
+        "relative_path":  "handler.go",
+        "start_line":  12,
+        "start_column":  3,
+        "end_line":  12,
+        "end_column":  44
+      },
+      "operation":  "get",
+      "target_package":  "github.com/redis/go-redis/v9",
+      "resource":  "orders",
+      "value":  "order:{id}",
+      "value_is_static":  true
+    },
+    {
+      "id":  "dependency:sql",
+      "kind":  "SQL",
+      "name":  "database/sql.Query",
+      "function_id":  "fn:orders.StoreOrder",
+      "source_location":  {
+        "relative_path":  "store.go",
+        "start_line":  6,
+        "start_column":  3,
+        "end_line":  6,
+        "end_column":  62
+      },
+      "operation":  "query",
+      "target_package":  "database/sql",
+      "resource":  "orders",
+      "value":  "INSERT INTO orders (id) VALUES (?)",
+      "value_is_static":  true
+    }
+  ],
+  "call_edges":  [
+    {
+      "id":  "edge:create-order-store",
+      "caller_function_id":  "fn:orders.CreateOrder",
+      "callee_function_id":  "fn:orders.StoreOrder",
+      "source_location":  {
+        "relative_path":  "handler.go",
+        "start_line":  13,
+        "start_column":  3,
+        "end_line":  13,
+        "end_column":  31
+      },
+      "resolution":  "RESOLVED"
+    }
+  ],
+  "diagnostics":  [
+    {
+      "severity":  "WARNING",
+      "code":  "UNRESOLVED_CALL",
+      "message":  "interface call target could not be resolved"
+    },
+    {
+      "severity":  "INFO",
+      "code":  "DYNAMIC_REDIS_KEY",
+      "message":  "redis key is dynamic"
+    }
+  ]
+}

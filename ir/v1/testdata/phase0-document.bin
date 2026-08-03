@@ -1,0 +1,33 @@
+
+v17
+orders./go"example.com/orders*1.0.02
+pkg:orders>
+
+pkg:ordersordersexample.com/orders"
+handler.go"store.go"ç
+fn:orders.CreateOrderCreateOrderorders.CreateOrder"
+pkg:orders*example.com/orders2Orders:func() errorB
+
+handler.go
+ (HRendpoint:http:create-orderRendpoint:grpc:create-orderRendpoint:cron:cleanupbdependency:redisbdependency:sqlrfn:orders.StoreOrder"Œ
+fn:orders.StoreOrder
+StoreOrderorders.StoreOrder"
+pkg:orders*example.com/orders:func() errorB
+store.go 	(HRendpoint:cron:cleanupZendpoint:cron:cleanupbdependency:sqljfn:orders.CreateOrder*g
+endpoint:http:create-orderCreateOrder"fn:orders.CreateOrder*
+
+handler.go (!2POST:/orders*z
+endpoint:grpc:create-orderCreateOrder"fn:orders.CreateOrder*
+
+handler.go (<Borders.OrderServiceJCreateOrder*W
+endpoint:cron:cleanupcleanup"fn:orders.StoreOrder*
+store.go (R	0 3 * * *2å
+dependency:redisredis.Client.Get"fn:orders.CreateOrder*
+
+handler.go (,2getJgithub.com/redis/go-redis/v9RordersZ
+order:{id}`2ì
+dependency:sqldatabase/sql.Query"fn:orders.StoreOrder*
+store.go (>2queryJdatabase/sqlRordersZ"INSERT INTO orders (id) VALUES (?)`:^
+edge:create-order-storefn:orders.CreateOrderfn:orders.StoreOrder"
+
+handler.go ((B@UNRESOLVED_CALL+interface call target could not be resolvedB+DYNAMIC_REDIS_KEYredis key is dynamic

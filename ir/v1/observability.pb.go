@@ -250,8 +250,12 @@ type ObservabilityDocument struct {
 	Dependencies  []*Dependency          `protobuf:"bytes,6,rep,name=dependencies,proto3" json:"dependencies,omitempty"`
 	CallEdges     []*CallEdge            `protobuf:"bytes,7,rep,name=call_edges,json=callEdges,proto3" json:"call_edges,omitempty"`
 	Diagnostics   []*Diagnostic          `protobuf:"bytes,8,rep,name=diagnostics,proto3" json:"diagnostics,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// generation_plan is populated exclusively by the Generator Planner
+	// (Phase 1+). The Analyzer never constructs or modifies this field, so
+	// scan output never contains a plan. Field number is append-only.
+	GenerationPlan *GenerationPlan `protobuf:"bytes,9,opt,name=generation_plan,json=generationPlan,proto3" json:"generation_plan,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ObservabilityDocument) Reset() {
@@ -336,6 +340,13 @@ func (x *ObservabilityDocument) GetCallEdges() []*CallEdge {
 func (x *ObservabilityDocument) GetDiagnostics() []*Diagnostic {
 	if x != nil {
 		return x.Diagnostics
+	}
+	return nil
+}
+
+func (x *ObservabilityDocument) GetGenerationPlan() *GenerationPlan {
+	if x != nil {
+		return x.GenerationPlan
 	}
 	return nil
 }
@@ -1120,7 +1131,7 @@ var File_ir_v1_observability_proto protoreflect.FileDescriptor
 
 const file_ir_v1_observability_proto_rawDesc = "" +
 	"\n" +
-	"\x19ir/v1/observability.proto\x12\x13axiom.insight.ir.v1\"\xf0\x03\n" +
+	"\x19ir/v1/observability.proto\x12\x13axiom.insight.ir.v1\x1a\x16ir/v1/generation.proto\"\xbe\x04\n" +
 	"\x15ObservabilityDocument\x12%\n" +
 	"\x0eschema_version\x18\x01 \x01(\tR\rschemaVersion\x126\n" +
 	"\aservice\x18\x02 \x01(\v2\x1c.axiom.insight.ir.v1.ServiceR\aservice\x128\n" +
@@ -1130,7 +1141,8 @@ const file_ir_v1_observability_proto_rawDesc = "" +
 	"\fdependencies\x18\x06 \x03(\v2\x1f.axiom.insight.ir.v1.DependencyR\fdependencies\x12<\n" +
 	"\n" +
 	"call_edges\x18\a \x03(\v2\x1d.axiom.insight.ir.v1.CallEdgeR\tcallEdges\x12A\n" +
-	"\vdiagnostics\x18\b \x03(\v2\x1f.axiom.insight.ir.v1.DiagnosticR\vdiagnostics\"\xb6\x01\n" +
+	"\vdiagnostics\x18\b \x03(\v2\x1f.axiom.insight.ir.v1.DiagnosticR\vdiagnostics\x12L\n" +
+	"\x0fgeneration_plan\x18\t \x01(\v2#.axiom.insight.ir.v1.GenerationPlanR\x0egenerationPlan\"\xb6\x01\n" +
 	"\aService\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1f\n" +
 	"\vsource_root\x18\x02 \x01(\tR\n" +
@@ -1271,6 +1283,7 @@ var file_ir_v1_observability_proto_goTypes = []any{
 	(*CallEdge)(nil),              // 10: axiom.insight.ir.v1.CallEdge
 	(*Diagnostic)(nil),            // 11: axiom.insight.ir.v1.Diagnostic
 	(*SourceLocation)(nil),        // 12: axiom.insight.ir.v1.SourceLocation
+	(*GenerationPlan)(nil),        // 13: axiom.insight.ir.v1.GenerationPlan
 }
 var file_ir_v1_observability_proto_depIdxs = []int32{
 	5,  // 0: axiom.insight.ir.v1.ObservabilityDocument.service:type_name -> axiom.insight.ir.v1.Service
@@ -1280,20 +1293,21 @@ var file_ir_v1_observability_proto_depIdxs = []int32{
 	9,  // 4: axiom.insight.ir.v1.ObservabilityDocument.dependencies:type_name -> axiom.insight.ir.v1.Dependency
 	10, // 5: axiom.insight.ir.v1.ObservabilityDocument.call_edges:type_name -> axiom.insight.ir.v1.CallEdge
 	11, // 6: axiom.insight.ir.v1.ObservabilityDocument.diagnostics:type_name -> axiom.insight.ir.v1.Diagnostic
-	12, // 7: axiom.insight.ir.v1.Function.source_location:type_name -> axiom.insight.ir.v1.SourceLocation
-	0,  // 8: axiom.insight.ir.v1.Endpoint.kind:type_name -> axiom.insight.ir.v1.EndpointKind
-	12, // 9: axiom.insight.ir.v1.Endpoint.source_location:type_name -> axiom.insight.ir.v1.SourceLocation
-	1,  // 10: axiom.insight.ir.v1.Dependency.kind:type_name -> axiom.insight.ir.v1.DependencyKind
-	12, // 11: axiom.insight.ir.v1.Dependency.source_location:type_name -> axiom.insight.ir.v1.SourceLocation
-	12, // 12: axiom.insight.ir.v1.CallEdge.source_location:type_name -> axiom.insight.ir.v1.SourceLocation
-	2,  // 13: axiom.insight.ir.v1.CallEdge.resolution:type_name -> axiom.insight.ir.v1.CallResolution
-	3,  // 14: axiom.insight.ir.v1.Diagnostic.severity:type_name -> axiom.insight.ir.v1.DiagnosticSeverity
-	12, // 15: axiom.insight.ir.v1.Diagnostic.source_location:type_name -> axiom.insight.ir.v1.SourceLocation
-	16, // [16:16] is the sub-list for method output_type
-	16, // [16:16] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	13, // 7: axiom.insight.ir.v1.ObservabilityDocument.generation_plan:type_name -> axiom.insight.ir.v1.GenerationPlan
+	12, // 8: axiom.insight.ir.v1.Function.source_location:type_name -> axiom.insight.ir.v1.SourceLocation
+	0,  // 9: axiom.insight.ir.v1.Endpoint.kind:type_name -> axiom.insight.ir.v1.EndpointKind
+	12, // 10: axiom.insight.ir.v1.Endpoint.source_location:type_name -> axiom.insight.ir.v1.SourceLocation
+	1,  // 11: axiom.insight.ir.v1.Dependency.kind:type_name -> axiom.insight.ir.v1.DependencyKind
+	12, // 12: axiom.insight.ir.v1.Dependency.source_location:type_name -> axiom.insight.ir.v1.SourceLocation
+	12, // 13: axiom.insight.ir.v1.CallEdge.source_location:type_name -> axiom.insight.ir.v1.SourceLocation
+	2,  // 14: axiom.insight.ir.v1.CallEdge.resolution:type_name -> axiom.insight.ir.v1.CallResolution
+	3,  // 15: axiom.insight.ir.v1.Diagnostic.severity:type_name -> axiom.insight.ir.v1.DiagnosticSeverity
+	12, // 16: axiom.insight.ir.v1.Diagnostic.source_location:type_name -> axiom.insight.ir.v1.SourceLocation
+	17, // [17:17] is the sub-list for method output_type
+	17, // [17:17] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_ir_v1_observability_proto_init() }
@@ -1301,6 +1315,7 @@ func file_ir_v1_observability_proto_init() {
 	if File_ir_v1_observability_proto != nil {
 		return
 	}
+	file_ir_v1_generation_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

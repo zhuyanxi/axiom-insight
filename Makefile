@@ -33,4 +33,5 @@ generate:
 		--go-grpc_out=. \
 		--go-grpc_opt=paths=source_relative \
 		ir/v1/observability.proto \
+		ir/v1/generation.proto \
 		ir/v1/language_analyzer.proto

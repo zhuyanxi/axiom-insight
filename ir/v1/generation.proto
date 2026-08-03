@@ -1,0 +1,300 @@
+syntax = "proto3";
+
+package axiom.insight.ir.v1;
+
+option go_package = "github.com/zhuyanxi/axiom-insight/ir/v1;observabilityv1";
+
+// GenerationPlan is the language-neutral, strongly typed output of the
+// Generator Planner. It carries Metrics, Tracing and Logging definitions
+// plus generator-owned diagnostics.
+//
+// Ownership boundary: this file is standalone (no imports), so the
+// generator contract can evolve independently from the analysis IR.
+// observability.proto imports this file one-way to append the optional
+// generation_plan field. The Analyzer never constructs or fills a
+// GenerationPlan; only the Generator Planner (Phase 1+) does. Adding,
+// renaming or renumbering any published field requires a new explicit
+// schema version; this contract is append-only.
+message GenerationPlan {
+  // schema_version is the GenerationPlan contract version. It evolves
+  // independently from source_ir_schema_version.
+  string schema_version = 1;
+  // source_ir_schema_version records the ObservabilityDocument schema
+  // version this plan was derived from.
+  string source_ir_schema_version = 2;
+  // service_name matches the source IR Service.name and is constant
+  // across a single plan.
+  string service_name = 3;
+  // metrics, spans and logs are ordered lists. Order is a presentation
+  // detail; consumers must never rely on insertion order for semantics.
+  repeated MetricPlan metrics = 4;
+  repeated SpanPlan spans = 5;
+  repeated LogPlan logs = 6;
+  repeated PlanDiagnostic diagnostics = 7;
+}
+
+// MetricPlan defines one metric instrument and how to record it.
+message MetricPlan {
+  // id is a stable, globally unique plan ID derived from signal, target
+  // and purpose. It must not change when names change.
+  string id = 1;
+  // name is the normalized machine metric name (ASCII snake_case).
+  string name = 2;
+  MetricType type = 3;
+  // unit is a UCUM-compatible unit; empty means dimensionless.
+  string unit = 4;
+  // description explains the object, unit and record timing. It never
+  // contains absolute paths or source snippets.
+  string description = 5;
+  TargetRef target = 6;
+  // trigger describes when the instrument is recorded.
+  Trigger trigger = 7;
+  // value is the binding that produces the recorded value.
+  ValueBinding value = 8;
+  repeated AttributeBinding attributes = 9;
+}
+
+// SpanPlan defines one span to be produced by the Runtime.
+message SpanPlan {
+  string id = 1;
+  // name follows the P1-04 naming rules (e.g. "POST /orders/{id}").
+  string name = 2;
+  SpanKind kind = 3;
+  TargetRef target = 4;
+  Trigger start_trigger = 5;
+  Trigger end_trigger = 6;
+  ParentStrategy parent = 7;
+  repeated AttributeBinding attributes = 8;
+  // status maps every runtime operation status to an OTel-compatible
+  // status; no status may be left unmapped.
+  StatusPolicy status = 9;
+  repeated SpanEvent events = 10;
+}
+
+// LogPlan defines one structured log event.
+message LogPlan {
+  string id = 1;
+  // event_name is a lower-case dotted name, e.g. "http.request.completed".
+  string event_name = 2;
+  LogSeverity severity = 3;
+  TargetRef target = 4;
+  Trigger trigger = 5;
+  repeated FieldBinding fields = 6;
+  // correlation_fields are stable field keys the Runtime must fill with
+  // request/trace/span context when available. They never carry fake IDs.
+  repeated string correlation_fields = 7;
+  // redaction_policy_id selects a built-in redaction policy applied by the
+  // Runtime; the Generator never inlines sensitive values.
+  string redaction_policy_id = 8;
+}
+
+// TargetRef is a strongly typed reference to an IR entity. The target kind
+// must match the ID's actual entity type or plan validation fails.
+message TargetRef {
+  TargetKind kind = 1;
+  string id = 2;
+}
+
+// Trigger describes when a signal is recorded.
+message Trigger {
+  TriggerPhase phase = 1;
+}
+
+// ValueBinding states where a value comes from and how the Runtime must
+// treat it. Plan constants, IR constants and runtime sources are kept
+// distinct so no Renderer has to guess provenance.
+message ValueBinding {
+  // path is the stable dotted source path, e.g. "runtime.operation.status"
+  // or "endpoint.http_path".
+  string path = 1;
+  ValueSource source = 2;
+  ValueType type = 3;
+  // required marks values the Runtime must provide. When false, a missing
+  // runtime value falls back to fallback or the field is omitted.
+  bool required = 4;
+  // fallback is a static fallback value; it must never contain secrets.
+  string fallback = 5;
+  CardinalityClass cardinality = 6;
+}
+
+// AttributeBinding binds one static metric or span attribute key to a value.
+message AttributeBinding {
+  string key = 1;
+  ValueBinding value = 2;
+}
+
+// FieldBinding binds one structured log field key to a value.
+message FieldBinding {
+  string key = 1;
+  ValueBinding value = 2;
+}
+
+// ParentStrategy decides how a span's parent is established at runtime.
+message ParentStrategy {
+  ParentStrategyMode mode = 1;
+  // static_parent_span_id is required when mode is STATIC and must
+  // reference another SpanPlan id.
+  string static_parent_span_id = 2;
+}
+
+// StatusPolicy maps each runtime operation status to a span status.
+// Every runtime status must have exactly one documented mapping.
+message StatusPolicy {
+  StatusSetting ok = 1;
+  StatusSetting error = 2;
+  StatusSetting timeout = 3;
+  StatusSetting cancelled = 4;
+  StatusSetting unknown = 5;
+}
+
+// SpanEvent defines a controlled event emitted by a span.
+message SpanEvent {
+  string id = 1;
+  // name is a controlled static event name, e.g. "exception" or "timeout".
+  // Raw error strings never become event names.
+  string name = 2;
+  // statuses lists the runtime operation statuses that fire this event.
+  // Empty means the event fires unconditionally.
+  repeated RuntimeStatus statuses = 3;
+  repeated AttributeBinding attributes = 4;
+}
+
+// PlanDiagnostic reports a generator-owned issue attached to a plan.
+message PlanDiagnostic {
+  PlanSeverity severity = 1;
+  // code is a stable generator diagnostic code, e.g. "GEN_NAME_COLLISION".
+  string code = 2;
+  // message never contains the dropped sensitive value itself.
+  string message = 3;
+}
+
+// MetricType identifies the supported instrument types.
+enum MetricType {
+  METRIC_TYPE_UNSPECIFIED = 0;
+  METRIC_TYPE_COUNTER = 1;
+  METRIC_TYPE_HISTOGRAM = 2;
+  METRIC_TYPE_GAUGE = 3;
+  METRIC_TYPE_SUMMARY = 4;
+}
+
+// SpanKind mirrors OpenTelemetry span kinds by name only; it does not
+// expose any SDK type.
+enum SpanKind {
+  SPAN_KIND_UNSPECIFIED = 0;
+  SPAN_KIND_SERVER = 1;
+  SPAN_KIND_CLIENT = 2;
+  SPAN_KIND_PRODUCER = 3;
+  SPAN_KIND_CONSUMER = 4;
+  SPAN_KIND_INTERNAL = 5;
+}
+
+// TargetKind identifies which IR entity a plan item references.
+enum TargetKind {
+  TARGET_KIND_UNSPECIFIED = 0;
+  TARGET_KIND_ENDPOINT = 1;
+  TARGET_KIND_FUNCTION = 2;
+  TARGET_KIND_DEPENDENCY = 3;
+  TARGET_KIND_CALL_EDGE = 4;
+}
+
+// TriggerPhase identifies the moment a signal is recorded.
+enum TriggerPhase {
+  TRIGGER_PHASE_UNSPECIFIED = 0;
+  // START fires when the operation begins.
+  TRIGGER_PHASE_START = 1;
+  // END fires when the operation completes, success or failure.
+  TRIGGER_PHASE_END = 2;
+  // STATE_CHANGE fires whenever the observed state changes.
+  TRIGGER_PHASE_STATE_CHANGE = 3;
+}
+
+// ValueSource classifies where a bound value comes from.
+enum ValueSource {
+  VALUE_SOURCE_UNSPECIFIED = 0;
+  // PLAN_CONSTANT: constant fixed by the Generator, e.g. a counter value of
+  // "1" or an operation normalized from a validated IR field.
+  VALUE_SOURCE_PLAN_CONSTANT = 1;
+  // IR_CONSTANT: constant copied from a validated IR field, e.g.
+  // "service.name" or "endpoint.http_path".
+  VALUE_SOURCE_IR_CONSTANT = 2;
+  // RUNTIME_RESOURCE: value bound at runtime from resource information,
+  // e.g. "runtime.resource.service.version".
+  VALUE_SOURCE_RUNTIME_RESOURCE = 3;
+  // RUNTIME_CONTEXT: value bound at runtime from request context, e.g.
+  // "runtime.context.trace_id".
+  VALUE_SOURCE_RUNTIME_CONTEXT = 4;
+  // RUNTIME_RESULT: value bound at runtime from the operation result, e.g.
+  // "runtime.operation.status" or "runtime.operation.duration_seconds".
+  VALUE_SOURCE_RUNTIME_RESULT = 5;
+}
+
+// ValueType is the data type of a bound value.
+enum ValueType {
+  VALUE_TYPE_UNSPECIFIED = 0;
+  VALUE_TYPE_STRING = 1;
+  VALUE_TYPE_INT64 = 2;
+  VALUE_TYPE_DOUBLE = 3;
+  VALUE_TYPE_BOOL = 4;
+  // STATUS is the finite runtime operation status vocabulary.
+  VALUE_TYPE_STATUS = 5;
+}
+
+// CardinalityClass estimates how many distinct values a binding may take.
+enum CardinalityClass {
+  CARDINALITY_CLASS_UNSPECIFIED = 0;
+  // CONSTANT: one value for the whole plan.
+  CARDINALITY_CLASS_CONSTANT = 1;
+  // LOW: bounded low-cardinality values.
+  CARDINALITY_CLASS_LOW = 2;
+  // HIGH: unbounded values; must not become metric attributes.
+  CARDINALITY_CLASS_HIGH = 3;
+}
+
+// ParentStrategyMode chooses how a parent span is established.
+enum ParentStrategyMode {
+  PARENT_STRATEGY_MODE_UNSPECIFIED = 0;
+  // EXTRACT_OR_ROOT: extract a remote parent from the carrier when present,
+  // otherwise start a new root.
+  PARENT_STRATEGY_MODE_EXTRACT_OR_ROOT = 1;
+  // NEW_ROOT: always start a new root unless the Runtime explicitly
+  // supplies a context.
+  PARENT_STRATEGY_MODE_NEW_ROOT = 2;
+  // CURRENT_CONTEXT: use the current execution context as parent.
+  PARENT_STRATEGY_MODE_CURRENT_CONTEXT = 3;
+  // STATIC: always parent to the referenced SpanPlan.
+  PARENT_STRATEGY_MODE_STATIC = 4;
+}
+
+// StatusSetting is an OTel-compatible span status output.
+enum StatusSetting {
+  STATUS_SETTING_UNSPECIFIED = 0;
+  STATUS_SETTING_UNSET = 1;
+  STATUS_SETTING_ERROR = 2;
+  STATUS_SETTING_OK = 3;
+}
+
+// RuntimeStatus is the finite runtime operation status vocabulary.
+enum RuntimeStatus {
+  RUNTIME_STATUS_UNSPECIFIED = 0;
+  RUNTIME_STATUS_OK = 1;
+  RUNTIME_STATUS_ERROR = 2;
+  RUNTIME_STATUS_CANCELLED = 3;
+  RUNTIME_STATUS_TIMEOUT = 4;
+  RUNTIME_STATUS_UNKNOWN = 5;
+}
+
+// LogSeverity is the structured log severity vocabulary.
+enum LogSeverity {
+  LOG_SEVERITY_UNSPECIFIED = 0;
+  LOG_SEVERITY_INFO = 1;
+  LOG_SEVERITY_WARN = 2;
+  LOG_SEVERITY_ERROR = 3;
+}
+
+// PlanSeverity is the generator diagnostic severity vocabulary.
+enum PlanSeverity {
+  PLAN_SEVERITY_UNSPECIFIED = 0;
+  PLAN_SEVERITY_INFO = 1;
+  PLAN_SEVERITY_WARNING = 2;
+  PLAN_SEVERITY_ERROR = 3;
+}

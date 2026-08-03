@@ -4,6 +4,8 @@ package axiom.insight.ir.v1;
 
 option go_package = "github.com/zhuyanxi/axiom-insight/ir/v1;observabilityv1";
 
+import "ir/v1/generation.proto";
+
 // ObservabilityDocument is the language-neutral compiler output.
 message ObservabilityDocument {
   string schema_version = 1;
@@ -14,6 +16,10 @@ message ObservabilityDocument {
   repeated Dependency dependencies = 6;
   repeated CallEdge call_edges = 7;
   repeated Diagnostic diagnostics = 8;
+  // generation_plan is populated exclusively by the Generator Planner
+  // (Phase 1+). The Analyzer never constructs or modifies this field, so
+  // scan output never contains a plan. Field number is append-only.
+  GenerationPlan generation_plan = 9;
 }
 
 // Service identifies analyzed source and its language frontend.
