@@ -184,6 +184,63 @@ func TestRunScanRejectsInvalidConfigWithUsageExitCode(t *testing.T) {
 	}
 }
 
+func TestRunScanAcceptsValidGenerationNode(t *testing.T) {
+	root := writeCLIProject(t, map[string]string{
+		"go.mod": "module example.com/cli-generation\n\ngo 1.26.1\n",
+		"run.go": "package cligeneration\n\nfunc Run() {}\n",
+		"si.yaml": "service:\n  name: gen-service\ngeneration:\n  signals: [metrics, tracing, logging]\n  metrics:\n    histogram_buckets_seconds: [0.1, 0.5, 1]\n",
+	})
+
+	var stdout, stderr bytes.Buffer
+	code := run([]string{"scan", root}, &stdout, &stderr)
+	if code != 0 {
+		t.Fatalf("exit code = %d, want 0; stderr = %s", code, stderr.String())
+	}
+	if !strings.Contains(stdout.String(), "service: gen-service") {
+		t.Fatalf("text output missing service: %s", stdout.String())
+	}
+}
+
+func TestRunScanRejectsUnknownGenerationFieldWithConfigExitCode(t *testing.T) {
+	root := writeCLIProject(t, map[string]string{
+		"go.mod": "module example.com/cli-generation-unknown\n\ngo 1.26.1\n",
+		"run.go": "package cligenerationunknown\n\nfunc Run() {}\n",
+		"si.yaml": "generation:\n  semantic_conventions_version: 1.38.0\n",
+	})
+
+	var stdout, stderr bytes.Buffer
+	code := run([]string{"scan", root}, &stdout, &stderr)
+	if code != exitUsageError {
+		t.Fatalf("exit code = %d, want %d", code, exitUsageError)
+	}
+	if !strings.Contains(stderr.String(), "GEN_INVALID_CONFIG") {
+		t.Fatalf("stderr = %q, want GEN_INVALID_CONFIG", stderr.String())
+	}
+	if !strings.Contains(stderr.String(), "semantic_conventions_version") {
+		t.Fatalf("stderr = %q, want unknown field name", stderr.String())
+	}
+	if !strings.Contains(stderr.String(), cliUsageMessageCode) {
+		t.Fatalf("stderr = %q, want message code %s", stderr.String(), cliUsageMessageCode)
+	}
+}
+
+func TestRunScanRejectsInvalidGenerationRangeWithFieldPath(t *testing.T) {
+	root := writeCLIProject(t, map[string]string{
+		"go.mod": "module example.com/cli-generation-range\n\ngo 1.26.1\n",
+		"run.go": "package cligenerationrange\n\nfunc Run() {}\n",
+		"si.yaml": "generation:\n  metrics:\n    histogram_buckets_seconds: [0.5, 0.1]\n",
+	})
+
+	var stdout, stderr bytes.Buffer
+	code := run([]string{"scan", root}, &stdout, &stderr)
+	if code != exitUsageError {
+		t.Fatalf("exit code = %d, want %d", code, exitUsageError)
+	}
+	if !strings.Contains(stderr.String(), "generation.metrics.histogram_buckets_seconds[1]") {
+		t.Fatalf("stderr = %q, want exact field path", stderr.String())
+	}
+}
+
 func TestRunScanOutputWriteFailureUsesScanExitCode(t *testing.T) {
 	root := writeCLIProject(t, map[string]string{
 		"go.mod": "module example.com/cli-write-error\n\ngo 1.26.1\n",

@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zhuyanxi/axiom-insight/compiler/semantic"
+	"github.com/zhuyanxi/axiom-insight/generator/policy"
 	observabilityv1 "github.com/zhuyanxi/axiom-insight/ir/v1"
 	"github.com/zhuyanxi/axiom-insight/plugins"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -67,6 +68,11 @@ type scanConfig struct {
 	Service           struct {
 		Name string `mapstructure:"name"`
 	} `mapstructure:"service"`
+	// Generation holds the strictly decoded si.yaml `generation` node. It
+	// has no mapstructure tag on purpose: Viper decodes the scan fields
+	// only, and loadScanConfig fills this field from the strict decoder so
+	// unknown generation fields are rejected with GEN_INVALID_CONFIG.
+	Generation *policy.GenerationConfig
 }
 
 type jsonSummaryItem struct {
@@ -187,6 +193,12 @@ func executeScan(command *cobra.Command, args []string, options scanOptions) err
 	if err := validateScanConfig(config); err != nil {
 		return usageFailure(err)
 	}
+	// The generation node is part of the si.yaml contract: an invalid
+	// value must fail the command with a config error instead of being
+	// silently ignored. scan itself does not consume the policy.
+	if _, err := policy.Resolve(config.Generation, nil); err != nil {
+		return usageFailure(err)
+	}
 
 	request := &observabilityv1.AnalyzeRequest{
 		SourceRoot:    root,
@@ -272,6 +284,11 @@ func loadScanConfig(root, configPath string) (scanConfig, string, error) {
 	if err != nil {
 		return scanConfig{}, "", fmt.Errorf("read scan config contents: %w", err)
 	}
+	generation, err := policy.DecodeConfigFile(contents)
+	if err != nil {
+		return scanConfig{}, "", fmt.Errorf("%s: decode generation config: %w", policy.CodeInvalidConfig, err)
+	}
+	config.Generation = generation
 	return config, string(contents), nil
 }
 
