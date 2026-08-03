@@ -1,0 +1,126 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://axiom-insight.dev/schemas/generator/v1/logging.schema.json",
+  "title": "Axiom Insight logging.yaml contract v1",
+  "description": "Closed v1 contract of logging.yaml. Built-in redaction rules are immutable and cannot be relaxed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "document_type", "source", "generated_by", "redaction", "events"],
+  "properties": {
+    "schema_version": { "type": "string", "const": "generator.logging/v1" },
+    "document_type": { "type": "string", "const": "instrumentation.logging" },
+    "source": { "$ref": "#/$defs/source" },
+    "generated_by": { "$ref": "#/$defs/generated_by" },
+    "redaction": { "$ref": "#/$defs/redaction" },
+    "events": { "type": "array", "items": { "$ref": "#/$defs/event" } }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ir_schema_version", "service_name"],
+      "properties": {
+        "ir_schema_version": { "type": "string", "minLength": 1 },
+        "service_name": { "type": "string", "minLength": 1 }
+      }
+    },
+    "generated_by": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": { "type": "string", "enum": ["endpoint", "function", "dependency", "call_edge"] },
+        "id": { "type": "string", "minLength": 1 }
+      }
+    },
+    "value_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["constant", "ir", "runtime_result", "runtime_resource", "runtime_context", "runtime_clock"]
+        },
+        "path": { "type": "string" },
+        "string": { "type": "string" },
+        "number": { "type": "number" },
+        "bool": { "type": "boolean" },
+        "allowed_values": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["ok", "error", "cancelled", "timeout", "unknown"] }
+        },
+        "fallback": { "type": "string" },
+        "required": { "type": "boolean" },
+        "type": { "type": "string", "enum": ["string", "int", "double", "bool", "status", "timestamp", "number"] }
+      }
+    },
+    "redaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["immutable", "field_names"],
+      "properties": {
+        "immutable": { "type": "boolean", "const": true },
+        "field_names": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status_in"],
+      "properties": {
+        "status_in": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "enum": ["ok", "error", "cancelled", "timeout", "unknown"] }
+        }
+      }
+    },
+    "severity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["constant"],
+      "properties": {
+        "constant": { "type": "string", "enum": ["info", "warn", "error"] }
+      }
+    },
+    "field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "type", "binding"],
+      "properties": {
+        "key": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "enum": ["string", "int", "double", "bool", "status", "timestamp", "number"] },
+        "required": { "type": "boolean" },
+        "binding": { "$ref": "#/$defs/value_binding" }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "event_name", "target", "trigger", "condition", "severity", "fields"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "event_name": { "type": "string", "minLength": 1 },
+        "target": { "$ref": "#/$defs/target" },
+        "trigger": { "type": "string", "enum": ["operation_start", "operation_end", "state_change"] },
+        "condition": { "$ref": "#/$defs/condition" },
+        "severity": { "$ref": "#/$defs/severity" },
+        "fields": { "type": "array", "items": { "$ref": "#/$defs/field" } }
+      }
+    }
+  }
+}

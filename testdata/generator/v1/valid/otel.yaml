@@ -1,0 +1,90 @@
+schema_version: generator.otel/v1
+document_type: instrumentation.tracing
+plan_kind: instrumentation
+semantic_conventions_version: "1.37.0"
+source:
+  ir_schema_version: v1
+  service_name: orders
+generated_by:
+  name: si
+  version: v0.2.0
+resources:
+  - key: service.name
+    type: string
+    binding:
+      source: ir
+      path: service.name
+  - key: service.version
+    type: string
+    binding:
+      source: runtime_resource
+      path: service.version
+      fallback: unknown
+spans:
+  - id: span:endpoint:http-create-order:root
+    name: POST /orders/{id}
+    kind: server
+    target:
+      type: endpoint
+      id: endpoint:http:create-order
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: extract_or_root
+      carrier: http_headers
+    attributes:
+      - key: http.request.method
+        type: string
+        binding:
+          source: ir
+          path: endpoint.http_method
+      - key: http.route
+        type: string
+        binding:
+          source: ir
+          path: endpoint.http_path
+      - key: code.function.name
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+    status:
+      mapping:
+        ok: unset
+        error: error
+        timeout: error
+        cancelled: error
+        unknown: unset
+    events:
+      - id: event:endpoint:http-create-order:exception
+        name: exception
+        condition: status_is_error
+        attributes:
+          - key: exception.type
+            type: string
+            binding:
+              source: runtime_result
+              path: error.type
+  - id: span:dependency:orders-redis:get
+    name: redis get
+    kind: client
+    target:
+      type: dependency
+      id: dependency:orders-redis
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: current_context
+    attributes:
+      - key: db.system
+        type: string
+        binding:
+          source: constant
+          string: redis
+      - key: db.operation
+        type: string
+        binding:
+          source: ir
+          path: dependency.operation

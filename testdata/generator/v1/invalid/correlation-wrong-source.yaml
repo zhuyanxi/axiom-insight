@@ -1,0 +1,30 @@
+schema_version: generator.logging/v1
+document_type: instrumentation.logging
+source:
+  ir_schema_version: v1
+  service_name: orders
+generated_by:
+  name: si
+  version: v0.2.0
+redaction:
+  immutable: true
+  field_names:
+    - authorization
+events:
+  - id: log:a
+    event_name: http.request.completed
+    target:
+      type: endpoint
+      id: endpoint:a
+    trigger: operation_end
+    condition:
+      status_in: [ok]
+    severity:
+      constant: info
+    fields:
+      - key: trace_id
+        type: string
+        required: true
+        binding:
+          source: ir
+          path: service.name

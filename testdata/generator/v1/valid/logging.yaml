@@ -1,0 +1,94 @@
+schema_version: generator.logging/v1
+document_type: instrumentation.logging
+source:
+  ir_schema_version: v1
+  service_name: orders
+generated_by:
+  name: si
+  version: v0.2.0
+redaction:
+  immutable: true
+  field_names:
+    - authorization
+    - cookie
+    - password
+    - secret
+    - token
+events:
+  - id: log:endpoint:http-create-order:completed
+    event_name: http.request.completed
+    target:
+      type: endpoint
+      id: endpoint:http:create-order
+    trigger: operation_end
+    condition:
+      status_in: [ok]
+    severity:
+      constant: info
+    fields:
+      - key: timestamp
+        type: timestamp
+        binding:
+          source: runtime_clock
+          path: now
+      - key: request_id
+        type: string
+        required: false
+        binding:
+          source: runtime_context
+          path: request.id
+      - key: trace_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: trace.id
+      - key: span_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: span.id
+      - key: service
+        type: string
+        required: true
+        binding:
+          source: ir
+          path: service.name
+      - key: module
+        type: string
+        required: true
+        binding:
+          source: ir
+          path: function.package_path
+      - key: function
+        type: string
+        required: true
+        binding:
+          source: ir
+          path: function.qualified_name
+      - key: operation
+        type: string
+        required: true
+        binding:
+          source: constant
+          string: POST /orders/{id}
+      - key: status
+        type: string
+        required: true
+        binding:
+          source: runtime_result
+          path: operation.status
+      - key: duration_seconds
+        type: double
+        required: true
+        binding:
+          source: runtime_result
+          path: operation.duration_seconds
+      - key: version
+        type: string
+        required: true
+        binding:
+          source: runtime_resource
+          path: service.version
+          fallback: unknown

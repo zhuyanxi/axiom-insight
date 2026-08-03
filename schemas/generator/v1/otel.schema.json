@@ -1,0 +1,159 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://axiom-insight.dev/schemas/generator/v1/otel.schema.json",
+  "title": "Axiom Insight otel.yaml contract v1",
+  "description": "Closed v1 contract of otel.yaml. This is an instrumentation plan, not an OpenTelemetry Collector configuration.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "document_type",
+    "plan_kind",
+    "semantic_conventions_version",
+    "source",
+    "generated_by"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "generator.otel/v1" },
+    "document_type": { "type": "string", "const": "instrumentation.tracing" },
+    "plan_kind": { "type": "string", "const": "instrumentation" },
+    "semantic_conventions_version": { "type": "string", "const": "1.37.0" },
+    "source": { "$ref": "#/$defs/source" },
+    "generated_by": { "$ref": "#/$defs/generated_by" },
+    "resources": { "type": "array", "items": { "$ref": "#/$defs/attribute" } },
+    "spans": { "type": "array", "items": { "$ref": "#/$defs/span" } }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ir_schema_version", "service_name"],
+      "properties": {
+        "ir_schema_version": { "type": "string", "minLength": 1 },
+        "service_name": { "type": "string", "minLength": 1 }
+      }
+    },
+    "generated_by": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": { "type": "string", "enum": ["endpoint", "function", "dependency", "call_edge"] },
+        "id": { "type": "string", "minLength": 1 }
+      }
+    },
+    "value_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["constant", "ir", "runtime_result", "runtime_resource", "runtime_context", "runtime_clock"]
+        },
+        "path": { "type": "string" },
+        "string": { "type": "string" },
+        "number": { "type": "number" },
+        "bool": { "type": "boolean" },
+        "allowed_values": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["ok", "error", "cancelled", "timeout", "unknown"] }
+        },
+        "fallback": { "type": "string" },
+        "required": { "type": "boolean" },
+        "type": { "type": "string", "enum": ["string", "int", "double", "bool", "status", "timestamp", "number"] }
+      }
+    },
+    "attribute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "binding"],
+      "properties": {
+        "key": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "enum": ["string", "int", "double", "bool", "status", "timestamp", "number"] },
+        "binding": { "$ref": "#/$defs/value_binding" }
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "string", "enum": ["operation_start", "operation_end", "state_change"] },
+        "end": { "type": "string", "enum": ["operation_start", "operation_end", "state_change"] }
+      }
+    },
+    "parent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy"],
+      "properties": {
+        "strategy": { "type": "string", "enum": ["extract_or_root", "new_root", "current_context", "static"] },
+        "carrier": { "type": "string", "enum": ["http_headers", "grpc_metadata", "kafka_headers", "none"] },
+        "static_parent_span_id": { "type": "string", "minLength": 1 }
+      }
+    },
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mapping"],
+      "properties": {
+        "mapping": {
+          "type": "object",
+          "additionalProperties": { "type": "string", "enum": ["unset", "error", "ok"] },
+          "properties": {
+            "ok": { "type": "string", "enum": ["unset", "error", "ok"] },
+            "error": { "type": "string", "enum": ["unset", "error", "ok"] },
+            "cancelled": { "type": "string", "enum": ["unset", "error", "ok"] },
+            "timeout": { "type": "string", "enum": ["unset", "error", "ok"] },
+            "unknown": { "type": "string", "enum": ["unset", "error", "ok"] }
+          },
+          "required": ["ok", "error", "cancelled", "timeout", "unknown"]
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "condition": {
+          "type": "string",
+          "enum": ["status_is_error", "status_is_timeout", "status_is_cancelled"]
+        },
+        "statuses": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["ok", "error", "cancelled", "timeout", "unknown"] }
+        },
+        "attributes": { "type": "array", "items": { "$ref": "#/$defs/attribute" } }
+      }
+    },
+    "span": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "kind", "target", "lifecycle", "parent"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "kind": { "type": "string", "enum": ["server", "client", "producer", "consumer", "internal"] },
+        "target": { "$ref": "#/$defs/target" },
+        "lifecycle": { "$ref": "#/$defs/lifecycle" },
+        "parent": { "$ref": "#/$defs/parent" },
+        "attributes": { "type": "array", "items": { "$ref": "#/$defs/attribute" } },
+        "status": { "$ref": "#/$defs/status" },
+        "events": { "type": "array", "items": { "$ref": "#/$defs/event" } }
+      }
+    }
+  }
+}

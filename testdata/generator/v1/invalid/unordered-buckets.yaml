@@ -1,0 +1,22 @@
+schema_version: generator.metrics/v1
+document_type: instrumentation.metrics
+source:
+  ir_schema_version: v1
+  service_name: orders
+generated_by:
+  name: si
+  version: v0.2.0
+metrics:
+  - id: metric:a
+    name: a_duration_seconds
+    type: histogram
+    unit: s
+    target:
+      type: endpoint
+      id: endpoint:a
+    record:
+      trigger: operation_end
+      value:
+        source: runtime_result
+        path: operation.duration_seconds
+    buckets: [0.5, 0.1]

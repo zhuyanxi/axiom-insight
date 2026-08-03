@@ -1,0 +1,10 @@
+schema_version: generator.metrics/v1
+document_type: instrumentation.metrics
+document_type: instrumentation.metrics
+source:
+  ir_schema_version: v1
+  service_name: orders
+generated_by:
+  name: si
+  version: v0.2.0
+metrics: []

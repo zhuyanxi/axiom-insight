@@ -1,0 +1,80 @@
+schema_version: generator.metrics/v1
+document_type: instrumentation.metrics
+source:
+  ir_schema_version: v1
+  service_name: orders
+generated_by:
+  name: si
+  version: v0.2.0
+metrics:
+  - id: metric:endpoint:http-create-order:requests
+    name: orders_create_order_http_requests_total
+    type: counter
+    unit: "{request}"
+    description: Completed HTTP requests handled by api.CreateOrder.
+    target:
+      type: endpoint
+      id: endpoint:http:create-order
+    record:
+      trigger: operation_end
+      value:
+        source: constant
+        number: 1
+    attributes:
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: POST /orders/{id}
+      - key: status
+        type: string
+        binding:
+          source: runtime_result
+          path: operation.status
+          allowed_values: [ok, error, cancelled, timeout, unknown]
+  - id: metric:endpoint:http-create-order:duration
+    name: orders_create_order_http_request_duration_seconds
+    type: histogram
+    unit: s
+    description: HTTP request duration in seconds.
+    target:
+      type: endpoint
+      id: endpoint:http:create-order
+    record:
+      trigger: operation_end
+      value:
+        source: runtime_result
+        path: operation.duration_seconds
+    buckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10]
+  - id: metric:endpoint:http-create-order:inflight
+    name: orders_create_order_http_requests_in_flight
+    type: gauge
+    unit: "{request}"
+    description: HTTP requests currently being handled.
+    target:
+      type: endpoint
+      id: endpoint:http:create-order
+    record:
+      trigger: state_change
+      value:
+        source: runtime_result
+        path: operation.in_flight
+  - id: metric:dependency:orders-redis:duration-summary
+    name: orders_redis_operation_duration_seconds_summary
+    type: summary
+    unit: s
+    description: Redis operation duration summary.
+    target:
+      type: dependency
+      id: dependency:orders-redis
+    record:
+      trigger: operation_end
+      value:
+        source: runtime_result
+        path: operation.duration_seconds
+    quantiles: [0.5, 0.9, 0.99]

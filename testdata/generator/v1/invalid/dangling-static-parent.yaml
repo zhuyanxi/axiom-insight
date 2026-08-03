@@ -1,0 +1,23 @@
+schema_version: generator.otel/v1
+document_type: instrumentation.tracing
+plan_kind: instrumentation
+semantic_conventions_version: "1.37.0"
+source:
+  ir_schema_version: v1
+  service_name: orders
+generated_by:
+  name: si
+  version: v0.2.0
+spans:
+  - id: span:a
+    name: GET /orders
+    kind: server
+    target:
+      type: endpoint
+      id: endpoint:a
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: static
+      static_parent_span_id: span:missing

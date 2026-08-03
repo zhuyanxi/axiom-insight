@@ -1,0 +1,21 @@
+schema_version: generator.metrics/v1
+document_type: instrumentation.metrics
+source:
+  ir_schema_version: v1
+  service_name: orders
+generated_by:
+  name: si
+  version: v0.2.0
+metrics:
+  - id: metric:a
+    name: a_requests_total
+    type: counter
+    unit: "requests per second "
+    target:
+      type: endpoint
+      id: endpoint:a
+    record:
+      trigger: operation_end
+      value:
+        source: constant
+        number: 1
