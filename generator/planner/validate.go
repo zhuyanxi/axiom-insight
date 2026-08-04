@@ -51,6 +51,12 @@ func (failure *InvalidIRError) Error() string {
 // not be modified.
 func (failure *InvalidIRError) Violations() []ValidationError { return failure.violations }
 
+// ValidateDocument is the exported validation entry point used by signal
+// sub-planners and tests. See validateDocument for the rules.
+func ValidateDocument(ctx context.Context, document *observabilityv1.ObservabilityDocument) (*Index, []ValidationError, error) {
+	return validateDocument(ctx, document)
+}
+
 // validateDocument checks document presence, service identity, schema
 // support, entity IDs and every cross-entity reference. It runs in one
 // pass, checks context cancellation periodically and never panics. The

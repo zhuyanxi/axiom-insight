@@ -843,8 +843,13 @@ type MetricPlan struct {
 	// trigger describes when the instrument is recorded.
 	Trigger *Trigger `protobuf:"bytes,7,opt,name=trigger,proto3" json:"trigger,omitempty"`
 	// value is the binding that produces the recorded value.
-	Value         *ValueBinding       `protobuf:"bytes,8,opt,name=value,proto3" json:"value,omitempty"`
-	Attributes    []*AttributeBinding `protobuf:"bytes,9,rep,name=attributes,proto3" json:"attributes,omitempty"`
+	Value      *ValueBinding       `protobuf:"bytes,8,opt,name=value,proto3" json:"value,omitempty"`
+	Attributes []*AttributeBinding `protobuf:"bytes,9,rep,name=attributes,proto3" json:"attributes,omitempty"`
+	// function_id references the Function the target entity belongs to,
+	// kept stable for Dashboard and Runtime consumers. Populated by the
+	// Generator Planner for endpoint metrics; absent when the metric does
+	// not belong to a function.
+	FunctionId    string `protobuf:"bytes,10,opt,name=function_id,json=functionId,proto3" json:"function_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -940,6 +945,13 @@ func (x *MetricPlan) GetAttributes() []*AttributeBinding {
 		return x.Attributes
 	}
 	return nil
+}
+
+func (x *MetricPlan) GetFunctionId() string {
+	if x != nil {
+		return x.FunctionId
+	}
+	return ""
 }
 
 // SpanPlan defines one span to be produced by the Runtime.
@@ -1746,7 +1758,7 @@ const file_ir_v1_generation_proto_rawDesc = "" +
 	"\ametrics\x18\x04 \x03(\v2\x1f.axiom.insight.ir.v1.MetricPlanR\ametrics\x123\n" +
 	"\x05spans\x18\x05 \x03(\v2\x1d.axiom.insight.ir.v1.SpanPlanR\x05spans\x120\n" +
 	"\x04logs\x18\x06 \x03(\v2\x1c.axiom.insight.ir.v1.LogPlanR\x04logs\x12E\n" +
-	"\vdiagnostics\x18\a \x03(\v2#.axiom.insight.ir.v1.PlanDiagnosticR\vdiagnostics\"\x8b\x03\n" +
+	"\vdiagnostics\x18\a \x03(\v2#.axiom.insight.ir.v1.PlanDiagnosticR\vdiagnostics\"\xac\x03\n" +
 	"\n" +
 	"MetricPlan\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
@@ -1759,7 +1771,10 @@ const file_ir_v1_generation_proto_rawDesc = "" +
 	"\x05value\x18\b \x01(\v2!.axiom.insight.ir.v1.ValueBindingR\x05value\x12E\n" +
 	"\n" +
 	"attributes\x18\t \x03(\v2%.axiom.insight.ir.v1.AttributeBindingR\n" +
-	"attributes\"\x92\x04\n" +
+	"attributes\x12\x1f\n" +
+	"\vfunction_id\x18\n" +
+	" \x01(\tR\n" +
+	"functionId\"\x92\x04\n" +
 	"\bSpanPlan\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x121\n" +

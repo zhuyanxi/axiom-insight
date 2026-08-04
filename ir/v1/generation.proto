@@ -52,6 +52,11 @@ message MetricPlan {
   // value is the binding that produces the recorded value.
   ValueBinding value = 8;
   repeated AttributeBinding attributes = 9;
+  // function_id references the Function the target entity belongs to,
+  // kept stable for Dashboard and Runtime consumers. Populated by the
+  // Generator Planner for endpoint metrics; absent when the metric does
+  // not belong to a function.
+  string function_id = 10;
 }
 
 // SpanPlan defines one span to be produced by the Runtime.
