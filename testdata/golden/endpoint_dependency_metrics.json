@@ -1,1726 +1,1726 @@
 {
+  "schema_version": "v1",
+  "source_ir_schema_version": "v1",
+  "service_name": "checkout",
   "metrics": [
     {
-      "attributes": [
-        {
-          "key": "operation",
-          "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
-            "path": "plan.constant.consume",
-            "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
-          }
-        },
-        {
-          "key": "service",
-          "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
-            "path": "service.name",
-            "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
-          }
-        },
-        {
-          "key": "status",
-          "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
-            "path": "runtime.operation.status",
-            "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
-          }
-        }
-      ],
-      "description": "Number of Kafka consumer operations completed; unit {operation}; recorded at operation end",
-      "function_id": "fn:service",
       "id": "metrics:dep:consumer:count",
       "name": "checkout_internal_orders_checkout_orders_consume_kafka_operations_total",
+      "type": "METRIC_TYPE_COUNTER",
+      "unit": "{operation}",
+      "description": "Number of Kafka consumer operations completed; unit {operation}; recorded at operation end",
       "target": {
-        "id": "dep:consumer",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:consumer"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_COUNTER",
-      "unit": "{operation}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_CONSTANT",
         "path": "plan.constant.one",
         "source": "VALUE_SOURCE_PLAN_CONSTANT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_CONSTANT"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.consume",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration of Kafka consumer operations; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:consumer:duration",
       "name": "checkout_internal_orders_checkout_orders_consume_kafka_operation_duration_seconds",
+      "type": "METRIC_TYPE_HISTOGRAM",
+      "unit": "s",
+      "description": "Duration of Kafka consumer operations; unit s; recorded at operation end",
       "target": {
-        "id": "dep:consumer",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:consumer"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_HISTOGRAM",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.consume",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration summary of Kafka consumer operations; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:consumer:duration_summary",
       "name": "checkout_internal_orders_checkout_orders_consume_kafka_operation_duration_seconds_summary",
+      "type": "METRIC_TYPE_SUMMARY",
+      "unit": "s",
+      "description": "Duration summary of Kafka consumer operations; unit s; recorded at operation end",
       "target": {
-        "id": "dep:consumer",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:consumer"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_SUMMARY",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.consume",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Number of Kafka consumer operations in flight (in-call operations only); unit {operation}; recorded on state change",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:consumer:in_flight",
       "name": "checkout_internal_orders_checkout_orders_consume_kafka_operations_in_flight",
+      "type": "METRIC_TYPE_GAUGE",
+      "unit": "{operation}",
+      "description": "Number of Kafka consumer operations in flight (in-call operations only); unit {operation}; recorded on state change",
       "target": {
-        "id": "dep:consumer",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:consumer"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_STATE_CHANGE"
       },
-      "type": "METRIC_TYPE_GAUGE",
-      "unit": "{operation}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.in_flight",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
-            "path": "plan.constant.get",
+            "path": "plan.constant.consume",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
-          }
-        },
-        {
-          "key": "status",
-          "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
-            "path": "runtime.operation.status",
-            "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         }
       ],
-      "description": "Number of HTTP client operations completed; unit {operation}; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:http:count",
       "name": "checkout_internal_orders_checkout_orders_get_http_operations_total",
+      "type": "METRIC_TYPE_COUNTER",
+      "unit": "{operation}",
+      "description": "Number of HTTP client operations completed; unit {operation}; recorded at operation end",
       "target": {
-        "id": "dep:http",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:http"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_COUNTER",
-      "unit": "{operation}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_CONSTANT",
         "path": "plan.constant.one",
         "source": "VALUE_SOURCE_PLAN_CONSTANT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_CONSTANT"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.get",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration of HTTP client operations; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:http:duration",
       "name": "checkout_internal_orders_checkout_orders_get_http_operation_duration_seconds",
+      "type": "METRIC_TYPE_HISTOGRAM",
+      "unit": "s",
+      "description": "Duration of HTTP client operations; unit s; recorded at operation end",
       "target": {
-        "id": "dep:http",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:http"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_HISTOGRAM",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.get",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration summary of HTTP client operations; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:http:duration_summary",
       "name": "checkout_internal_orders_checkout_orders_get_http_operation_duration_seconds_summary",
+      "type": "METRIC_TYPE_SUMMARY",
+      "unit": "s",
+      "description": "Duration summary of HTTP client operations; unit s; recorded at operation end",
       "target": {
-        "id": "dep:http",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:http"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_SUMMARY",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.get",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Number of HTTP client operations in flight (in-call operations only); unit {operation}; recorded on state change",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:http:in_flight",
       "name": "checkout_internal_orders_checkout_orders_get_http_operations_in_flight",
+      "type": "METRIC_TYPE_GAUGE",
+      "unit": "{operation}",
+      "description": "Number of HTTP client operations in flight (in-call operations only); unit {operation}; recorded on state change",
       "target": {
-        "id": "dep:http",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:http"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_STATE_CHANGE"
       },
-      "type": "METRIC_TYPE_GAUGE",
-      "unit": "{operation}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.in_flight",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
-            "path": "plan.constant.produce",
+            "path": "plan.constant.get",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
-          }
-        },
-        {
-          "key": "status",
-          "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
-            "path": "runtime.operation.status",
-            "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         }
       ],
-      "description": "Number of Kafka producer operations completed; unit {operation}; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:producer:count",
       "name": "checkout_internal_orders_checkout_orders_produce_kafka_operations_total",
+      "type": "METRIC_TYPE_COUNTER",
+      "unit": "{operation}",
+      "description": "Number of Kafka producer operations completed; unit {operation}; recorded at operation end",
       "target": {
-        "id": "dep:producer",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:producer"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_COUNTER",
-      "unit": "{operation}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_CONSTANT",
         "path": "plan.constant.one",
         "source": "VALUE_SOURCE_PLAN_CONSTANT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_CONSTANT"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.produce",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration of Kafka producer operations; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:producer:duration",
       "name": "checkout_internal_orders_checkout_orders_produce_kafka_operation_duration_seconds",
+      "type": "METRIC_TYPE_HISTOGRAM",
+      "unit": "s",
+      "description": "Duration of Kafka producer operations; unit s; recorded at operation end",
       "target": {
-        "id": "dep:producer",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:producer"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_HISTOGRAM",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.produce",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration summary of Kafka producer operations; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:producer:duration_summary",
       "name": "checkout_internal_orders_checkout_orders_produce_kafka_operation_duration_seconds_summary",
+      "type": "METRIC_TYPE_SUMMARY",
+      "unit": "s",
+      "description": "Duration summary of Kafka producer operations; unit s; recorded at operation end",
       "target": {
-        "id": "dep:producer",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:producer"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_SUMMARY",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.produce",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Number of Kafka producer operations in flight (in-call operations only); unit {operation}; recorded on state change",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:producer:in_flight",
       "name": "checkout_internal_orders_checkout_orders_produce_kafka_operations_in_flight",
+      "type": "METRIC_TYPE_GAUGE",
+      "unit": "{operation}",
+      "description": "Number of Kafka producer operations in flight (in-call operations only); unit {operation}; recorded on state change",
       "target": {
-        "id": "dep:producer",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:producer"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_STATE_CHANGE"
       },
-      "type": "METRIC_TYPE_GAUGE",
-      "unit": "{operation}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.in_flight",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
-            "path": "plan.constant.get",
+            "path": "plan.constant.produce",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
-          }
-        },
-        {
-          "key": "status",
-          "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
-            "path": "runtime.operation.status",
-            "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         }
       ],
-      "description": "Number of Redis operations completed; unit {operation}; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:redis:count",
       "name": "checkout_internal_orders_checkout_orders_get_redis_operations_total",
+      "type": "METRIC_TYPE_COUNTER",
+      "unit": "{operation}",
+      "description": "Number of Redis operations completed; unit {operation}; recorded at operation end",
       "target": {
-        "id": "dep:redis",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:redis"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_COUNTER",
-      "unit": "{operation}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_CONSTANT",
         "path": "plan.constant.one",
         "source": "VALUE_SOURCE_PLAN_CONSTANT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_CONSTANT"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.get",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration of Redis operations; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:redis:duration",
       "name": "checkout_internal_orders_checkout_orders_get_redis_operation_duration_seconds",
+      "type": "METRIC_TYPE_HISTOGRAM",
+      "unit": "s",
+      "description": "Duration of Redis operations; unit s; recorded at operation end",
       "target": {
-        "id": "dep:redis",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:redis"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_HISTOGRAM",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.get",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration summary of Redis operations; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:redis:duration_summary",
       "name": "checkout_internal_orders_checkout_orders_get_redis_operation_duration_seconds_summary",
+      "type": "METRIC_TYPE_SUMMARY",
+      "unit": "s",
+      "description": "Duration summary of Redis operations; unit s; recorded at operation end",
       "target": {
-        "id": "dep:redis",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:redis"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_SUMMARY",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.get",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Number of Redis operations in flight (in-call operations only); unit {operation}; recorded on state change",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:redis:in_flight",
       "name": "checkout_internal_orders_checkout_orders_get_redis_operations_in_flight",
+      "type": "METRIC_TYPE_GAUGE",
+      "unit": "{operation}",
+      "description": "Number of Redis operations in flight (in-call operations only); unit {operation}; recorded on state change",
       "target": {
-        "id": "dep:redis",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:redis"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_STATE_CHANGE"
       },
-      "type": "METRIC_TYPE_GAUGE",
-      "unit": "{operation}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.in_flight",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
-            "path": "plan.constant.orderservice_createorder",
+            "path": "plan.constant.get",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
-          }
-        },
-        {
-          "key": "status",
-          "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
-            "path": "runtime.operation.status",
-            "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         }
       ],
-      "description": "Number of RPC client operations completed; unit {operation}; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:rpc:count",
       "name": "checkout_internal_orders_checkout_orders_orderservice_createorder_rpc_operations_total",
+      "type": "METRIC_TYPE_COUNTER",
+      "unit": "{operation}",
+      "description": "Number of RPC client operations completed; unit {operation}; recorded at operation end",
       "target": {
-        "id": "dep:rpc",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:rpc"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_COUNTER",
-      "unit": "{operation}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_CONSTANT",
         "path": "plan.constant.one",
         "source": "VALUE_SOURCE_PLAN_CONSTANT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_CONSTANT"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.orderservice_createorder",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration of RPC client operations; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:rpc:duration",
       "name": "checkout_internal_orders_checkout_orders_orderservice_createorder_rpc_operation_duration_seconds",
+      "type": "METRIC_TYPE_HISTOGRAM",
+      "unit": "s",
+      "description": "Duration of RPC client operations; unit s; recorded at operation end",
       "target": {
-        "id": "dep:rpc",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:rpc"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_HISTOGRAM",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.orderservice_createorder",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration summary of RPC client operations; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:rpc:duration_summary",
       "name": "checkout_internal_orders_checkout_orders_orderservice_createorder_rpc_operation_duration_seconds_summary",
+      "type": "METRIC_TYPE_SUMMARY",
+      "unit": "s",
+      "description": "Duration summary of RPC client operations; unit s; recorded at operation end",
       "target": {
-        "id": "dep:rpc",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:rpc"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_SUMMARY",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.orderservice_createorder",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Number of RPC client operations in flight (in-call operations only); unit {operation}; recorded on state change",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:rpc:in_flight",
       "name": "checkout_internal_orders_checkout_orders_orderservice_createorder_rpc_operations_in_flight",
+      "type": "METRIC_TYPE_GAUGE",
+      "unit": "{operation}",
+      "description": "Number of RPC client operations in flight (in-call operations only); unit {operation}; recorded on state change",
       "target": {
-        "id": "dep:rpc",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:rpc"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_STATE_CHANGE"
       },
-      "type": "METRIC_TYPE_GAUGE",
-      "unit": "{operation}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.in_flight",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
-            "path": "plan.constant.exec",
+            "path": "plan.constant.orderservice_createorder",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
-          }
-        },
-        {
-          "key": "status",
-          "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
-            "path": "runtime.operation.status",
-            "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         }
       ],
-      "description": "Number of SQL operations completed; unit {operation}; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:sql:count",
       "name": "checkout_internal_orders_checkout_orders_exec_sql_operations_total",
+      "type": "METRIC_TYPE_COUNTER",
+      "unit": "{operation}",
+      "description": "Number of SQL operations completed; unit {operation}; recorded at operation end",
       "target": {
-        "id": "dep:sql",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:sql"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_COUNTER",
-      "unit": "{operation}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_CONSTANT",
         "path": "plan.constant.one",
         "source": "VALUE_SOURCE_PLAN_CONSTANT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_CONSTANT"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.exec",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration of SQL operations; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:sql:duration",
       "name": "checkout_internal_orders_checkout_orders_exec_sql_operation_duration_seconds",
+      "type": "METRIC_TYPE_HISTOGRAM",
+      "unit": "s",
+      "description": "Duration of SQL operations; unit s; recorded at operation end",
       "target": {
-        "id": "dep:sql",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:sql"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_HISTOGRAM",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.exec",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration summary of SQL operations; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:sql:duration_summary",
       "name": "checkout_internal_orders_checkout_orders_exec_sql_operation_duration_seconds_summary",
+      "type": "METRIC_TYPE_SUMMARY",
+      "unit": "s",
+      "description": "Duration summary of SQL operations; unit s; recorded at operation end",
       "target": {
-        "id": "dep:sql",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:sql"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_SUMMARY",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.exec",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Number of SQL operations in flight (in-call operations only); unit {operation}; recorded on state change",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:dep:sql:in_flight",
       "name": "checkout_internal_orders_checkout_orders_exec_sql_operations_in_flight",
+      "type": "METRIC_TYPE_GAUGE",
+      "unit": "{operation}",
+      "description": "Number of SQL operations in flight (in-call operations only); unit {operation}; recorded on state change",
       "target": {
-        "id": "dep:sql",
-        "kind": "TARGET_KIND_DEPENDENCY"
+        "kind": "TARGET_KIND_DEPENDENCY",
+        "id": "dep:sql"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_STATE_CHANGE"
       },
-      "type": "METRIC_TYPE_GAUGE",
-      "unit": "{operation}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.in_flight",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
-            "path": "plan.constant.nightly_cleanup",
+            "path": "plan.constant.exec",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
-          }
-        },
-        {
-          "key": "status",
-          "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
-            "path": "runtime.operation.status",
-            "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         }
       ],
-      "description": "Number of cron runs completed; unit {run}; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:ep:cron:count",
       "name": "checkout_internal_orders_checkout_orders_nightly_cleanup_cron_runs_total",
-      "target": {
-        "id": "ep:cron",
-        "kind": "TARGET_KIND_ENDPOINT"
-      },
-      "trigger": {
-        "phase": "TRIGGER_PHASE_END"
-      },
       "type": "METRIC_TYPE_COUNTER",
       "unit": "{run}",
+      "description": "Number of cron runs completed; unit {run}; recorded at operation end",
+      "target": {
+        "kind": "TARGET_KIND_ENDPOINT",
+        "id": "ep:cron"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      },
       "value": {
-        "cardinality": "CARDINALITY_CLASS_CONSTANT",
         "path": "plan.constant.one",
         "source": "VALUE_SOURCE_PLAN_CONSTANT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_CONSTANT"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.nightly_cleanup",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration of cron runs; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:ep:cron:duration",
       "name": "checkout_internal_orders_checkout_orders_nightly_cleanup_cron_run_duration_seconds",
+      "type": "METRIC_TYPE_HISTOGRAM",
+      "unit": "s",
+      "description": "Duration of cron runs; unit s; recorded at operation end",
       "target": {
-        "id": "ep:cron",
-        "kind": "TARGET_KIND_ENDPOINT"
+        "kind": "TARGET_KIND_ENDPOINT",
+        "id": "ep:cron"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_HISTOGRAM",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.nightly_cleanup",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration summary of cron runs; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:ep:cron:duration_summary",
       "name": "checkout_internal_orders_checkout_orders_nightly_cleanup_cron_run_duration_seconds_summary",
+      "type": "METRIC_TYPE_SUMMARY",
+      "unit": "s",
+      "description": "Duration summary of cron runs; unit s; recorded at operation end",
       "target": {
-        "id": "ep:cron",
-        "kind": "TARGET_KIND_ENDPOINT"
+        "kind": "TARGET_KIND_ENDPOINT",
+        "id": "ep:cron"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_SUMMARY",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.nightly_cleanup",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Number of cron runs in flight; unit {operation}; recorded on state change",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:ep:cron:in_flight",
       "name": "checkout_internal_orders_checkout_orders_nightly_cleanup_cron_jobs_in_flight",
+      "type": "METRIC_TYPE_GAUGE",
+      "unit": "{operation}",
+      "description": "Number of cron runs in flight; unit {operation}; recorded on state change",
       "target": {
-        "id": "ep:cron",
-        "kind": "TARGET_KIND_ENDPOINT"
+        "kind": "TARGET_KIND_ENDPOINT",
+        "id": "ep:cron"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_STATE_CHANGE"
       },
-      "type": "METRIC_TYPE_GAUGE",
-      "unit": "{operation}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.in_flight",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
-            "path": "plan.constant.orderservice_createorder",
+            "path": "plan.constant.nightly_cleanup",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
-          }
-        },
-        {
-          "key": "status",
-          "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
-            "path": "runtime.operation.status",
-            "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         }
       ],
-      "description": "Number of gRPC requests completed; unit {request}; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:ep:grpc:count",
       "name": "checkout_internal_orders_checkout_orders_orderservice_createorder_grpc_requests_total",
+      "type": "METRIC_TYPE_COUNTER",
+      "unit": "{request}",
+      "description": "Number of gRPC requests completed; unit {request}; recorded at operation end",
       "target": {
-        "id": "ep:grpc",
-        "kind": "TARGET_KIND_ENDPOINT"
+        "kind": "TARGET_KIND_ENDPOINT",
+        "id": "ep:grpc"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_COUNTER",
-      "unit": "{request}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_CONSTANT",
         "path": "plan.constant.one",
         "source": "VALUE_SOURCE_PLAN_CONSTANT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_CONSTANT"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.orderservice_createorder",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration of gRPC requests; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:ep:grpc:duration",
       "name": "checkout_internal_orders_checkout_orders_orderservice_createorder_grpc_request_duration_seconds",
+      "type": "METRIC_TYPE_HISTOGRAM",
+      "unit": "s",
+      "description": "Duration of gRPC requests; unit s; recorded at operation end",
       "target": {
-        "id": "ep:grpc",
-        "kind": "TARGET_KIND_ENDPOINT"
+        "kind": "TARGET_KIND_ENDPOINT",
+        "id": "ep:grpc"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_HISTOGRAM",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.orderservice_createorder",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration summary of gRPC requests; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:ep:grpc:duration_summary",
       "name": "checkout_internal_orders_checkout_orders_orderservice_createorder_grpc_request_duration_seconds_summary",
+      "type": "METRIC_TYPE_SUMMARY",
+      "unit": "s",
+      "description": "Duration summary of gRPC requests; unit s; recorded at operation end",
       "target": {
-        "id": "ep:grpc",
-        "kind": "TARGET_KIND_ENDPOINT"
+        "kind": "TARGET_KIND_ENDPOINT",
+        "id": "ep:grpc"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_SUMMARY",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.orderservice_createorder",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Number of gRPC requests in flight; unit {operation}; recorded on state change",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:ep:grpc:in_flight",
       "name": "checkout_internal_orders_checkout_orders_orderservice_createorder_grpc_requests_in_flight",
+      "type": "METRIC_TYPE_GAUGE",
+      "unit": "{operation}",
+      "description": "Number of gRPC requests in flight; unit {operation}; recorded on state change",
       "target": {
-        "id": "ep:grpc",
-        "kind": "TARGET_KIND_ENDPOINT"
+        "kind": "TARGET_KIND_ENDPOINT",
+        "id": "ep:grpc"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_STATE_CHANGE"
       },
-      "type": "METRIC_TYPE_GAUGE",
-      "unit": "{operation}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.in_flight",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
-            "path": "plan.constant.post",
+            "path": "plan.constant.orderservice_createorder",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
-          }
-        },
-        {
-          "key": "status",
-          "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
-            "path": "runtime.operation.status",
-            "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         }
       ],
-      "description": "Number of HTTP requests completed; unit {request}; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:ep:orders:count",
       "name": "checkout_internal_orders_checkout_orders_post_http_requests_total",
-      "target": {
-        "id": "ep:orders",
-        "kind": "TARGET_KIND_ENDPOINT"
-      },
-      "trigger": {
-        "phase": "TRIGGER_PHASE_END"
-      },
       "type": "METRIC_TYPE_COUNTER",
       "unit": "{request}",
+      "description": "Number of HTTP requests completed; unit {request}; recorded at operation end",
+      "target": {
+        "kind": "TARGET_KIND_ENDPOINT",
+        "id": "ep:orders"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      },
       "value": {
-        "cardinality": "CARDINALITY_CLASS_CONSTANT",
         "path": "plan.constant.one",
         "source": "VALUE_SOURCE_PLAN_CONSTANT",
-        "type": "VALUE_TYPE_INT64"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_CONSTANT"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.post",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration of HTTP requests; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:ep:orders:duration",
       "name": "checkout_internal_orders_checkout_orders_post_http_request_duration_seconds",
+      "type": "METRIC_TYPE_HISTOGRAM",
+      "unit": "s",
+      "description": "Duration of HTTP requests; unit s; recorded at operation end",
       "target": {
-        "id": "ep:orders",
-        "kind": "TARGET_KIND_ENDPOINT"
+        "kind": "TARGET_KIND_ENDPOINT",
+        "id": "ep:orders"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_HISTOGRAM",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.post",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "status",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_LOW",
             "path": "runtime.operation.status",
             "source": "VALUE_SOURCE_RUNTIME_RESULT",
-            "type": "VALUE_TYPE_STATUS"
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Duration summary of HTTP requests; unit s; recorded at operation end",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:ep:orders:duration_summary",
       "name": "checkout_internal_orders_checkout_orders_post_http_request_duration_seconds_summary",
+      "type": "METRIC_TYPE_SUMMARY",
+      "unit": "s",
+      "description": "Duration summary of HTTP requests; unit s; recorded at operation end",
       "target": {
-        "id": "ep:orders",
-        "kind": "TARGET_KIND_ENDPOINT"
+        "kind": "TARGET_KIND_ENDPOINT",
+        "id": "ep:orders"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
-      "type": "METRIC_TYPE_SUMMARY",
-      "unit": "s",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.duration_seconds",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_DOUBLE"
-      }
-    },
-    {
+        "type": "VALUE_TYPE_DOUBLE",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
       "attributes": [
         {
           "key": "operation",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "plan.constant.post",
             "source": "VALUE_SOURCE_PLAN_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
           }
         },
         {
           "key": "service",
           "value": {
-            "cardinality": "CARDINALITY_CLASS_CONSTANT",
             "path": "service.name",
             "source": "VALUE_SOURCE_IR_CONSTANT",
-            "type": "VALUE_TYPE_STRING"
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS",
+            "cardinality": "CARDINALITY_CLASS_LOW"
           }
         }
       ],
-      "description": "Number of HTTP requests in flight; unit {operation}; recorded on state change",
-      "function_id": "fn:service",
+      "function_id": "fn:service"
+    },
+    {
       "id": "metrics:ep:orders:in_flight",
       "name": "checkout_internal_orders_checkout_orders_post_http_requests_in_flight",
+      "type": "METRIC_TYPE_GAUGE",
+      "unit": "{operation}",
+      "description": "Number of HTTP requests in flight; unit {operation}; recorded on state change",
       "target": {
-        "id": "ep:orders",
-        "kind": "TARGET_KIND_ENDPOINT"
+        "kind": "TARGET_KIND_ENDPOINT",
+        "id": "ep:orders"
       },
       "trigger": {
         "phase": "TRIGGER_PHASE_STATE_CHANGE"
       },
-      "type": "METRIC_TYPE_GAUGE",
-      "unit": "{operation}",
       "value": {
-        "cardinality": "CARDINALITY_CLASS_LOW",
         "path": "runtime.operation.in_flight",
         "source": "VALUE_SOURCE_RUNTIME_RESULT",
-        "type": "VALUE_TYPE_INT64"
-      }
+        "type": "VALUE_TYPE_INT64",
+        "cardinality": "CARDINALITY_CLASS_LOW"
+      },
+      "attributes": [
+        {
+          "key": "operation",
+          "value": {
+            "path": "plan.constant.post",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING",
+            "cardinality": "CARDINALITY_CLASS_CONSTANT"
+          }
+        }
+      ],
+      "function_id": "fn:service"
     }
-  ],
-  "schema_version": "v1",
-  "service_name": "checkout",
-  "source_ir_schema_version": "v1"
+  ]
 }

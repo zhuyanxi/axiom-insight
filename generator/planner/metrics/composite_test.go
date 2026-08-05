@@ -179,11 +179,7 @@ func TestGoldenEndpointAndDependencyMetrics(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Plan failed: %v", err)
 	}
-	contents, err := protojson.MarshalOptions{UseProtoNames: true, Indent: "  "}.Marshal(plan)
-	if err != nil {
-		t.Fatalf("marshal plan: %v", err)
-	}
-	contents = append(contents, '\n')
+	contents := marshalGolden(t, plan)
 
 	goldenPath := filepath.Join("testdata", "golden", "endpoint_dependency_metrics.json")
 	if os.Getenv(updateGoldenEnv) != "" {

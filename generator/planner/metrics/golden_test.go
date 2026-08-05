@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
@@ -11,6 +12,27 @@ import (
 	observabilityv1 "github.com/zhuyanxi/axiom-insight/ir/v1"
 	"google.golang.org/protobuf/encoding/protojson"
 )
+
+// marshalGolden serializes a plan to stable golden bytes. protojson's
+// indented output contains a detrand-seeded extra space after "key:" that
+// varies per compiled binary; re-marshaling through encoding/json removes
+// that build dependence so golden files are byte-stable everywhere.
+func marshalGolden(t *testing.T, plan *observabilityv1.GenerationPlan) []byte {
+	t.Helper()
+	contents, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(plan)
+	if err != nil {
+		t.Fatalf("marshal plan: %v", err)
+	}
+	var value any
+	if err := json.Unmarshal(contents, &value); err != nil {
+		t.Fatalf("unmarshal plan JSON: %v", err)
+	}
+	normalized, err := json.MarshalIndent(value, "", "  ")
+	if err != nil {
+		t.Fatalf("normalize plan JSON: %v", err)
+	}
+	return append(normalized, '\n')
+}
 
 // updateGoldenEnv switches golden-file regeneration on for this test
 // only, matching the repository-wide convention.
@@ -29,11 +51,7 @@ func TestGoldenEndpointMetrics(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Plan failed: %v", err)
 	}
-	contents, err := protojson.MarshalOptions{UseProtoNames: true, Indent: "  "}.Marshal(plan)
-	if err != nil {
-		t.Fatalf("marshal plan: %v", err)
-	}
-	contents = append(contents, '\n')
+	contents := marshalGolden(t, plan)
 
 	goldenPath := filepath.Join("testdata", "golden", "endpoint_metrics.json")
 	if os.Getenv(updateGoldenEnv) != "" {

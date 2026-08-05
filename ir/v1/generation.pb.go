@@ -21,6 +21,64 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// CarrierType identifies the abstract carrier a remote parent context is
+// extracted from. It names a class of runtime values, never a concrete
+// header map.
+type CarrierType int32
+
+const (
+	CarrierType_CARRIER_TYPE_UNSPECIFIED   CarrierType = 0
+	CarrierType_CARRIER_TYPE_HTTP_HEADERS  CarrierType = 1
+	CarrierType_CARRIER_TYPE_GRPC_METADATA CarrierType = 2
+	CarrierType_CARRIER_TYPE_KAFKA_HEADERS CarrierType = 3
+	CarrierType_CARRIER_TYPE_NONE          CarrierType = 4
+)
+
+// Enum value maps for CarrierType.
+var (
+	CarrierType_name = map[int32]string{
+		0: "CARRIER_TYPE_UNSPECIFIED",
+		1: "CARRIER_TYPE_HTTP_HEADERS",
+		2: "CARRIER_TYPE_GRPC_METADATA",
+		3: "CARRIER_TYPE_KAFKA_HEADERS",
+		4: "CARRIER_TYPE_NONE",
+	}
+	CarrierType_value = map[string]int32{
+		"CARRIER_TYPE_UNSPECIFIED":   0,
+		"CARRIER_TYPE_HTTP_HEADERS":  1,
+		"CARRIER_TYPE_GRPC_METADATA": 2,
+		"CARRIER_TYPE_KAFKA_HEADERS": 3,
+		"CARRIER_TYPE_NONE":          4,
+	}
+)
+
+func (x CarrierType) Enum() *CarrierType {
+	p := new(CarrierType)
+	*p = x
+	return p
+}
+
+func (x CarrierType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (CarrierType) Descriptor() protoreflect.EnumDescriptor {
+	return file_ir_v1_generation_proto_enumTypes[0].Descriptor()
+}
+
+func (CarrierType) Type() protoreflect.EnumType {
+	return &file_ir_v1_generation_proto_enumTypes[0]
+}
+
+func (x CarrierType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use CarrierType.Descriptor instead.
+func (CarrierType) EnumDescriptor() ([]byte, []int) {
+	return file_ir_v1_generation_proto_rawDescGZIP(), []int{0}
+}
+
 // MetricType identifies the supported instrument types.
 type MetricType int32
 
@@ -61,11 +119,11 @@ func (x MetricType) String() string {
 }
 
 func (MetricType) Descriptor() protoreflect.EnumDescriptor {
-	return file_ir_v1_generation_proto_enumTypes[0].Descriptor()
+	return file_ir_v1_generation_proto_enumTypes[1].Descriptor()
 }
 
 func (MetricType) Type() protoreflect.EnumType {
-	return &file_ir_v1_generation_proto_enumTypes[0]
+	return &file_ir_v1_generation_proto_enumTypes[1]
 }
 
 func (x MetricType) Number() protoreflect.EnumNumber {
@@ -74,7 +132,7 @@ func (x MetricType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MetricType.Descriptor instead.
 func (MetricType) EnumDescriptor() ([]byte, []int) {
-	return file_ir_v1_generation_proto_rawDescGZIP(), []int{0}
+	return file_ir_v1_generation_proto_rawDescGZIP(), []int{1}
 }
 
 // SpanKind mirrors OpenTelemetry span kinds by name only; it does not
@@ -121,11 +179,11 @@ func (x SpanKind) String() string {
 }
 
 func (SpanKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_ir_v1_generation_proto_enumTypes[1].Descriptor()
+	return file_ir_v1_generation_proto_enumTypes[2].Descriptor()
 }
 
 func (SpanKind) Type() protoreflect.EnumType {
-	return &file_ir_v1_generation_proto_enumTypes[1]
+	return &file_ir_v1_generation_proto_enumTypes[2]
 }
 
 func (x SpanKind) Number() protoreflect.EnumNumber {
@@ -134,7 +192,7 @@ func (x SpanKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use SpanKind.Descriptor instead.
 func (SpanKind) EnumDescriptor() ([]byte, []int) {
-	return file_ir_v1_generation_proto_rawDescGZIP(), []int{1}
+	return file_ir_v1_generation_proto_rawDescGZIP(), []int{2}
 }
 
 // TargetKind identifies which IR entity a plan item references.
@@ -177,11 +235,11 @@ func (x TargetKind) String() string {
 }
 
 func (TargetKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_ir_v1_generation_proto_enumTypes[2].Descriptor()
+	return file_ir_v1_generation_proto_enumTypes[3].Descriptor()
 }
 
 func (TargetKind) Type() protoreflect.EnumType {
-	return &file_ir_v1_generation_proto_enumTypes[2]
+	return &file_ir_v1_generation_proto_enumTypes[3]
 }
 
 func (x TargetKind) Number() protoreflect.EnumNumber {
@@ -190,7 +248,7 @@ func (x TargetKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TargetKind.Descriptor instead.
 func (TargetKind) EnumDescriptor() ([]byte, []int) {
-	return file_ir_v1_generation_proto_rawDescGZIP(), []int{2}
+	return file_ir_v1_generation_proto_rawDescGZIP(), []int{3}
 }
 
 // TriggerPhase identifies the moment a signal is recorded.
@@ -233,11 +291,11 @@ func (x TriggerPhase) String() string {
 }
 
 func (TriggerPhase) Descriptor() protoreflect.EnumDescriptor {
-	return file_ir_v1_generation_proto_enumTypes[3].Descriptor()
+	return file_ir_v1_generation_proto_enumTypes[4].Descriptor()
 }
 
 func (TriggerPhase) Type() protoreflect.EnumType {
-	return &file_ir_v1_generation_proto_enumTypes[3]
+	return &file_ir_v1_generation_proto_enumTypes[4]
 }
 
 func (x TriggerPhase) Number() protoreflect.EnumNumber {
@@ -246,7 +304,7 @@ func (x TriggerPhase) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TriggerPhase.Descriptor instead.
 func (TriggerPhase) EnumDescriptor() ([]byte, []int) {
-	return file_ir_v1_generation_proto_rawDescGZIP(), []int{3}
+	return file_ir_v1_generation_proto_rawDescGZIP(), []int{4}
 }
 
 // ValueSource classifies where a bound value comes from.
@@ -302,11 +360,11 @@ func (x ValueSource) String() string {
 }
 
 func (ValueSource) Descriptor() protoreflect.EnumDescriptor {
-	return file_ir_v1_generation_proto_enumTypes[4].Descriptor()
+	return file_ir_v1_generation_proto_enumTypes[5].Descriptor()
 }
 
 func (ValueSource) Type() protoreflect.EnumType {
-	return &file_ir_v1_generation_proto_enumTypes[4]
+	return &file_ir_v1_generation_proto_enumTypes[5]
 }
 
 func (x ValueSource) Number() protoreflect.EnumNumber {
@@ -315,7 +373,7 @@ func (x ValueSource) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ValueSource.Descriptor instead.
 func (ValueSource) EnumDescriptor() ([]byte, []int) {
-	return file_ir_v1_generation_proto_rawDescGZIP(), []int{4}
+	return file_ir_v1_generation_proto_rawDescGZIP(), []int{5}
 }
 
 // ValueType is the data type of a bound value.
@@ -362,11 +420,11 @@ func (x ValueType) String() string {
 }
 
 func (ValueType) Descriptor() protoreflect.EnumDescriptor {
-	return file_ir_v1_generation_proto_enumTypes[5].Descriptor()
+	return file_ir_v1_generation_proto_enumTypes[6].Descriptor()
 }
 
 func (ValueType) Type() protoreflect.EnumType {
-	return &file_ir_v1_generation_proto_enumTypes[5]
+	return &file_ir_v1_generation_proto_enumTypes[6]
 }
 
 func (x ValueType) Number() protoreflect.EnumNumber {
@@ -375,7 +433,7 @@ func (x ValueType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ValueType.Descriptor instead.
 func (ValueType) EnumDescriptor() ([]byte, []int) {
-	return file_ir_v1_generation_proto_rawDescGZIP(), []int{5}
+	return file_ir_v1_generation_proto_rawDescGZIP(), []int{6}
 }
 
 // CardinalityClass estimates how many distinct values a binding may take.
@@ -418,11 +476,11 @@ func (x CardinalityClass) String() string {
 }
 
 func (CardinalityClass) Descriptor() protoreflect.EnumDescriptor {
-	return file_ir_v1_generation_proto_enumTypes[6].Descriptor()
+	return file_ir_v1_generation_proto_enumTypes[7].Descriptor()
 }
 
 func (CardinalityClass) Type() protoreflect.EnumType {
-	return &file_ir_v1_generation_proto_enumTypes[6]
+	return &file_ir_v1_generation_proto_enumTypes[7]
 }
 
 func (x CardinalityClass) Number() protoreflect.EnumNumber {
@@ -431,7 +489,7 @@ func (x CardinalityClass) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use CardinalityClass.Descriptor instead.
 func (CardinalityClass) EnumDescriptor() ([]byte, []int) {
-	return file_ir_v1_generation_proto_rawDescGZIP(), []int{6}
+	return file_ir_v1_generation_proto_rawDescGZIP(), []int{7}
 }
 
 // ParentStrategyMode chooses how a parent span is established.
@@ -480,11 +538,11 @@ func (x ParentStrategyMode) String() string {
 }
 
 func (ParentStrategyMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_ir_v1_generation_proto_enumTypes[7].Descriptor()
+	return file_ir_v1_generation_proto_enumTypes[8].Descriptor()
 }
 
 func (ParentStrategyMode) Type() protoreflect.EnumType {
-	return &file_ir_v1_generation_proto_enumTypes[7]
+	return &file_ir_v1_generation_proto_enumTypes[8]
 }
 
 func (x ParentStrategyMode) Number() protoreflect.EnumNumber {
@@ -493,7 +551,7 @@ func (x ParentStrategyMode) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ParentStrategyMode.Descriptor instead.
 func (ParentStrategyMode) EnumDescriptor() ([]byte, []int) {
-	return file_ir_v1_generation_proto_rawDescGZIP(), []int{7}
+	return file_ir_v1_generation_proto_rawDescGZIP(), []int{8}
 }
 
 // StatusSetting is an OTel-compatible span status output.
@@ -533,11 +591,11 @@ func (x StatusSetting) String() string {
 }
 
 func (StatusSetting) Descriptor() protoreflect.EnumDescriptor {
-	return file_ir_v1_generation_proto_enumTypes[8].Descriptor()
+	return file_ir_v1_generation_proto_enumTypes[9].Descriptor()
 }
 
 func (StatusSetting) Type() protoreflect.EnumType {
-	return &file_ir_v1_generation_proto_enumTypes[8]
+	return &file_ir_v1_generation_proto_enumTypes[9]
 }
 
 func (x StatusSetting) Number() protoreflect.EnumNumber {
@@ -546,7 +604,7 @@ func (x StatusSetting) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use StatusSetting.Descriptor instead.
 func (StatusSetting) EnumDescriptor() ([]byte, []int) {
-	return file_ir_v1_generation_proto_rawDescGZIP(), []int{8}
+	return file_ir_v1_generation_proto_rawDescGZIP(), []int{9}
 }
 
 // RuntimeStatus is the finite runtime operation status vocabulary.
@@ -592,11 +650,11 @@ func (x RuntimeStatus) String() string {
 }
 
 func (RuntimeStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_ir_v1_generation_proto_enumTypes[9].Descriptor()
+	return file_ir_v1_generation_proto_enumTypes[10].Descriptor()
 }
 
 func (RuntimeStatus) Type() protoreflect.EnumType {
-	return &file_ir_v1_generation_proto_enumTypes[9]
+	return &file_ir_v1_generation_proto_enumTypes[10]
 }
 
 func (x RuntimeStatus) Number() protoreflect.EnumNumber {
@@ -605,7 +663,7 @@ func (x RuntimeStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use RuntimeStatus.Descriptor instead.
 func (RuntimeStatus) EnumDescriptor() ([]byte, []int) {
-	return file_ir_v1_generation_proto_rawDescGZIP(), []int{9}
+	return file_ir_v1_generation_proto_rawDescGZIP(), []int{10}
 }
 
 // LogSeverity is the structured log severity vocabulary.
@@ -645,11 +703,11 @@ func (x LogSeverity) String() string {
 }
 
 func (LogSeverity) Descriptor() protoreflect.EnumDescriptor {
-	return file_ir_v1_generation_proto_enumTypes[10].Descriptor()
+	return file_ir_v1_generation_proto_enumTypes[11].Descriptor()
 }
 
 func (LogSeverity) Type() protoreflect.EnumType {
-	return &file_ir_v1_generation_proto_enumTypes[10]
+	return &file_ir_v1_generation_proto_enumTypes[11]
 }
 
 func (x LogSeverity) Number() protoreflect.EnumNumber {
@@ -658,7 +716,7 @@ func (x LogSeverity) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use LogSeverity.Descriptor instead.
 func (LogSeverity) EnumDescriptor() ([]byte, []int) {
-	return file_ir_v1_generation_proto_rawDescGZIP(), []int{10}
+	return file_ir_v1_generation_proto_rawDescGZIP(), []int{11}
 }
 
 // PlanSeverity is the generator diagnostic severity vocabulary.
@@ -698,11 +756,11 @@ func (x PlanSeverity) String() string {
 }
 
 func (PlanSeverity) Descriptor() protoreflect.EnumDescriptor {
-	return file_ir_v1_generation_proto_enumTypes[11].Descriptor()
+	return file_ir_v1_generation_proto_enumTypes[12].Descriptor()
 }
 
 func (PlanSeverity) Type() protoreflect.EnumType {
-	return &file_ir_v1_generation_proto_enumTypes[11]
+	return &file_ir_v1_generation_proto_enumTypes[12]
 }
 
 func (x PlanSeverity) Number() protoreflect.EnumNumber {
@@ -711,7 +769,7 @@ func (x PlanSeverity) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use PlanSeverity.Descriptor instead.
 func (PlanSeverity) EnumDescriptor() ([]byte, []int) {
-	return file_ir_v1_generation_proto_rawDescGZIP(), []int{11}
+	return file_ir_v1_generation_proto_rawDescGZIP(), []int{12}
 }
 
 // GenerationPlan is the language-neutral, strongly typed output of the
@@ -1484,8 +1542,12 @@ type ParentStrategy struct {
 	// static_parent_span_id is required when mode is STATIC and must
 	// reference another SpanPlan id.
 	StaticParentSpanId string `protobuf:"bytes,2,opt,name=static_parent_span_id,json=staticParentSpanId,proto3" json:"static_parent_span_id,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// carrier names the abstract carrier a remote parent is extracted from.
+	// Required (HTTP_HEADERS, GRPC_METADATA or KAFKA_HEADERS) when mode is
+	// EXTRACT_OR_ROOT; must be UNSPECIFIED or NONE otherwise.
+	Carrier       CarrierType `protobuf:"varint,3,opt,name=carrier,proto3,enum=axiom.insight.ir.v1.CarrierType" json:"carrier,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ParentStrategy) Reset() {
@@ -1530,6 +1592,13 @@ func (x *ParentStrategy) GetStaticParentSpanId() string {
 		return x.StaticParentSpanId
 	}
 	return ""
+}
+
+func (x *ParentStrategy) GetCarrier() CarrierType {
+	if x != nil {
+		return x.Carrier
+	}
+	return CarrierType_CARRIER_TYPE_UNSPECIFIED
 }
 
 // StatusPolicy maps each runtime operation status to a span status.
@@ -1817,10 +1886,11 @@ const file_ir_v1_generation_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\v2!.axiom.insight.ir.v1.ValueBindingR\x05value\"Y\n" +
 	"\fFieldBinding\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x127\n" +
-	"\x05value\x18\x02 \x01(\v2!.axiom.insight.ir.v1.ValueBindingR\x05value\"\x80\x01\n" +
+	"\x05value\x18\x02 \x01(\v2!.axiom.insight.ir.v1.ValueBindingR\x05value\"\xbc\x01\n" +
 	"\x0eParentStrategy\x12;\n" +
 	"\x04mode\x18\x01 \x01(\x0e2'.axiom.insight.ir.v1.ParentStrategyModeR\x04mode\x121\n" +
-	"\x15static_parent_span_id\x18\x02 \x01(\tR\x12staticParentSpanId\"\xba\x02\n" +
+	"\x15static_parent_span_id\x18\x02 \x01(\tR\x12staticParentSpanId\x12:\n" +
+	"\acarrier\x18\x03 \x01(\x0e2 .axiom.insight.ir.v1.CarrierTypeR\acarrier\"\xba\x02\n" +
 	"\fStatusPolicy\x122\n" +
 	"\x02ok\x18\x01 \x01(\x0e2\".axiom.insight.ir.v1.StatusSettingR\x02ok\x128\n" +
 	"\x05error\x18\x02 \x01(\x0e2\".axiom.insight.ir.v1.StatusSettingR\x05error\x12<\n" +
@@ -1837,7 +1907,13 @@ const file_ir_v1_generation_proto_rawDesc = "" +
 	"\x0ePlanDiagnostic\x12=\n" +
 	"\bseverity\x18\x01 \x01(\x0e2!.axiom.insight.ir.v1.PlanSeverityR\bseverity\x12\x12\n" +
 	"\x04code\x18\x02 \x01(\tR\x04code\x12\x18\n" +
-	"\amessage\x18\x03 \x01(\tR\amessage*\x8d\x01\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage*\xa1\x01\n" +
+	"\vCarrierType\x12\x1c\n" +
+	"\x18CARRIER_TYPE_UNSPECIFIED\x10\x00\x12\x1d\n" +
+	"\x19CARRIER_TYPE_HTTP_HEADERS\x10\x01\x12\x1e\n" +
+	"\x1aCARRIER_TYPE_GRPC_METADATA\x10\x02\x12\x1e\n" +
+	"\x1aCARRIER_TYPE_KAFKA_HEADERS\x10\x03\x12\x15\n" +
+	"\x11CARRIER_TYPE_NONE\x10\x04*\x8d\x01\n" +
 	"\n" +
 	"MetricType\x12\x1b\n" +
 	"\x17METRIC_TYPE_UNSPECIFIED\x10\x00\x12\x17\n" +
@@ -1924,78 +2000,80 @@ func file_ir_v1_generation_proto_rawDescGZIP() []byte {
 	return file_ir_v1_generation_proto_rawDescData
 }
 
-var file_ir_v1_generation_proto_enumTypes = make([]protoimpl.EnumInfo, 12)
+var file_ir_v1_generation_proto_enumTypes = make([]protoimpl.EnumInfo, 13)
 var file_ir_v1_generation_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_ir_v1_generation_proto_goTypes = []any{
-	(MetricType)(0),          // 0: axiom.insight.ir.v1.MetricType
-	(SpanKind)(0),            // 1: axiom.insight.ir.v1.SpanKind
-	(TargetKind)(0),          // 2: axiom.insight.ir.v1.TargetKind
-	(TriggerPhase)(0),        // 3: axiom.insight.ir.v1.TriggerPhase
-	(ValueSource)(0),         // 4: axiom.insight.ir.v1.ValueSource
-	(ValueType)(0),           // 5: axiom.insight.ir.v1.ValueType
-	(CardinalityClass)(0),    // 6: axiom.insight.ir.v1.CardinalityClass
-	(ParentStrategyMode)(0),  // 7: axiom.insight.ir.v1.ParentStrategyMode
-	(StatusSetting)(0),       // 8: axiom.insight.ir.v1.StatusSetting
-	(RuntimeStatus)(0),       // 9: axiom.insight.ir.v1.RuntimeStatus
-	(LogSeverity)(0),         // 10: axiom.insight.ir.v1.LogSeverity
-	(PlanSeverity)(0),        // 11: axiom.insight.ir.v1.PlanSeverity
-	(*GenerationPlan)(nil),   // 12: axiom.insight.ir.v1.GenerationPlan
-	(*MetricPlan)(nil),       // 13: axiom.insight.ir.v1.MetricPlan
-	(*SpanPlan)(nil),         // 14: axiom.insight.ir.v1.SpanPlan
-	(*LogPlan)(nil),          // 15: axiom.insight.ir.v1.LogPlan
-	(*TargetRef)(nil),        // 16: axiom.insight.ir.v1.TargetRef
-	(*Trigger)(nil),          // 17: axiom.insight.ir.v1.Trigger
-	(*ValueBinding)(nil),     // 18: axiom.insight.ir.v1.ValueBinding
-	(*AttributeBinding)(nil), // 19: axiom.insight.ir.v1.AttributeBinding
-	(*FieldBinding)(nil),     // 20: axiom.insight.ir.v1.FieldBinding
-	(*ParentStrategy)(nil),   // 21: axiom.insight.ir.v1.ParentStrategy
-	(*StatusPolicy)(nil),     // 22: axiom.insight.ir.v1.StatusPolicy
-	(*SpanEvent)(nil),        // 23: axiom.insight.ir.v1.SpanEvent
-	(*PlanDiagnostic)(nil),   // 24: axiom.insight.ir.v1.PlanDiagnostic
+	(CarrierType)(0),         // 0: axiom.insight.ir.v1.CarrierType
+	(MetricType)(0),          // 1: axiom.insight.ir.v1.MetricType
+	(SpanKind)(0),            // 2: axiom.insight.ir.v1.SpanKind
+	(TargetKind)(0),          // 3: axiom.insight.ir.v1.TargetKind
+	(TriggerPhase)(0),        // 4: axiom.insight.ir.v1.TriggerPhase
+	(ValueSource)(0),         // 5: axiom.insight.ir.v1.ValueSource
+	(ValueType)(0),           // 6: axiom.insight.ir.v1.ValueType
+	(CardinalityClass)(0),    // 7: axiom.insight.ir.v1.CardinalityClass
+	(ParentStrategyMode)(0),  // 8: axiom.insight.ir.v1.ParentStrategyMode
+	(StatusSetting)(0),       // 9: axiom.insight.ir.v1.StatusSetting
+	(RuntimeStatus)(0),       // 10: axiom.insight.ir.v1.RuntimeStatus
+	(LogSeverity)(0),         // 11: axiom.insight.ir.v1.LogSeverity
+	(PlanSeverity)(0),        // 12: axiom.insight.ir.v1.PlanSeverity
+	(*GenerationPlan)(nil),   // 13: axiom.insight.ir.v1.GenerationPlan
+	(*MetricPlan)(nil),       // 14: axiom.insight.ir.v1.MetricPlan
+	(*SpanPlan)(nil),         // 15: axiom.insight.ir.v1.SpanPlan
+	(*LogPlan)(nil),          // 16: axiom.insight.ir.v1.LogPlan
+	(*TargetRef)(nil),        // 17: axiom.insight.ir.v1.TargetRef
+	(*Trigger)(nil),          // 18: axiom.insight.ir.v1.Trigger
+	(*ValueBinding)(nil),     // 19: axiom.insight.ir.v1.ValueBinding
+	(*AttributeBinding)(nil), // 20: axiom.insight.ir.v1.AttributeBinding
+	(*FieldBinding)(nil),     // 21: axiom.insight.ir.v1.FieldBinding
+	(*ParentStrategy)(nil),   // 22: axiom.insight.ir.v1.ParentStrategy
+	(*StatusPolicy)(nil),     // 23: axiom.insight.ir.v1.StatusPolicy
+	(*SpanEvent)(nil),        // 24: axiom.insight.ir.v1.SpanEvent
+	(*PlanDiagnostic)(nil),   // 25: axiom.insight.ir.v1.PlanDiagnostic
 }
 var file_ir_v1_generation_proto_depIdxs = []int32{
-	13, // 0: axiom.insight.ir.v1.GenerationPlan.metrics:type_name -> axiom.insight.ir.v1.MetricPlan
-	14, // 1: axiom.insight.ir.v1.GenerationPlan.spans:type_name -> axiom.insight.ir.v1.SpanPlan
-	15, // 2: axiom.insight.ir.v1.GenerationPlan.logs:type_name -> axiom.insight.ir.v1.LogPlan
-	24, // 3: axiom.insight.ir.v1.GenerationPlan.diagnostics:type_name -> axiom.insight.ir.v1.PlanDiagnostic
-	0,  // 4: axiom.insight.ir.v1.MetricPlan.type:type_name -> axiom.insight.ir.v1.MetricType
-	16, // 5: axiom.insight.ir.v1.MetricPlan.target:type_name -> axiom.insight.ir.v1.TargetRef
-	17, // 6: axiom.insight.ir.v1.MetricPlan.trigger:type_name -> axiom.insight.ir.v1.Trigger
-	18, // 7: axiom.insight.ir.v1.MetricPlan.value:type_name -> axiom.insight.ir.v1.ValueBinding
-	19, // 8: axiom.insight.ir.v1.MetricPlan.attributes:type_name -> axiom.insight.ir.v1.AttributeBinding
-	1,  // 9: axiom.insight.ir.v1.SpanPlan.kind:type_name -> axiom.insight.ir.v1.SpanKind
-	16, // 10: axiom.insight.ir.v1.SpanPlan.target:type_name -> axiom.insight.ir.v1.TargetRef
-	17, // 11: axiom.insight.ir.v1.SpanPlan.start_trigger:type_name -> axiom.insight.ir.v1.Trigger
-	17, // 12: axiom.insight.ir.v1.SpanPlan.end_trigger:type_name -> axiom.insight.ir.v1.Trigger
-	21, // 13: axiom.insight.ir.v1.SpanPlan.parent:type_name -> axiom.insight.ir.v1.ParentStrategy
-	19, // 14: axiom.insight.ir.v1.SpanPlan.attributes:type_name -> axiom.insight.ir.v1.AttributeBinding
-	22, // 15: axiom.insight.ir.v1.SpanPlan.status:type_name -> axiom.insight.ir.v1.StatusPolicy
-	23, // 16: axiom.insight.ir.v1.SpanPlan.events:type_name -> axiom.insight.ir.v1.SpanEvent
-	10, // 17: axiom.insight.ir.v1.LogPlan.severity:type_name -> axiom.insight.ir.v1.LogSeverity
-	16, // 18: axiom.insight.ir.v1.LogPlan.target:type_name -> axiom.insight.ir.v1.TargetRef
-	17, // 19: axiom.insight.ir.v1.LogPlan.trigger:type_name -> axiom.insight.ir.v1.Trigger
-	20, // 20: axiom.insight.ir.v1.LogPlan.fields:type_name -> axiom.insight.ir.v1.FieldBinding
-	2,  // 21: axiom.insight.ir.v1.TargetRef.kind:type_name -> axiom.insight.ir.v1.TargetKind
-	3,  // 22: axiom.insight.ir.v1.Trigger.phase:type_name -> axiom.insight.ir.v1.TriggerPhase
-	4,  // 23: axiom.insight.ir.v1.ValueBinding.source:type_name -> axiom.insight.ir.v1.ValueSource
-	5,  // 24: axiom.insight.ir.v1.ValueBinding.type:type_name -> axiom.insight.ir.v1.ValueType
-	6,  // 25: axiom.insight.ir.v1.ValueBinding.cardinality:type_name -> axiom.insight.ir.v1.CardinalityClass
-	18, // 26: axiom.insight.ir.v1.AttributeBinding.value:type_name -> axiom.insight.ir.v1.ValueBinding
-	18, // 27: axiom.insight.ir.v1.FieldBinding.value:type_name -> axiom.insight.ir.v1.ValueBinding
-	7,  // 28: axiom.insight.ir.v1.ParentStrategy.mode:type_name -> axiom.insight.ir.v1.ParentStrategyMode
-	8,  // 29: axiom.insight.ir.v1.StatusPolicy.ok:type_name -> axiom.insight.ir.v1.StatusSetting
-	8,  // 30: axiom.insight.ir.v1.StatusPolicy.error:type_name -> axiom.insight.ir.v1.StatusSetting
-	8,  // 31: axiom.insight.ir.v1.StatusPolicy.timeout:type_name -> axiom.insight.ir.v1.StatusSetting
-	8,  // 32: axiom.insight.ir.v1.StatusPolicy.cancelled:type_name -> axiom.insight.ir.v1.StatusSetting
-	8,  // 33: axiom.insight.ir.v1.StatusPolicy.unknown:type_name -> axiom.insight.ir.v1.StatusSetting
-	9,  // 34: axiom.insight.ir.v1.SpanEvent.statuses:type_name -> axiom.insight.ir.v1.RuntimeStatus
-	19, // 35: axiom.insight.ir.v1.SpanEvent.attributes:type_name -> axiom.insight.ir.v1.AttributeBinding
-	11, // 36: axiom.insight.ir.v1.PlanDiagnostic.severity:type_name -> axiom.insight.ir.v1.PlanSeverity
-	37, // [37:37] is the sub-list for method output_type
-	37, // [37:37] is the sub-list for method input_type
-	37, // [37:37] is the sub-list for extension type_name
-	37, // [37:37] is the sub-list for extension extendee
-	0,  // [0:37] is the sub-list for field type_name
+	14, // 0: axiom.insight.ir.v1.GenerationPlan.metrics:type_name -> axiom.insight.ir.v1.MetricPlan
+	15, // 1: axiom.insight.ir.v1.GenerationPlan.spans:type_name -> axiom.insight.ir.v1.SpanPlan
+	16, // 2: axiom.insight.ir.v1.GenerationPlan.logs:type_name -> axiom.insight.ir.v1.LogPlan
+	25, // 3: axiom.insight.ir.v1.GenerationPlan.diagnostics:type_name -> axiom.insight.ir.v1.PlanDiagnostic
+	1,  // 4: axiom.insight.ir.v1.MetricPlan.type:type_name -> axiom.insight.ir.v1.MetricType
+	17, // 5: axiom.insight.ir.v1.MetricPlan.target:type_name -> axiom.insight.ir.v1.TargetRef
+	18, // 6: axiom.insight.ir.v1.MetricPlan.trigger:type_name -> axiom.insight.ir.v1.Trigger
+	19, // 7: axiom.insight.ir.v1.MetricPlan.value:type_name -> axiom.insight.ir.v1.ValueBinding
+	20, // 8: axiom.insight.ir.v1.MetricPlan.attributes:type_name -> axiom.insight.ir.v1.AttributeBinding
+	2,  // 9: axiom.insight.ir.v1.SpanPlan.kind:type_name -> axiom.insight.ir.v1.SpanKind
+	17, // 10: axiom.insight.ir.v1.SpanPlan.target:type_name -> axiom.insight.ir.v1.TargetRef
+	18, // 11: axiom.insight.ir.v1.SpanPlan.start_trigger:type_name -> axiom.insight.ir.v1.Trigger
+	18, // 12: axiom.insight.ir.v1.SpanPlan.end_trigger:type_name -> axiom.insight.ir.v1.Trigger
+	22, // 13: axiom.insight.ir.v1.SpanPlan.parent:type_name -> axiom.insight.ir.v1.ParentStrategy
+	20, // 14: axiom.insight.ir.v1.SpanPlan.attributes:type_name -> axiom.insight.ir.v1.AttributeBinding
+	23, // 15: axiom.insight.ir.v1.SpanPlan.status:type_name -> axiom.insight.ir.v1.StatusPolicy
+	24, // 16: axiom.insight.ir.v1.SpanPlan.events:type_name -> axiom.insight.ir.v1.SpanEvent
+	11, // 17: axiom.insight.ir.v1.LogPlan.severity:type_name -> axiom.insight.ir.v1.LogSeverity
+	17, // 18: axiom.insight.ir.v1.LogPlan.target:type_name -> axiom.insight.ir.v1.TargetRef
+	18, // 19: axiom.insight.ir.v1.LogPlan.trigger:type_name -> axiom.insight.ir.v1.Trigger
+	21, // 20: axiom.insight.ir.v1.LogPlan.fields:type_name -> axiom.insight.ir.v1.FieldBinding
+	3,  // 21: axiom.insight.ir.v1.TargetRef.kind:type_name -> axiom.insight.ir.v1.TargetKind
+	4,  // 22: axiom.insight.ir.v1.Trigger.phase:type_name -> axiom.insight.ir.v1.TriggerPhase
+	5,  // 23: axiom.insight.ir.v1.ValueBinding.source:type_name -> axiom.insight.ir.v1.ValueSource
+	6,  // 24: axiom.insight.ir.v1.ValueBinding.type:type_name -> axiom.insight.ir.v1.ValueType
+	7,  // 25: axiom.insight.ir.v1.ValueBinding.cardinality:type_name -> axiom.insight.ir.v1.CardinalityClass
+	19, // 26: axiom.insight.ir.v1.AttributeBinding.value:type_name -> axiom.insight.ir.v1.ValueBinding
+	19, // 27: axiom.insight.ir.v1.FieldBinding.value:type_name -> axiom.insight.ir.v1.ValueBinding
+	8,  // 28: axiom.insight.ir.v1.ParentStrategy.mode:type_name -> axiom.insight.ir.v1.ParentStrategyMode
+	0,  // 29: axiom.insight.ir.v1.ParentStrategy.carrier:type_name -> axiom.insight.ir.v1.CarrierType
+	9,  // 30: axiom.insight.ir.v1.StatusPolicy.ok:type_name -> axiom.insight.ir.v1.StatusSetting
+	9,  // 31: axiom.insight.ir.v1.StatusPolicy.error:type_name -> axiom.insight.ir.v1.StatusSetting
+	9,  // 32: axiom.insight.ir.v1.StatusPolicy.timeout:type_name -> axiom.insight.ir.v1.StatusSetting
+	9,  // 33: axiom.insight.ir.v1.StatusPolicy.cancelled:type_name -> axiom.insight.ir.v1.StatusSetting
+	9,  // 34: axiom.insight.ir.v1.StatusPolicy.unknown:type_name -> axiom.insight.ir.v1.StatusSetting
+	10, // 35: axiom.insight.ir.v1.SpanEvent.statuses:type_name -> axiom.insight.ir.v1.RuntimeStatus
+	20, // 36: axiom.insight.ir.v1.SpanEvent.attributes:type_name -> axiom.insight.ir.v1.AttributeBinding
+	12, // 37: axiom.insight.ir.v1.PlanDiagnostic.severity:type_name -> axiom.insight.ir.v1.PlanSeverity
+	38, // [38:38] is the sub-list for method output_type
+	38, // [38:38] is the sub-list for method input_type
+	38, // [38:38] is the sub-list for extension type_name
+	38, // [38:38] is the sub-list for extension extendee
+	0,  // [0:38] is the sub-list for field type_name
 }
 
 func init() { file_ir_v1_generation_proto_init() }
@@ -2008,7 +2086,7 @@ func file_ir_v1_generation_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ir_v1_generation_proto_rawDesc), len(file_ir_v1_generation_proto_rawDesc)),
-			NumEnums:      12,
+			NumEnums:      13,
 			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,

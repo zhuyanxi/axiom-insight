@@ -307,7 +307,7 @@ func fullGenerationPlan() *GenerationPlan {
 				Target:       &TargetRef{Kind: TargetKind_TARGET_KIND_ENDPOINT, Id: "endpoint:http:create-order"},
 				StartTrigger: &Trigger{Phase: TriggerPhase_TRIGGER_PHASE_START},
 				EndTrigger:   &Trigger{Phase: TriggerPhase_TRIGGER_PHASE_END},
-				Parent:       &ParentStrategy{Mode: ParentStrategyMode_PARENT_STRATEGY_MODE_EXTRACT_OR_ROOT},
+				Parent:       &ParentStrategy{Mode: ParentStrategyMode_PARENT_STRATEGY_MODE_EXTRACT_OR_ROOT, Carrier: CarrierType_CARRIER_TYPE_HTTP_HEADERS},
 				Attributes: []*AttributeBinding{
 					{
 						Key: "http.request.method",

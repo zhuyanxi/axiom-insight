@@ -1,0 +1,265 @@
+{
+  "schema_version": "v1",
+  "service_name": "checkout",
+  "source_ir_schema_version": "v1",
+  "spans": [
+    {
+      "attributes": [
+        {
+          "key": "code.function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "code.namespace",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "cron.job.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "cron.job.schedule",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.cron_schedule",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service.version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "end_trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      },
+      "id": "tracing:ep:cron:root",
+      "kind": "SPAN_KIND_INTERNAL",
+      "name": "cron Nightly Cleanup",
+      "parent": {
+        "carrier": "CARRIER_TYPE_NONE",
+        "mode": "PARENT_STRATEGY_MODE_NEW_ROOT"
+      },
+      "start_trigger": {
+        "phase": "TRIGGER_PHASE_START"
+      },
+      "status": {
+        "cancelled": "STATUS_SETTING_ERROR",
+        "error": "STATUS_SETTING_ERROR",
+        "ok": "STATUS_SETTING_UNSET",
+        "timeout": "STATUS_SETTING_ERROR",
+        "unknown": "STATUS_SETTING_UNSET"
+      },
+      "target": {
+        "id": "ep:cron",
+        "kind": "TARGET_KIND_ENDPOINT"
+      }
+    },
+    {
+      "attributes": [
+        {
+          "key": "code.function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "code.namespace",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "rpc.method",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.grpc_method",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "rpc.service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.grpc_service",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "rpc.system",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.grpc",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service.version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "end_trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      },
+      "id": "tracing:ep:grpc:root",
+      "kind": "SPAN_KIND_SERVER",
+      "name": "OrderService/CreateOrder",
+      "parent": {
+        "carrier": "CARRIER_TYPE_GRPC_METADATA",
+        "mode": "PARENT_STRATEGY_MODE_EXTRACT_OR_ROOT"
+      },
+      "start_trigger": {
+        "phase": "TRIGGER_PHASE_START"
+      },
+      "status": {
+        "cancelled": "STATUS_SETTING_ERROR",
+        "error": "STATUS_SETTING_ERROR",
+        "ok": "STATUS_SETTING_UNSET",
+        "timeout": "STATUS_SETTING_ERROR",
+        "unknown": "STATUS_SETTING_UNSET"
+      },
+      "target": {
+        "id": "ep:grpc",
+        "kind": "TARGET_KIND_ENDPOINT"
+      }
+    },
+    {
+      "attributes": [
+        {
+          "key": "code.function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "code.namespace",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "http.request.method",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.POST",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "http.route",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.http_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service.version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "end_trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      },
+      "id": "tracing:ep:orders:root",
+      "kind": "SPAN_KIND_SERVER",
+      "name": "POST /orders/{id}",
+      "parent": {
+        "carrier": "CARRIER_TYPE_HTTP_HEADERS",
+        "mode": "PARENT_STRATEGY_MODE_EXTRACT_OR_ROOT"
+      },
+      "start_trigger": {
+        "phase": "TRIGGER_PHASE_START"
+      },
+      "status": {
+        "cancelled": "STATUS_SETTING_ERROR",
+        "error": "STATUS_SETTING_ERROR",
+        "ok": "STATUS_SETTING_UNSET",
+        "timeout": "STATUS_SETTING_ERROR",
+        "unknown": "STATUS_SETTING_UNSET"
+      },
+      "target": {
+        "id": "ep:orders",
+        "kind": "TARGET_KIND_ENDPOINT"
+      }
+    }
+  ]
+}

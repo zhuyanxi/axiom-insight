@@ -261,6 +261,30 @@ func TestValidateGenerationPlanViolations(t *testing.T) {
 			wantSubstr: "outside",
 		},
 		{
+			name: "extract_or_root without carrier",
+			mutate: func(plan *GenerationPlan) {
+				plan.Spans[0].Parent = &ParentStrategy{Mode: ParentStrategyMode_PARENT_STRATEGY_MODE_EXTRACT_OR_ROOT}
+			},
+			wantField:  "spans[0].parent.carrier",
+			wantSubstr: "carrier",
+		},
+		{
+			name: "extract_or_root with none carrier",
+			mutate: func(plan *GenerationPlan) {
+				plan.Spans[0].Parent = &ParentStrategy{Mode: ParentStrategyMode_PARENT_STRATEGY_MODE_EXTRACT_OR_ROOT, Carrier: CarrierType_CARRIER_TYPE_NONE}
+			},
+			wantField:  "spans[0].parent.carrier",
+			wantSubstr: "carrier",
+		},
+		{
+			name: "new_root with a context carrier",
+			mutate: func(plan *GenerationPlan) {
+				plan.Spans[0].Parent = &ParentStrategy{Mode: ParentStrategyMode_PARENT_STRATEGY_MODE_NEW_ROOT, Carrier: CarrierType_CARRIER_TYPE_HTTP_HEADERS}
+			},
+			wantField:  "spans[0].parent.carrier",
+			wantSubstr: "only valid with extract_or_root",
+		},
+		{
 			name: "missing status policy",
 			mutate: func(plan *GenerationPlan) {
 				plan.Spans[0].Status = nil

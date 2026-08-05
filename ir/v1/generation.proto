@@ -140,6 +140,21 @@ message ParentStrategy {
   // static_parent_span_id is required when mode is STATIC and must
   // reference another SpanPlan id.
   string static_parent_span_id = 2;
+  // carrier names the abstract carrier a remote parent is extracted from.
+  // Required (HTTP_HEADERS, GRPC_METADATA or KAFKA_HEADERS) when mode is
+  // EXTRACT_OR_ROOT; must be UNSPECIFIED or NONE otherwise.
+  CarrierType carrier = 3;
+}
+
+// CarrierType identifies the abstract carrier a remote parent context is
+// extracted from. It names a class of runtime values, never a concrete
+// header map.
+enum CarrierType {
+  CARRIER_TYPE_UNSPECIFIED = 0;
+  CARRIER_TYPE_HTTP_HEADERS = 1;
+  CARRIER_TYPE_GRPC_METADATA = 2;
+  CARRIER_TYPE_KAFKA_HEADERS = 3;
+  CARRIER_TYPE_NONE = 4;
 }
 
 // StatusPolicy maps each runtime operation status to a span status.

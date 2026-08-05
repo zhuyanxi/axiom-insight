@@ -259,6 +259,18 @@ func validateParentStrategy(emit func(*PlanValidationError), span *SpanPlan, fie
 	if mode != ParentStrategyMode_PARENT_STRATEGY_MODE_STATIC && staticParent != "" {
 		emit(&PlanValidationError{Field: field + ".static_parent_span_id", EntityID: span.GetId(), Message: "static parent span ID set outside static parent mode"})
 	}
+	carrier := span.GetParent().GetCarrier()
+	if mode == ParentStrategyMode_PARENT_STRATEGY_MODE_EXTRACT_OR_ROOT {
+		if carrier != CarrierType_CARRIER_TYPE_HTTP_HEADERS &&
+			carrier != CarrierType_CARRIER_TYPE_GRPC_METADATA &&
+			carrier != CarrierType_CARRIER_TYPE_KAFKA_HEADERS {
+			emit(&PlanValidationError{Field: field + ".carrier", EntityID: span.GetId(), Message: "extract_or_root parent mode requires an HTTP, gRPC or Kafka carrier"})
+		}
+	} else if carrier == CarrierType_CARRIER_TYPE_HTTP_HEADERS ||
+		carrier == CarrierType_CARRIER_TYPE_GRPC_METADATA ||
+		carrier == CarrierType_CARRIER_TYPE_KAFKA_HEADERS {
+		emit(&PlanValidationError{Field: field + ".carrier", EntityID: span.GetId(), Message: "a context carrier is only valid with extract_or_root parent mode"})
+	}
 }
 
 // validateStatusPolicy requires the policy to be present and every runtime
