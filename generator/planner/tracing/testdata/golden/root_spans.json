@@ -64,6 +64,40 @@
       "end_trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
+      "events": [
+        {
+          "id": "tracing:ep:cron:cancelled",
+          "name": "cancelled",
+          "statuses": [
+            "RUNTIME_STATUS_CANCELLED"
+          ]
+        },
+        {
+          "attributes": [
+            {
+              "key": "exception.type",
+              "value": {
+                "cardinality": "CARDINALITY_CLASS_LOW",
+                "path": "runtime.error.type",
+                "source": "VALUE_SOURCE_RUNTIME_RESULT",
+                "type": "VALUE_TYPE_STRING"
+              }
+            }
+          ],
+          "id": "tracing:ep:cron:exception",
+          "name": "exception",
+          "statuses": [
+            "RUNTIME_STATUS_ERROR"
+          ]
+        },
+        {
+          "id": "tracing:ep:cron:timeout",
+          "name": "timeout",
+          "statuses": [
+            "RUNTIME_STATUS_TIMEOUT"
+          ]
+        }
+      ],
       "id": "tracing:ep:cron:root",
       "kind": "SPAN_KIND_INTERNAL",
       "name": "cron Nightly Cleanup",
@@ -156,6 +190,40 @@
       "end_trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
+      "events": [
+        {
+          "id": "tracing:ep:grpc:cancelled",
+          "name": "cancelled",
+          "statuses": [
+            "RUNTIME_STATUS_CANCELLED"
+          ]
+        },
+        {
+          "attributes": [
+            {
+              "key": "exception.type",
+              "value": {
+                "cardinality": "CARDINALITY_CLASS_LOW",
+                "path": "runtime.error.type",
+                "source": "VALUE_SOURCE_RUNTIME_RESULT",
+                "type": "VALUE_TYPE_STRING"
+              }
+            }
+          ],
+          "id": "tracing:ep:grpc:exception",
+          "name": "exception",
+          "statuses": [
+            "RUNTIME_STATUS_ERROR"
+          ]
+        },
+        {
+          "id": "tracing:ep:grpc:timeout",
+          "name": "timeout",
+          "statuses": [
+            "RUNTIME_STATUS_TIMEOUT"
+          ]
+        }
+      ],
       "id": "tracing:ep:grpc:root",
       "kind": "SPAN_KIND_SERVER",
       "name": "OrderService/CreateOrder",
@@ -239,6 +307,40 @@
       "end_trigger": {
         "phase": "TRIGGER_PHASE_END"
       },
+      "events": [
+        {
+          "id": "tracing:ep:orders:cancelled",
+          "name": "cancelled",
+          "statuses": [
+            "RUNTIME_STATUS_CANCELLED"
+          ]
+        },
+        {
+          "attributes": [
+            {
+              "key": "exception.type",
+              "value": {
+                "cardinality": "CARDINALITY_CLASS_LOW",
+                "path": "runtime.error.type",
+                "source": "VALUE_SOURCE_RUNTIME_RESULT",
+                "type": "VALUE_TYPE_STRING"
+              }
+            }
+          ],
+          "id": "tracing:ep:orders:exception",
+          "name": "exception",
+          "statuses": [
+            "RUNTIME_STATUS_ERROR"
+          ]
+        },
+        {
+          "id": "tracing:ep:orders:timeout",
+          "name": "timeout",
+          "statuses": [
+            "RUNTIME_STATUS_TIMEOUT"
+          ]
+        }
+      ],
       "id": "tracing:ep:orders:root",
       "kind": "SPAN_KIND_SERVER",
       "name": "POST /orders/{id}",

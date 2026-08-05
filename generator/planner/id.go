@@ -27,4 +27,9 @@ const (
 	PurposeStart  = "started"
 	PurposeEnd    = "completed"
 	PurposeFailed = "failed"
+	// PurposeException/PurposeTimeout/PurposeCancelled mark controlled
+	// span error events.
+	PurposeException  = "exception"
+	PurposeTimeout    = "timeout"
+	PurposeCancelled  = "cancelled"
 )

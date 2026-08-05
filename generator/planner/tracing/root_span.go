@@ -74,6 +74,7 @@ func (EndpointRootSpanPlanner) PlanTracing(ctx context.Context, input *planner.S
 			continue
 		}
 		span, diagnostics := buildRootSpan(endpoint, input.Index, serviceName, spec)
+		attachEvents(span, endpoint.GetId(), input.Policy)
 		result.Items = append(result.Items, span)
 		result.Diagnostics = append(result.Diagnostics, diagnostics...)
 	}
@@ -84,6 +85,9 @@ func (EndpointRootSpanPlanner) PlanTracing(ctx context.Context, input *planner.S
 	for _, span := range result.Items {
 		sort.Slice(span.Attributes, func(left, right int) bool {
 			return span.Attributes[left].GetKey() < span.Attributes[right].GetKey()
+		})
+		sort.Slice(span.Events, func(left, right int) bool {
+			return span.Events[left].GetId() < span.Events[right].GetId()
 		})
 	}
 	return result, nil

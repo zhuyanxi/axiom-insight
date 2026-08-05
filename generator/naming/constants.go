@@ -82,6 +82,7 @@ var traceAttributeKeys = map[string]bool{
 	"cron.job.schedule":     true,
 	"server.system":         true,
 	"span.scope":            true,
+	"exception.type":        true,
 }
 
 // Blocked trace attribute key prefixes and exact names. Kept explicit so
@@ -109,9 +110,11 @@ var blockedTraceAttributeNames = map[string]bool{
 	"net.peer.name":    true,
 	"net.peer.host":    true,
 	"net.peer.address": true,
-	"enduser.id":       true,
-	"enduser.email":    true,
-	"enduser.phone":    true,
+	"enduser.id":          true,
+	"enduser.email":       true,
+	"enduser.phone":       true,
+	"exception.message":   true,
+	"exception.stacktrace": true,
 }
 
 var blockedTraceAttributePrefixes = []string{
