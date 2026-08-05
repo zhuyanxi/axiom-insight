@@ -1,0 +1,189 @@
+schema_version: generator.metrics/v1
+document_type: instrumentation.metrics
+source:
+  ir_schema_version: v1
+  service_name: orders
+generated_by:
+  name: si
+  version: v0.2.0
+metrics:
+  - id: metrics:dep:sql:count
+    name: orders_orders_store_exec_sql_operations_total
+    type: counter
+    unit: '{operation}'
+    description: Generic dependency metrics; target values omitted
+    target:
+      type: dependency
+      id: dep:sql
+    record:
+      trigger: operation_end
+      value:
+        source: runtime_result
+        path: runtime.operation.duration_seconds
+        fallback: unknown
+        required: true
+        type: double
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: post
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:dep:sql:duration_summary
+    name: orders_orders_store_exec_sql_operation_duration_seconds_summary
+    type: summary
+    unit: s
+    description: Duration summary of SQL operations; unit s; recorded at operation end
+    target:
+      type: dependency
+      id: dep:sql
+    record:
+      trigger: operation_end
+      value:
+        source: runtime_result
+        path: runtime.operation.duration_seconds
+        fallback: unknown
+        required: true
+        type: double
+    quantiles:
+      - 0.5
+      - 0.9
+      - 0.99
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: post
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:ep:orders:duration
+    name: orders_orders_handleorder_post_http_request_duration_seconds
+    type: histogram
+    unit: s
+    description: Duration of HTTP requests; unit s; recorded at operation end
+    target:
+      type: endpoint
+      id: ep:orders
+    record:
+      trigger: operation_end
+      value:
+        source: runtime_result
+        path: runtime.operation.duration_seconds
+        fallback: unknown
+        required: true
+        type: double
+    buckets:
+      - 0.005
+      - 0.01
+      - 0.025
+      - 0.05
+      - 0.1
+      - 0.25
+      - 0.5
+      - 1
+      - 2.5
+      - 5
+      - 10
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: post
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:ep:orders:in_flight
+    name: orders_orders_handleorder_post_http_requests_in_flight
+    type: gauge
+    unit: '{operation}'
+    description: Number of HTTP requests in flight; unit {operation}; recorded on state change
+    target:
+      type: endpoint
+      id: ep:orders
+    record:
+      trigger: state_change
+      value:
+        source: runtime_result
+        path: runtime.operation.in_flight
+        fallback: unknown
+        required: true
+        type: double
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: post
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
