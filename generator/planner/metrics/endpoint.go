@@ -78,7 +78,7 @@ func (EndpointMetricsPlanner) PlanMetrics(ctx context.Context, input *planner.Si
 			continue
 		}
 
-		operation, _, diagnostics := endpointOperation(endpoint, input.Index, spec.kindName)
+		operation, _, diagnostics := endpointOperation(endpoint, input.Index)
 		result.Diagnostics = append(result.Diagnostics, diagnostics...)
 
 		prefix := naming.MetricNameSpec{
@@ -110,7 +110,7 @@ func (EndpointMetricsPlanner) PlanMetrics(ctx context.Context, input *planner.Si
 			Trigger:     &observabilityv1.Trigger{Phase: observabilityv1.TriggerPhase_TRIGGER_PHASE_END},
 			Value:       constantBinding("plan.constant.one", observabilityv1.ValueType_VALUE_TYPE_INT64),
 			Attributes: []*observabilityv1.AttributeBinding{
-				serviceAttribute(serviceName),
+				serviceAttribute(),
 				operationAttribute(operation),
 				statusAttribute(),
 			},
@@ -131,7 +131,7 @@ func (EndpointMetricsPlanner) PlanMetrics(ctx context.Context, input *planner.Si
 			Trigger:     &observabilityv1.Trigger{Phase: observabilityv1.TriggerPhase_TRIGGER_PHASE_END},
 			Value:       durationBinding(),
 			Attributes: []*observabilityv1.AttributeBinding{
-				serviceAttribute(serviceName),
+				serviceAttribute(),
 				operationAttribute(operation),
 				statusAttribute(),
 			},
@@ -158,7 +158,7 @@ func (EndpointMetricsPlanner) PlanMetrics(ctx context.Context, input *planner.Si
 					Type: observabilityv1.ValueType_VALUE_TYPE_INT64, Cardinality: observabilityv1.CardinalityClass_CARDINALITY_CLASS_LOW,
 				},
 				Attributes: []*observabilityv1.AttributeBinding{
-					serviceAttribute(serviceName),
+					serviceAttribute(),
 					operationAttribute(operation),
 				},
 			})
@@ -179,7 +179,7 @@ func (EndpointMetricsPlanner) PlanMetrics(ctx context.Context, input *planner.Si
 				Trigger:     &observabilityv1.Trigger{Phase: observabilityv1.TriggerPhase_TRIGGER_PHASE_END},
 				Value:       durationBinding(),
 				Attributes: []*observabilityv1.AttributeBinding{
-					serviceAttribute(serviceName),
+					serviceAttribute(),
 					operationAttribute(operation),
 					statusAttribute(),
 				},
@@ -215,7 +215,7 @@ func (EndpointMetricsPlanner) PlanMetrics(ctx context.Context, input *planner.Si
 // route), gRPC uses service/method (fallback to the function identity),
 // cron uses the stable job name. Degradations report
 // GEN_INCOMPLETE_TARGET without raw values.
-func endpointOperation(endpoint *observabilityv1.Endpoint, index *planner.Index, kindName string) (string, bool, []naming.Diagnostic) {
+func endpointOperation(endpoint *observabilityv1.Endpoint, index *planner.Index) (string, bool, []naming.Diagnostic) {
 	var diagnostics []naming.Diagnostic
 	emit := func(operation string, message string) (string, bool, []naming.Diagnostic) {
 		diagnostics = append(diagnostics, naming.Diagnostic{
@@ -289,7 +289,7 @@ func functionName(index *planner.Index, endpoint *observabilityv1.Endpoint) stri
 	return function.GetQualifiedName()
 }
 
-func serviceAttribute(serviceName string) *observabilityv1.AttributeBinding {
+func serviceAttribute() *observabilityv1.AttributeBinding {
 	return &observabilityv1.AttributeBinding{
 		Key: "service",
 		Value: &observabilityv1.ValueBinding{

@@ -86,6 +86,13 @@ func shortHash(value string) string {
 	return hex.EncodeToString(sum[:])[:CollisionSuffixLength]
 }
 
+// DisambiguationSuffix returns the stable suffix the collision table
+// derives from a target ID. Exported so planners can match disambiguated
+// names back to their items.
+func DisambiguationSuffix(targetID string) string {
+	return shortHash(targetID)
+}
+
 // ContainsName reports whether the disambiguated results include a name.
 func ContainsName(results []NameResult, name string) bool {
 	for _, result := range results {

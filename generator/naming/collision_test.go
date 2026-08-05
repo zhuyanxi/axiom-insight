@@ -135,3 +135,20 @@ func resultFor(results []NameResult, targetID string) *NameResult {
 	}
 	return nil
 }
+
+// TestDisambiguationSuffixIsStable: the exported suffix helper derives
+// the same suffix the collision table uses, so planners can match
+// disambiguated names back to their items.
+func TestDisambiguationSuffixIsStable(t *testing.T) {
+	targetID := "dep:orders-v2"
+	want := shortHash(targetID)
+	if got := DisambiguationSuffix(targetID); got != want {
+		t.Errorf("DisambiguationSuffix(%q) = %q, want %q", targetID, got, want)
+	}
+	if len(DisambiguationSuffix(targetID)) != CollisionSuffixLength {
+		t.Errorf("suffix length = %d, want %d", len(DisambiguationSuffix(targetID)), CollisionSuffixLength)
+	}
+	if DisambiguationSuffix("dep:a") == DisambiguationSuffix("dep:b") {
+		t.Error("different target IDs must produce different suffixes")
+	}
+}

@@ -169,6 +169,13 @@ func (p *Planner) Plan(ctx context.Context, document *observabilityv1.Observabil
 		return nil, report, &InvalidIRError{violations: violations}
 	}
 
+	// Combined metrics budget (P1-07): endpoint and dependency metrics
+	// share one instrument and series budget, checked after merge so the
+	// union cannot exceed the configured limits.
+	if err := checkCombinedMetricsBudget(plan, policy); err != nil {
+		return nil, report, err
+	}
+
 	sortPlanItems(plan)
 
 	// Strict mode promotes generator warnings; error-level diagnostics
@@ -217,6 +224,62 @@ func (p *Planner) planLogging(ctx context.Context, input *SignalInput) (*Logging
 		return nil, fmt.Errorf("planner: %s: %w", SignalLogging, err)
 	}
 	return result, nil
+}
+
+// checkCombinedMetricsBudget enforces the unified instrument and series
+// limits over the merged metrics signal (endpoint + dependency items).
+// The estimate mirrors the classic-exposition rules: service and
+// operation are constant per target, status adds the finite five-value
+// domain (never on gauges), histogram series use the policy buckets and
+// summary series use the policy quantiles.
+func checkCombinedMetricsBudget(plan *observabilityv1.GenerationPlan, policy policy.Policy) error {
+	estimator := naming.SeriesEstimator{}
+	check := naming.BudgetCheck{}
+	var series int64
+	for _, metric := range plan.Metrics {
+		domains := []int{1, 1}
+		if metric.GetType() != observabilityv1.MetricType_METRIC_TYPE_GAUGE && hasMetricAttribute(metric, "status") {
+			domains = append(domains, 5)
+		}
+		estimated, err := estimator.EstimateSeries(
+			metricTypeName(metric.GetType()),
+			domains,
+			len(policy.Metrics.HistogramBucketsSeconds),
+			len(policy.Metrics.Summaries.Quantiles),
+		)
+		if err != nil {
+			return fmt.Errorf("planner: %s: %w", SignalMetrics, err)
+		}
+		series += estimated
+	}
+	if err := check.InstrumentBudget(SignalMetrics, int64(len(plan.Metrics)), policy.Metrics.MaxInstruments); err != nil {
+		return err
+	}
+	return check.SeriesBudget(SignalMetrics, series, policy.Metrics.MaxEstimatedSeries)
+}
+
+func metricTypeName(metricType observabilityv1.MetricType) string {
+	switch metricType {
+	case observabilityv1.MetricType_METRIC_TYPE_COUNTER:
+		return naming.MetricTypeCounter
+	case observabilityv1.MetricType_METRIC_TYPE_HISTOGRAM:
+		return naming.MetricTypeHistogram
+	case observabilityv1.MetricType_METRIC_TYPE_GAUGE:
+		return naming.MetricTypeGauge
+	case observabilityv1.MetricType_METRIC_TYPE_SUMMARY:
+		return naming.MetricTypeSummary
+	default:
+		return ""
+	}
+}
+
+func hasMetricAttribute(metric *observabilityv1.MetricPlan, key string) bool {
+	for _, attribute := range metric.GetAttributes() {
+		if attribute.GetKey() == key {
+			return true
+		}
+	}
+	return false
 }
 
 // crossCheckItems verifies plan-wide invariants before merging: every
