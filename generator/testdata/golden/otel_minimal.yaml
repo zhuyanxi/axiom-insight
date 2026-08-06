@@ -1,0 +1,56 @@
+schema_version: generator.otel/v1
+document_type: instrumentation.tracing
+plan_kind: instrumentation
+semantic_conventions_version: 1.37.0
+source:
+  ir_schema_version: v1
+  service_name: orders
+generated_by:
+  name: si
+  version: v0.2.0
+resources:
+  - key: service.name
+    type: string
+    binding:
+      source: ir
+      path: service.name
+      type: string
+  - key: service.version
+    type: string
+    binding:
+      source: runtime_resource
+      path: runtime.resource.service.version
+      fallback: unknown
+      type: string
+spans:
+  - id: tracing:ep:orders:root
+    name: POST /orders/{id}
+    kind: server
+    target:
+      type: endpoint
+      id: ep:orders
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: extract_or_root
+      carrier: http_headers
+    attributes:
+      - key: http.request.method
+        type: string
+        binding:
+          source: constant
+          string: POST
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:ep:orders:root:exception
+        name: exception
+        statuses:
+          - error

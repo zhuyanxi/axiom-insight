@@ -1,0 +1,176 @@
+schema_version: generator.otel/v1
+document_type: instrumentation.tracing
+plan_kind: instrumentation
+semantic_conventions_version: 1.37.0
+source:
+  ir_schema_version: v1
+  service_name: orders
+generated_by:
+  name: si
+  version: v0.2.0
+resources:
+  - key: service.name
+    type: string
+    binding:
+      source: ir
+      path: service.name
+      type: string
+  - key: service.version
+    type: string
+    binding:
+      source: runtime_resource
+      path: runtime.resource.service.version
+      fallback: unknown
+      type: string
+spans:
+  - id: tracing:dep:consumer:child
+    name: kafka consume
+    kind: consumer
+    target:
+      type: dependency
+      id: dep:consumer
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: current_context
+    attributes:
+      - key: http.request.method
+        type: string
+        binding:
+          source: constant
+          string: POST
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:dep:consumer:child:exception
+        name: exception
+        statuses:
+          - error
+  - id: tracing:dep:producer:child
+    name: kafka produce
+    kind: producer
+    target:
+      type: dependency
+      id: dep:producer
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: current_context
+    attributes:
+      - key: http.request.method
+        type: string
+        binding:
+          source: constant
+          string: POST
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:dep:producer:child:exception
+        name: exception
+        statuses:
+          - error
+  - id: tracing:dep:sql:child
+    name: db exec
+    kind: client
+    target:
+      type: dependency
+      id: dep:sql
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: current_context
+    attributes:
+      - key: http.request.method
+        type: string
+        binding:
+          source: constant
+          string: POST
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:dep:sql:child:exception
+        name: exception
+        statuses:
+          - error
+  - id: tracing:edge:handler-validator:child
+    name: checkout.Validate
+    kind: internal
+    target:
+      type: call_edge
+      id: edge:handler-validator
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: current_context
+    attributes:
+      - key: http.request.method
+        type: string
+        binding:
+          source: constant
+          string: POST
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:edge:handler-validator:child:exception
+        name: exception
+        statuses:
+          - error
+  - id: tracing:ep:orders:root
+    name: POST /orders/{id}
+    kind: server
+    target:
+      type: endpoint
+      id: ep:orders
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: extract_or_root
+      carrier: http_headers
+    attributes:
+      - key: http.request.method
+        type: string
+        binding:
+          source: constant
+          string: POST
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:ep:orders:root:exception
+        name: exception
+        statuses:
+          - error
