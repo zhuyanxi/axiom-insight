@@ -264,11 +264,12 @@ func ValidateLogging(document *LoggingDocument) []*ValidationError {
 			validateValueBinding(fieldField+".binding", logField.Binding, emit)
 			switch normalized {
 			case "traceid", "spanid":
+				// Correlation IDs must come from the runtime context; they
+				// may be optional when no Root Span context is provable
+				// (P1-12 dependency events). The Runtime omits them when
+				// absent; empty string placeholders are never emitted.
 				if logField.Binding.Source != ValueSourceRuntimeContext {
 					emit.emit(fieldField+".binding.source", logField.Key+" must bind to runtime_context")
-				}
-				if logField.Required == nil || !*logField.Required {
-					emit.emit(fieldField+".required", logField.Key+" must be required")
 				}
 			case "requestid":
 				if logField.Binding.Source != ValueSourceRuntimeContext {

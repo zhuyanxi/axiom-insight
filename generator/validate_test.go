@@ -197,7 +197,10 @@ func TestValidateLoggingRejectsDuplicateEventName(t *testing.T) {
 	}
 }
 
-func TestValidateLoggingRejectsTraceIDNotRequired(t *testing.T) {
+// TestValidateLoggingAllowsOptionalTraceID: trace_id may be optional when
+// no Root Span context is provable (P1-12 dependency events); the source
+// must still be runtime_context.
+func TestValidateLoggingAllowsOptionalTraceID(t *testing.T) {
 	document := &LoggingDocument{
 		SchemaVersion: SchemaVersionLogging,
 		DocumentType:  DocumentTypeLogging,
@@ -206,11 +209,11 @@ func TestValidateLoggingRejectsTraceIDNotRequired(t *testing.T) {
 		Redaction:     Redaction{Immutable: true, FieldNames: []string{"authorization"}},
 		Events: []LogEvent{{
 			ID:        "log:a",
-			EventName: "http.request.completed",
-			Target:    TargetRef{Type: TargetKindEndpoint, ID: "endpoint:a"},
+			EventName: "dependency.operation.failed",
+			Target:    TargetRef{Type: TargetKindDependency, ID: "dependency:a"},
 			Trigger:   TriggerEnd,
-			Condition: Condition{StatusIn: []string{RuntimeStatusOK}},
-			Severity:  Severity{Constant: LogSeverityInfo},
+			Condition: Condition{StatusIn: []string{RuntimeStatusError}},
+			Severity:  Severity{Constant: LogSeverityError},
 			Fields: []Field{{
 				Key:     "trace_id",
 				Type:    ValueTypeString,
@@ -219,8 +222,8 @@ func TestValidateLoggingRejectsTraceIDNotRequired(t *testing.T) {
 		}},
 	}
 	violations := document.Validate()
-	if !hasViolationAt(violations, "events[0].fields[0].required") {
-		t.Fatalf("expected trace_id required violation, got: %v", violations)
+	if hasViolationAt(violations, "events[0].fields[0].required") {
+		t.Fatalf("optional trace_id must be allowed, got: %v", violations)
 	}
 }
 

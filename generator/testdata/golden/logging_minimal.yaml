@@ -1,0 +1,112 @@
+schema_version: generator.logging/v1
+document_type: instrumentation.logging
+source:
+  ir_schema_version: v1
+  service_name: orders
+generated_by:
+  name: si
+  version: v0.2.0
+redaction:
+  immutable: true
+  field_names:
+    - authorization
+    - cookie
+    - password
+    - secret
+    - token
+events:
+  - id: logging:ep:orders:completed
+    event_name: http.request.completed
+    target:
+      type: endpoint
+      id: ep:orders
+    trigger: operation_end
+    condition:
+      status_in:
+        - ok
+    severity:
+      constant: info
+    fields:
+      - key: duration_seconds
+        type: double
+        binding:
+          source: runtime_result
+          path: runtime.operation.duration_seconds
+          type: double
+      - key: event.name
+        type: string
+        binding:
+          source: constant
+          string: http.request.completed
+          type: string
+      - key: function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: module
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: post
+          type: string
+      - key: request_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.request_id
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: span_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: runtime.context.span_id
+          required: true
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+      - key: timestamp
+        type: timestamp
+        binding:
+          source: runtime_clock
+          path: runtime.clock
+          type: timestamp
+      - key: trace_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: runtime.context.trace_id
+          required: true
+          type: string
+      - key: version
+        type: string
+        binding:
+          source: runtime_resource
+          path: runtime.resource.service.version
+          fallback: unknown
+          type: string
