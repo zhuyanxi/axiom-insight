@@ -198,7 +198,7 @@ func baseEvent(targetID, eventName, purpose string, severity observabilityv1.Log
 
 // commonFields are the fields shared by every event (timestamp and
 // event.name are added by baseEvent).
-func commonFields(serviceName, operation string) []*observabilityv1.FieldBinding {
+func commonFields(_, operation string) []*observabilityv1.FieldBinding {
 	return []*observabilityv1.FieldBinding{
 		irStringField("service", "service.name"),
 		irStringField("module", "function.package_path"),
@@ -209,20 +209,31 @@ func commonFields(serviceName, operation string) []*observabilityv1.FieldBinding
 }
 
 // endpointKindFields adds the kind-specific controlled fields: HTTP
-// method and route, gRPC service/method, cron stable job name.
+// method and route, gRPC service/method, cron stable job name. Missing
+// identity values are omitted — an empty constant must never be emitted.
 func endpointKindFields(endpoint *observabilityv1.Endpoint) []*observabilityv1.FieldBinding {
 	switch endpoint.GetKind() {
 	case observabilityv1.EndpointKind_HTTP_HANDLER:
-		return []*observabilityv1.FieldBinding{
-			constantField("method", endpoint.GetHttpMethod()),
+		fields := []*observabilityv1.FieldBinding{
 			irStringField("route", "endpoint.http_path"),
 		}
-	case observabilityv1.EndpointKind_GRPC_HANDLER:
-		return []*observabilityv1.FieldBinding{
-			irStringField("rpc.service", "endpoint.grpc_service"),
-			irStringField("rpc.method", "endpoint.grpc_method"),
+		if method := endpoint.GetHttpMethod(); method != "" {
+			fields = append([]*observabilityv1.FieldBinding{constantField("method", method)}, fields...)
 		}
+		return fields
+	case observabilityv1.EndpointKind_GRPC_HANDLER:
+		var fields []*observabilityv1.FieldBinding
+		if endpoint.GetGrpcService() != "" {
+			fields = append(fields, irStringField("rpc.service", "endpoint.grpc_service"))
+		}
+		if endpoint.GetGrpcMethod() != "" {
+			fields = append(fields, irStringField("rpc.method", "endpoint.grpc_method"))
+		}
+		return fields
 	default:
+		if endpoint.GetName() == "" {
+			return nil
+		}
 		return []*observabilityv1.FieldBinding{
 			irStringField("cron.job.name", "endpoint.name"),
 		}

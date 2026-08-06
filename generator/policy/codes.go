@@ -33,4 +33,7 @@ const (
 	CodeRenderError = "GEN_RENDER_ERROR"
 	// CodeOutputExists: a target file exists and --force was not given.
 	CodeOutputExists = "GEN_OUTPUT_EXISTS"
+	// CodeUnsafeTarget: a selected output target (or the output
+	// directory) is a symlink or not a regular file.
+	CodeUnsafeTarget = "GEN_UNSAFE_TARGET"
 )

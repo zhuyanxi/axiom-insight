@@ -152,6 +152,54 @@ IR diagnostics use stable codes such as `GO_PARSE_ERROR`,
 `PACKAGE_LOAD_ERROR`, `INVALID_CONFIG`, and `UNRESOLVED_CALL`. Diagnostics are
 preserved in JSON output and do not fail a scan when analysis can continue.
 
+## CLI Generate
+
+Generate versioned observability files from analyzed source. The pipeline is
+Analyze -> Plan -> Render -> Validate -> Commit; every stage is offline and
+deterministic.
+
+```sh
+bin/si generate
+bin/si generate ./path/to/service
+bin/si generate ./path/to/service --signals metrics,tracing
+bin/si generate ./path/to/service --dry-run
+bin/si generate ./path/to/service --strict
+bin/si generate ./path/to/service --force
+bin/si generate ./path/to/service --format json
+bin/si generate --version
+```
+
+Defaults: path is the current directory, output is `<source-root>/generate`,
+and all three signals (`metrics.yaml`, `otel.yaml`, `logging.yaml`) are
+generated. `--signals` selects a subset; unselected files are never created,
+overwritten or deleted. `--format` controls the command report only; the YAML
+files are identical in both formats.
+
+Safety guarantees:
+
+- All selected renderers must succeed and re-validate in memory before any
+  file is written; a failure writes nothing.
+- Existing targets are refused without `--force` (`GEN_OUTPUT_EXISTS`).
+- `--force` replaces only the selected managed targets; symlinked or
+  non-regular targets are rejected (`GEN_UNSAFE_TARGET`) and never followed.
+- Each file is written to an exclusive temporary file, synced, then renamed
+  atomically; a multi-file journal backs up pre-existing targets and rolls
+  back on failure.
+- `--dry-run` performs the full scan/plan/render/validate pipeline and prints
+  planned files, definition counts and SHA-256 hashes without creating the
+  output directory, locks, or any file.
+- A per-directory lock makes concurrent generations fail fast.
+
+Crash-atomicity limitation: the commit guarantees single-file atomic
+replacement and in-process rollback only. If the process is killed by force,
+the kernel crashes, or power is lost mid-commit, a mixed set of complete old
+and new files may remain — never a truncated renamed target.
+
+Exit codes: `0` success; `1` scan, plan, render, validate, or commit failure
+(`CLI_GENERATE_ERROR`); `2` invalid path, arguments, format, or configuration.
+With `--format json`, stdout carries exactly one `cli.generate_report/v1`
+document (success or failure) and stderr stays empty.
+
 ## Offline Fixture Tests
 
 Persistent Phase 0 fixtures live under `testdata/fixtures/`. Each fixture is

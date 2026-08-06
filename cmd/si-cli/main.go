@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -33,6 +34,10 @@ type commandError struct {
 	exitCode    int
 	messageCode string
 	err         error
+	// reported marks an error already written as a complete report to
+	// stdout (generate --format json); the runner must not duplicate it
+	// on stderr but must still preserve the exit code.
+	reported bool
 }
 
 func (failure *commandError) Error() string {
@@ -107,7 +112,9 @@ func run(args []string, stdout, stderr io.Writer) int {
 		if !errors.As(err, &failure) {
 			failure = internalFailure(err)
 		}
-		fmt.Fprintln(stderr, failure)
+		if !failure.reported {
+			fmt.Fprintln(stderr, failure)
+		}
 		return failure.exitCode
 	}
 	return 0
@@ -154,6 +161,7 @@ func newRootCommand(stdout, stderr io.Writer) *cobra.Command {
 	scan.Flags().BoolVar(&options.includeTests, "include-tests", false, "include Go test files")
 	scan.Flags().BoolVar(&options.version, "version", false, "print CLI and IR schema versions")
 	root.AddCommand(scan)
+	root.AddCommand(newGenerateCommand())
 	return root
 }
 
@@ -200,6 +208,37 @@ func executeScan(command *cobra.Command, args []string, options scanOptions) err
 		return usageFailure(err)
 	}
 
+	request := buildAnalyzeRequest(root, configYAML, config, command, options)
+	document, err := analyzeDocument(command.Context(), request)
+	if err != nil {
+		return scanFailure(err)
+	}
+
+	summary := summarizeIR(document)
+	if format == "json" {
+		contents, err := marshalScanResult(document, summary)
+		if err != nil {
+			return scanFailure(fmt.Errorf("marshal scan result: %w", err))
+		}
+		contents = append(contents, '\n')
+		if options.output == "" {
+			_, err = command.OutOrStdout().Write(contents)
+		} else {
+			err = os.WriteFile(options.output, contents, 0o644)
+		}
+		if err != nil {
+			return scanFailure(fmt.Errorf("write scan result: %w", err))
+		}
+		return nil
+	}
+
+	writeTextSummary(command.OutOrStdout(), document, summary)
+	return nil
+}
+
+// buildAnalyzeRequest assembles the AnalyzeRequest from the config file
+// with explicit CLI flag overrides, shared by scan and generate.
+func buildAnalyzeRequest(root, configYAML string, config scanConfig, command *cobra.Command, options scanOptions) *observabilityv1.AnalyzeRequest {
 	request := &observabilityv1.AnalyzeRequest{
 		SourceRoot:    root,
 		SchemaVersion: plugins.CurrentSchemaVersion,
@@ -217,41 +256,27 @@ func executeScan(command *cobra.Command, args []string, options scanOptions) err
 	if command.Flags().Changed("exclude") {
 		request.Exclude = append([]string(nil), options.exclude...)
 	}
+	return request
+}
 
+// analyzeDocument connects the analyzer transport, runs one analysis and
+// verifies the IR document, sharing the error mapping between scan and
+// generate.
+func analyzeDocument(ctx context.Context, request *observabilityv1.AnalyzeRequest) (*observabilityv1.ObservabilityDocument, error) {
 	transport := plugins.NewInProcessTransport(nil)
-	analyzer, err := transport.Connect(command.Context())
+	analyzer, err := transport.Connect(ctx)
 	if err != nil {
-		return scanFailure(fmt.Errorf("connect analyzer: %w", err))
+		return nil, fmt.Errorf("connect analyzer: %w", err)
 	}
 	defer transport.Close()
-	response, err := analyzer.Analyze(command.Context(), request)
+	response, err := analyzer.Analyze(ctx, request)
 	if err != nil {
-		return scanFailure(fmt.Errorf("scan %q: %w", sourceRoot, err))
+		return nil, fmt.Errorf("scan %q: %w", request.GetSourceRoot(), err)
 	}
 	if response == nil || response.Document == nil {
-		return scanFailure(fmt.Errorf("scan %q returned no IR document", sourceRoot))
+		return nil, fmt.Errorf("scan %q returned no IR document", request.GetSourceRoot())
 	}
-
-	summary := summarizeIR(response.Document)
-	if format == "json" {
-		contents, err := marshalScanResult(response.Document, summary)
-		if err != nil {
-			return scanFailure(fmt.Errorf("marshal scan result: %w", err))
-		}
-		contents = append(contents, '\n')
-		if options.output == "" {
-			_, err = command.OutOrStdout().Write(contents)
-		} else {
-			err = os.WriteFile(options.output, contents, 0o644)
-		}
-		if err != nil {
-			return scanFailure(fmt.Errorf("write scan result: %w", err))
-		}
-		return nil
-	}
-
-	writeTextSummary(command.OutOrStdout(), response.Document, summary)
-	return nil
+	return response.Document, nil
 }
 
 func loadScanConfig(root, configPath string) (scanConfig, string, error) {
