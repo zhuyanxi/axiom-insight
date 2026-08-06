@@ -327,6 +327,9 @@ const (
 	// RUNTIME_RESULT: value bound at runtime from the operation result, e.g.
 	// "runtime.operation.status" or "runtime.operation.duration_seconds".
 	ValueSource_VALUE_SOURCE_RUNTIME_RESULT ValueSource = 5
+	// RUNTIME_CLOCK: timestamp written by the Runtime at emission time. The
+	// Generator never fills a concrete time.
+	ValueSource_VALUE_SOURCE_RUNTIME_CLOCK ValueSource = 6
 )
 
 // Enum value maps for ValueSource.
@@ -338,6 +341,7 @@ var (
 		3: "VALUE_SOURCE_RUNTIME_RESOURCE",
 		4: "VALUE_SOURCE_RUNTIME_CONTEXT",
 		5: "VALUE_SOURCE_RUNTIME_RESULT",
+		6: "VALUE_SOURCE_RUNTIME_CLOCK",
 	}
 	ValueSource_value = map[string]int32{
 		"VALUE_SOURCE_UNSPECIFIED":      0,
@@ -346,6 +350,7 @@ var (
 		"VALUE_SOURCE_RUNTIME_RESOURCE": 3,
 		"VALUE_SOURCE_RUNTIME_CONTEXT":  4,
 		"VALUE_SOURCE_RUNTIME_RESULT":   5,
+		"VALUE_SOURCE_RUNTIME_CLOCK":    6,
 	}
 )
 
@@ -387,6 +392,9 @@ const (
 	ValueType_VALUE_TYPE_BOOL        ValueType = 4
 	// STATUS is the finite runtime operation status vocabulary.
 	ValueType_VALUE_TYPE_STATUS ValueType = 5
+	// TIMESTAMP marks a runtime clock value; the Runtime fills the concrete
+	// time, the Generator never does.
+	ValueType_VALUE_TYPE_TIMESTAMP ValueType = 6
 )
 
 // Enum value maps for ValueType.
@@ -398,6 +406,7 @@ var (
 		3: "VALUE_TYPE_DOUBLE",
 		4: "VALUE_TYPE_BOOL",
 		5: "VALUE_TYPE_STATUS",
+		6: "VALUE_TYPE_TIMESTAMP",
 	}
 	ValueType_value = map[string]int32{
 		"VALUE_TYPE_UNSPECIFIED": 0,
@@ -406,6 +415,7 @@ var (
 		"VALUE_TYPE_DOUBLE":      3,
 		"VALUE_TYPE_BOOL":        4,
 		"VALUE_TYPE_STATUS":      5,
+		"VALUE_TYPE_TIMESTAMP":   6,
 	}
 )
 
@@ -1148,8 +1158,12 @@ type LogPlan struct {
 	// redaction_policy_id selects a built-in redaction policy applied by the
 	// Runtime; the Generator never inlines sensitive values.
 	RedactionPolicyId string `protobuf:"bytes,8,opt,name=redaction_policy_id,json=redactionPolicyId,proto3" json:"redaction_policy_id,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// statuses lists the runtime operation statuses that fire this event.
+	// Empty means the event fires unconditionally (e.g. start events).
+	// Completed and failed events of one target must be mutually exclusive.
+	Statuses      []RuntimeStatus `protobuf:"varint,9,rep,packed,name=statuses,proto3,enum=axiom.insight.ir.v1.RuntimeStatus" json:"statuses,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *LogPlan) Reset() {
@@ -1236,6 +1250,13 @@ func (x *LogPlan) GetRedactionPolicyId() string {
 		return x.RedactionPolicyId
 	}
 	return ""
+}
+
+func (x *LogPlan) GetStatuses() []RuntimeStatus {
+	if x != nil {
+		return x.Statuses
+	}
+	return nil
 }
 
 // TargetRef is a strongly typed reference to an IR entity. The target kind
@@ -1858,7 +1879,7 @@ const file_ir_v1_generation_proto_rawDesc = "" +
 	"attributes\x129\n" +
 	"\x06status\x18\t \x01(\v2!.axiom.insight.ir.v1.StatusPolicyR\x06status\x126\n" +
 	"\x06events\x18\n" +
-	" \x03(\v2\x1e.axiom.insight.ir.v1.SpanEventR\x06events\"\x80\x03\n" +
+	" \x03(\v2\x1e.axiom.insight.ir.v1.SpanEventR\x06events\"\xc0\x03\n" +
 	"\aLogPlan\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -1868,7 +1889,8 @@ const file_ir_v1_generation_proto_rawDesc = "" +
 	"\atrigger\x18\x05 \x01(\v2\x1c.axiom.insight.ir.v1.TriggerR\atrigger\x129\n" +
 	"\x06fields\x18\x06 \x03(\v2!.axiom.insight.ir.v1.FieldBindingR\x06fields\x12-\n" +
 	"\x12correlation_fields\x18\a \x03(\tR\x11correlationFields\x12.\n" +
-	"\x13redaction_policy_id\x18\b \x01(\tR\x11redactionPolicyId\"P\n" +
+	"\x13redaction_policy_id\x18\b \x01(\tR\x11redactionPolicyId\x12>\n" +
+	"\bstatuses\x18\t \x03(\x0e2\".axiom.insight.ir.v1.RuntimeStatusR\bstatuses\"P\n" +
 	"\tTargetRef\x123\n" +
 	"\x04kind\x18\x01 \x01(\x0e2\x1f.axiom.insight.ir.v1.TargetKindR\x04kind\x12\x0e\n" +
 	"\x02id\x18\x02 \x01(\tR\x02id\"B\n" +
@@ -1939,21 +1961,23 @@ const file_ir_v1_generation_proto_rawDesc = "" +
 	"\x19TRIGGER_PHASE_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13TRIGGER_PHASE_START\x10\x01\x12\x15\n" +
 	"\x11TRIGGER_PHASE_END\x10\x02\x12\x1e\n" +
-	"\x1aTRIGGER_PHASE_STATE_CHANGE\x10\x03*\xcf\x01\n" +
+	"\x1aTRIGGER_PHASE_STATE_CHANGE\x10\x03*\xef\x01\n" +
 	"\vValueSource\x12\x1c\n" +
 	"\x18VALUE_SOURCE_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aVALUE_SOURCE_PLAN_CONSTANT\x10\x01\x12\x1c\n" +
 	"\x18VALUE_SOURCE_IR_CONSTANT\x10\x02\x12!\n" +
 	"\x1dVALUE_SOURCE_RUNTIME_RESOURCE\x10\x03\x12 \n" +
 	"\x1cVALUE_SOURCE_RUNTIME_CONTEXT\x10\x04\x12\x1f\n" +
-	"\x1bVALUE_SOURCE_RUNTIME_RESULT\x10\x05*\x97\x01\n" +
+	"\x1bVALUE_SOURCE_RUNTIME_RESULT\x10\x05\x12\x1e\n" +
+	"\x1aVALUE_SOURCE_RUNTIME_CLOCK\x10\x06*\xb1\x01\n" +
 	"\tValueType\x12\x1a\n" +
 	"\x16VALUE_TYPE_UNSPECIFIED\x10\x00\x12\x15\n" +
 	"\x11VALUE_TYPE_STRING\x10\x01\x12\x14\n" +
 	"\x10VALUE_TYPE_INT64\x10\x02\x12\x15\n" +
 	"\x11VALUE_TYPE_DOUBLE\x10\x03\x12\x13\n" +
 	"\x0fVALUE_TYPE_BOOL\x10\x04\x12\x15\n" +
-	"\x11VALUE_TYPE_STATUS\x10\x05*\x8c\x01\n" +
+	"\x11VALUE_TYPE_STATUS\x10\x05\x12\x18\n" +
+	"\x14VALUE_TYPE_TIMESTAMP\x10\x06*\x8c\x01\n" +
 	"\x10CardinalityClass\x12!\n" +
 	"\x1dCARDINALITY_CLASS_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aCARDINALITY_CLASS_CONSTANT\x10\x01\x12\x19\n" +
@@ -2052,28 +2076,29 @@ var file_ir_v1_generation_proto_depIdxs = []int32{
 	17, // 18: axiom.insight.ir.v1.LogPlan.target:type_name -> axiom.insight.ir.v1.TargetRef
 	18, // 19: axiom.insight.ir.v1.LogPlan.trigger:type_name -> axiom.insight.ir.v1.Trigger
 	21, // 20: axiom.insight.ir.v1.LogPlan.fields:type_name -> axiom.insight.ir.v1.FieldBinding
-	3,  // 21: axiom.insight.ir.v1.TargetRef.kind:type_name -> axiom.insight.ir.v1.TargetKind
-	4,  // 22: axiom.insight.ir.v1.Trigger.phase:type_name -> axiom.insight.ir.v1.TriggerPhase
-	5,  // 23: axiom.insight.ir.v1.ValueBinding.source:type_name -> axiom.insight.ir.v1.ValueSource
-	6,  // 24: axiom.insight.ir.v1.ValueBinding.type:type_name -> axiom.insight.ir.v1.ValueType
-	7,  // 25: axiom.insight.ir.v1.ValueBinding.cardinality:type_name -> axiom.insight.ir.v1.CardinalityClass
-	19, // 26: axiom.insight.ir.v1.AttributeBinding.value:type_name -> axiom.insight.ir.v1.ValueBinding
-	19, // 27: axiom.insight.ir.v1.FieldBinding.value:type_name -> axiom.insight.ir.v1.ValueBinding
-	8,  // 28: axiom.insight.ir.v1.ParentStrategy.mode:type_name -> axiom.insight.ir.v1.ParentStrategyMode
-	0,  // 29: axiom.insight.ir.v1.ParentStrategy.carrier:type_name -> axiom.insight.ir.v1.CarrierType
-	9,  // 30: axiom.insight.ir.v1.StatusPolicy.ok:type_name -> axiom.insight.ir.v1.StatusSetting
-	9,  // 31: axiom.insight.ir.v1.StatusPolicy.error:type_name -> axiom.insight.ir.v1.StatusSetting
-	9,  // 32: axiom.insight.ir.v1.StatusPolicy.timeout:type_name -> axiom.insight.ir.v1.StatusSetting
-	9,  // 33: axiom.insight.ir.v1.StatusPolicy.cancelled:type_name -> axiom.insight.ir.v1.StatusSetting
-	9,  // 34: axiom.insight.ir.v1.StatusPolicy.unknown:type_name -> axiom.insight.ir.v1.StatusSetting
-	10, // 35: axiom.insight.ir.v1.SpanEvent.statuses:type_name -> axiom.insight.ir.v1.RuntimeStatus
-	20, // 36: axiom.insight.ir.v1.SpanEvent.attributes:type_name -> axiom.insight.ir.v1.AttributeBinding
-	12, // 37: axiom.insight.ir.v1.PlanDiagnostic.severity:type_name -> axiom.insight.ir.v1.PlanSeverity
-	38, // [38:38] is the sub-list for method output_type
-	38, // [38:38] is the sub-list for method input_type
-	38, // [38:38] is the sub-list for extension type_name
-	38, // [38:38] is the sub-list for extension extendee
-	0,  // [0:38] is the sub-list for field type_name
+	10, // 21: axiom.insight.ir.v1.LogPlan.statuses:type_name -> axiom.insight.ir.v1.RuntimeStatus
+	3,  // 22: axiom.insight.ir.v1.TargetRef.kind:type_name -> axiom.insight.ir.v1.TargetKind
+	4,  // 23: axiom.insight.ir.v1.Trigger.phase:type_name -> axiom.insight.ir.v1.TriggerPhase
+	5,  // 24: axiom.insight.ir.v1.ValueBinding.source:type_name -> axiom.insight.ir.v1.ValueSource
+	6,  // 25: axiom.insight.ir.v1.ValueBinding.type:type_name -> axiom.insight.ir.v1.ValueType
+	7,  // 26: axiom.insight.ir.v1.ValueBinding.cardinality:type_name -> axiom.insight.ir.v1.CardinalityClass
+	19, // 27: axiom.insight.ir.v1.AttributeBinding.value:type_name -> axiom.insight.ir.v1.ValueBinding
+	19, // 28: axiom.insight.ir.v1.FieldBinding.value:type_name -> axiom.insight.ir.v1.ValueBinding
+	8,  // 29: axiom.insight.ir.v1.ParentStrategy.mode:type_name -> axiom.insight.ir.v1.ParentStrategyMode
+	0,  // 30: axiom.insight.ir.v1.ParentStrategy.carrier:type_name -> axiom.insight.ir.v1.CarrierType
+	9,  // 31: axiom.insight.ir.v1.StatusPolicy.ok:type_name -> axiom.insight.ir.v1.StatusSetting
+	9,  // 32: axiom.insight.ir.v1.StatusPolicy.error:type_name -> axiom.insight.ir.v1.StatusSetting
+	9,  // 33: axiom.insight.ir.v1.StatusPolicy.timeout:type_name -> axiom.insight.ir.v1.StatusSetting
+	9,  // 34: axiom.insight.ir.v1.StatusPolicy.cancelled:type_name -> axiom.insight.ir.v1.StatusSetting
+	9,  // 35: axiom.insight.ir.v1.StatusPolicy.unknown:type_name -> axiom.insight.ir.v1.StatusSetting
+	10, // 36: axiom.insight.ir.v1.SpanEvent.statuses:type_name -> axiom.insight.ir.v1.RuntimeStatus
+	20, // 37: axiom.insight.ir.v1.SpanEvent.attributes:type_name -> axiom.insight.ir.v1.AttributeBinding
+	12, // 38: axiom.insight.ir.v1.PlanDiagnostic.severity:type_name -> axiom.insight.ir.v1.PlanSeverity
+	39, // [39:39] is the sub-list for method output_type
+	39, // [39:39] is the sub-list for method input_type
+	39, // [39:39] is the sub-list for extension type_name
+	39, // [39:39] is the sub-list for extension extendee
+	0,  // [0:39] is the sub-list for field type_name
 }
 
 func init() { file_ir_v1_generation_proto_init() }

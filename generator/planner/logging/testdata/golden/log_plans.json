@@ -1,0 +1,2320 @@
+{
+  "logs": [
+    {
+      "correlation_fields": [
+        "request_id",
+        "trace_id",
+        "span_id"
+      ],
+      "event_name": "dependency.operation.failed",
+      "fields": [
+        {
+          "key": "duration_seconds",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.duration_seconds",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_DOUBLE"
+          }
+        },
+        {
+          "key": "error.category",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.category",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "error.type",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.type",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "event.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.dependency.operation.failed",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "module",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "operation",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.consume",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "request_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.request_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "span_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.span_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS"
+          }
+        },
+        {
+          "key": "system",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.kafka",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "timestamp",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "runtime.clock",
+            "source": "VALUE_SOURCE_RUNTIME_CLOCK",
+            "type": "VALUE_TYPE_TIMESTAMP"
+          }
+        },
+        {
+          "key": "trace_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.trace_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "id": "logging:dep:consumer:failed",
+      "redaction_policy_id": "builtin:v1",
+      "severity": "LOG_SEVERITY_ERROR",
+      "statuses": [
+        "RUNTIME_STATUS_ERROR",
+        "RUNTIME_STATUS_TIMEOUT",
+        "RUNTIME_STATUS_CANCELLED",
+        "RUNTIME_STATUS_UNKNOWN"
+      ],
+      "target": {
+        "id": "dep:consumer",
+        "kind": "TARGET_KIND_DEPENDENCY"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      }
+    },
+    {
+      "correlation_fields": [
+        "request_id",
+        "trace_id",
+        "span_id"
+      ],
+      "event_name": "dependency.operation.failed",
+      "fields": [
+        {
+          "key": "duration_seconds",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.duration_seconds",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_DOUBLE"
+          }
+        },
+        {
+          "key": "error.category",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.category",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "error.type",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.type",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "event.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.dependency.operation.failed",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "module",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "operation",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.get",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "request_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.request_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "span_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.span_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS"
+          }
+        },
+        {
+          "key": "system",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.http",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "timestamp",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "runtime.clock",
+            "source": "VALUE_SOURCE_RUNTIME_CLOCK",
+            "type": "VALUE_TYPE_TIMESTAMP"
+          }
+        },
+        {
+          "key": "trace_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.trace_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "id": "logging:dep:http:failed",
+      "redaction_policy_id": "builtin:v1",
+      "severity": "LOG_SEVERITY_ERROR",
+      "statuses": [
+        "RUNTIME_STATUS_ERROR",
+        "RUNTIME_STATUS_TIMEOUT",
+        "RUNTIME_STATUS_CANCELLED",
+        "RUNTIME_STATUS_UNKNOWN"
+      ],
+      "target": {
+        "id": "dep:http",
+        "kind": "TARGET_KIND_DEPENDENCY"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      }
+    },
+    {
+      "correlation_fields": [
+        "request_id",
+        "trace_id",
+        "span_id"
+      ],
+      "event_name": "dependency.operation.failed",
+      "fields": [
+        {
+          "key": "duration_seconds",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.duration_seconds",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_DOUBLE"
+          }
+        },
+        {
+          "key": "error.category",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.category",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "error.type",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.type",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "event.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.dependency.operation.failed",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "module",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "operation",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.produce",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "request_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.request_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "span_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.span_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS"
+          }
+        },
+        {
+          "key": "system",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.kafka",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "timestamp",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "runtime.clock",
+            "source": "VALUE_SOURCE_RUNTIME_CLOCK",
+            "type": "VALUE_TYPE_TIMESTAMP"
+          }
+        },
+        {
+          "key": "trace_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.trace_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "id": "logging:dep:producer:failed",
+      "redaction_policy_id": "builtin:v1",
+      "severity": "LOG_SEVERITY_ERROR",
+      "statuses": [
+        "RUNTIME_STATUS_ERROR",
+        "RUNTIME_STATUS_TIMEOUT",
+        "RUNTIME_STATUS_CANCELLED",
+        "RUNTIME_STATUS_UNKNOWN"
+      ],
+      "target": {
+        "id": "dep:producer",
+        "kind": "TARGET_KIND_DEPENDENCY"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      }
+    },
+    {
+      "correlation_fields": [
+        "request_id",
+        "trace_id",
+        "span_id"
+      ],
+      "event_name": "dependency.operation.failed",
+      "fields": [
+        {
+          "key": "duration_seconds",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.duration_seconds",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_DOUBLE"
+          }
+        },
+        {
+          "key": "error.category",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.category",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "error.type",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.type",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "event.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.dependency.operation.failed",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "module",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "operation",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.get",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "request_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.request_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "span_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.span_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS"
+          }
+        },
+        {
+          "key": "system",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.redis",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "timestamp",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "runtime.clock",
+            "source": "VALUE_SOURCE_RUNTIME_CLOCK",
+            "type": "VALUE_TYPE_TIMESTAMP"
+          }
+        },
+        {
+          "key": "trace_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.trace_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "id": "logging:dep:redis:failed",
+      "redaction_policy_id": "builtin:v1",
+      "severity": "LOG_SEVERITY_ERROR",
+      "statuses": [
+        "RUNTIME_STATUS_ERROR",
+        "RUNTIME_STATUS_TIMEOUT",
+        "RUNTIME_STATUS_CANCELLED",
+        "RUNTIME_STATUS_UNKNOWN"
+      ],
+      "target": {
+        "id": "dep:redis",
+        "kind": "TARGET_KIND_DEPENDENCY"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      }
+    },
+    {
+      "correlation_fields": [
+        "request_id",
+        "trace_id",
+        "span_id"
+      ],
+      "event_name": "dependency.operation.failed",
+      "fields": [
+        {
+          "key": "duration_seconds",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.duration_seconds",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_DOUBLE"
+          }
+        },
+        {
+          "key": "error.category",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.category",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "error.type",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.type",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "event.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.dependency.operation.failed",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "module",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "operation",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.createorder",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "request_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.request_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "span_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.span_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS"
+          }
+        },
+        {
+          "key": "system",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.rpc",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "timestamp",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "runtime.clock",
+            "source": "VALUE_SOURCE_RUNTIME_CLOCK",
+            "type": "VALUE_TYPE_TIMESTAMP"
+          }
+        },
+        {
+          "key": "trace_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.trace_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "id": "logging:dep:rpc:failed",
+      "redaction_policy_id": "builtin:v1",
+      "severity": "LOG_SEVERITY_ERROR",
+      "statuses": [
+        "RUNTIME_STATUS_ERROR",
+        "RUNTIME_STATUS_TIMEOUT",
+        "RUNTIME_STATUS_CANCELLED",
+        "RUNTIME_STATUS_UNKNOWN"
+      ],
+      "target": {
+        "id": "dep:rpc",
+        "kind": "TARGET_KIND_DEPENDENCY"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      }
+    },
+    {
+      "correlation_fields": [
+        "request_id",
+        "trace_id",
+        "span_id"
+      ],
+      "event_name": "dependency.operation.failed",
+      "fields": [
+        {
+          "key": "duration_seconds",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.duration_seconds",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_DOUBLE"
+          }
+        },
+        {
+          "key": "error.category",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.category",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "error.type",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.type",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "event.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.dependency.operation.failed",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "module",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "operation",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.exec",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "request_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.request_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "span_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.span_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS"
+          }
+        },
+        {
+          "key": "system",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.sql",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "timestamp",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "runtime.clock",
+            "source": "VALUE_SOURCE_RUNTIME_CLOCK",
+            "type": "VALUE_TYPE_TIMESTAMP"
+          }
+        },
+        {
+          "key": "trace_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.trace_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "id": "logging:dep:sql:failed",
+      "redaction_policy_id": "builtin:v1",
+      "severity": "LOG_SEVERITY_ERROR",
+      "statuses": [
+        "RUNTIME_STATUS_ERROR",
+        "RUNTIME_STATUS_TIMEOUT",
+        "RUNTIME_STATUS_CANCELLED",
+        "RUNTIME_STATUS_UNKNOWN"
+      ],
+      "target": {
+        "id": "dep:sql",
+        "kind": "TARGET_KIND_DEPENDENCY"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      }
+    },
+    {
+      "correlation_fields": [
+        "request_id",
+        "trace_id",
+        "span_id"
+      ],
+      "event_name": "cron.job.completed",
+      "fields": [
+        {
+          "key": "cron.job.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "duration_seconds",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.duration_seconds",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_DOUBLE"
+          }
+        },
+        {
+          "key": "event.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.cron.job.completed",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "module",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "operation",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.nightly_cleanup",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "request_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.request_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "span_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.span_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS"
+          }
+        },
+        {
+          "key": "timestamp",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "runtime.clock",
+            "source": "VALUE_SOURCE_RUNTIME_CLOCK",
+            "type": "VALUE_TYPE_TIMESTAMP"
+          }
+        },
+        {
+          "key": "trace_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.trace_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "id": "logging:ep:cron:completed",
+      "redaction_policy_id": "builtin:v1",
+      "severity": "LOG_SEVERITY_INFO",
+      "statuses": [
+        "RUNTIME_STATUS_OK"
+      ],
+      "target": {
+        "id": "ep:cron",
+        "kind": "TARGET_KIND_ENDPOINT"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      }
+    },
+    {
+      "correlation_fields": [
+        "request_id",
+        "trace_id",
+        "span_id"
+      ],
+      "event_name": "cron.job.failed",
+      "fields": [
+        {
+          "key": "cron.job.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "duration_seconds",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.duration_seconds",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_DOUBLE"
+          }
+        },
+        {
+          "key": "error.category",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.category",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "error.type",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.type",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "event.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.cron.job.failed",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "module",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "operation",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.nightly_cleanup",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "request_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.request_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "span_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.span_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS"
+          }
+        },
+        {
+          "key": "timestamp",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "runtime.clock",
+            "source": "VALUE_SOURCE_RUNTIME_CLOCK",
+            "type": "VALUE_TYPE_TIMESTAMP"
+          }
+        },
+        {
+          "key": "trace_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.trace_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "id": "logging:ep:cron:failed",
+      "redaction_policy_id": "builtin:v1",
+      "severity": "LOG_SEVERITY_ERROR",
+      "statuses": [
+        "RUNTIME_STATUS_ERROR",
+        "RUNTIME_STATUS_TIMEOUT",
+        "RUNTIME_STATUS_CANCELLED",
+        "RUNTIME_STATUS_UNKNOWN"
+      ],
+      "target": {
+        "id": "ep:cron",
+        "kind": "TARGET_KIND_ENDPOINT"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      }
+    },
+    {
+      "correlation_fields": [
+        "request_id",
+        "trace_id",
+        "span_id"
+      ],
+      "event_name": "cron.job.started",
+      "fields": [
+        {
+          "key": "cron.job.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "event.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.cron.job.started",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "module",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "operation",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.nightly_cleanup",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "request_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.request_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "span_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.span_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "timestamp",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "runtime.clock",
+            "source": "VALUE_SOURCE_RUNTIME_CLOCK",
+            "type": "VALUE_TYPE_TIMESTAMP"
+          }
+        },
+        {
+          "key": "trace_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.trace_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "id": "logging:ep:cron:started",
+      "redaction_policy_id": "builtin:v1",
+      "severity": "LOG_SEVERITY_INFO",
+      "target": {
+        "id": "ep:cron",
+        "kind": "TARGET_KIND_ENDPOINT"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_START"
+      }
+    },
+    {
+      "correlation_fields": [
+        "request_id",
+        "trace_id",
+        "span_id"
+      ],
+      "event_name": "rpc.request.completed",
+      "fields": [
+        {
+          "key": "duration_seconds",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.duration_seconds",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_DOUBLE"
+          }
+        },
+        {
+          "key": "event.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.rpc.request.completed",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "module",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "operation",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.orderservice_createorder",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "request_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.request_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "rpc.method",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.grpc_method",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "rpc.service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.grpc_service",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "span_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.span_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS"
+          }
+        },
+        {
+          "key": "timestamp",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "runtime.clock",
+            "source": "VALUE_SOURCE_RUNTIME_CLOCK",
+            "type": "VALUE_TYPE_TIMESTAMP"
+          }
+        },
+        {
+          "key": "trace_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.trace_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "id": "logging:ep:grpc:completed",
+      "redaction_policy_id": "builtin:v1",
+      "severity": "LOG_SEVERITY_INFO",
+      "statuses": [
+        "RUNTIME_STATUS_OK"
+      ],
+      "target": {
+        "id": "ep:grpc",
+        "kind": "TARGET_KIND_ENDPOINT"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      }
+    },
+    {
+      "correlation_fields": [
+        "request_id",
+        "trace_id",
+        "span_id"
+      ],
+      "event_name": "rpc.request.failed",
+      "fields": [
+        {
+          "key": "duration_seconds",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.duration_seconds",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_DOUBLE"
+          }
+        },
+        {
+          "key": "error.category",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.category",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "error.type",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.type",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "event.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.rpc.request.failed",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "module",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "operation",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.orderservice_createorder",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "request_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.request_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "rpc.method",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.grpc_method",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "rpc.service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.grpc_service",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "span_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.span_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS"
+          }
+        },
+        {
+          "key": "timestamp",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "runtime.clock",
+            "source": "VALUE_SOURCE_RUNTIME_CLOCK",
+            "type": "VALUE_TYPE_TIMESTAMP"
+          }
+        },
+        {
+          "key": "trace_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.trace_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "id": "logging:ep:grpc:failed",
+      "redaction_policy_id": "builtin:v1",
+      "severity": "LOG_SEVERITY_ERROR",
+      "statuses": [
+        "RUNTIME_STATUS_ERROR",
+        "RUNTIME_STATUS_TIMEOUT",
+        "RUNTIME_STATUS_CANCELLED",
+        "RUNTIME_STATUS_UNKNOWN"
+      ],
+      "target": {
+        "id": "ep:grpc",
+        "kind": "TARGET_KIND_ENDPOINT"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      }
+    },
+    {
+      "correlation_fields": [
+        "request_id",
+        "trace_id",
+        "span_id"
+      ],
+      "event_name": "rpc.request.started",
+      "fields": [
+        {
+          "key": "event.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.rpc.request.started",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "module",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "operation",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.orderservice_createorder",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "request_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.request_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "rpc.method",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.grpc_method",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "rpc.service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.grpc_service",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "span_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.span_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "timestamp",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "runtime.clock",
+            "source": "VALUE_SOURCE_RUNTIME_CLOCK",
+            "type": "VALUE_TYPE_TIMESTAMP"
+          }
+        },
+        {
+          "key": "trace_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.trace_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "id": "logging:ep:grpc:started",
+      "redaction_policy_id": "builtin:v1",
+      "severity": "LOG_SEVERITY_INFO",
+      "target": {
+        "id": "ep:grpc",
+        "kind": "TARGET_KIND_ENDPOINT"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_START"
+      }
+    },
+    {
+      "correlation_fields": [
+        "request_id",
+        "trace_id",
+        "span_id"
+      ],
+      "event_name": "http.request.completed",
+      "fields": [
+        {
+          "key": "duration_seconds",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.duration_seconds",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_DOUBLE"
+          }
+        },
+        {
+          "key": "event.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.http.request.completed",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "method",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.POST",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "module",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "operation",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.post",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "request_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.request_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "route",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.http_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "span_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.span_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS"
+          }
+        },
+        {
+          "key": "timestamp",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "runtime.clock",
+            "source": "VALUE_SOURCE_RUNTIME_CLOCK",
+            "type": "VALUE_TYPE_TIMESTAMP"
+          }
+        },
+        {
+          "key": "trace_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.trace_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "id": "logging:ep:http:completed",
+      "redaction_policy_id": "builtin:v1",
+      "severity": "LOG_SEVERITY_INFO",
+      "statuses": [
+        "RUNTIME_STATUS_OK"
+      ],
+      "target": {
+        "id": "ep:http",
+        "kind": "TARGET_KIND_ENDPOINT"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      }
+    },
+    {
+      "correlation_fields": [
+        "request_id",
+        "trace_id",
+        "span_id"
+      ],
+      "event_name": "http.request.failed",
+      "fields": [
+        {
+          "key": "duration_seconds",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.duration_seconds",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_DOUBLE"
+          }
+        },
+        {
+          "key": "error.category",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.category",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "error.type",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.error.type",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "event.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.http.request.failed",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "method",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.POST",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "module",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "operation",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.post",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "request_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.request_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "route",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.http_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "span_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.span_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "status",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.operation.status",
+            "source": "VALUE_SOURCE_RUNTIME_RESULT",
+            "type": "VALUE_TYPE_STATUS"
+          }
+        },
+        {
+          "key": "timestamp",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "runtime.clock",
+            "source": "VALUE_SOURCE_RUNTIME_CLOCK",
+            "type": "VALUE_TYPE_TIMESTAMP"
+          }
+        },
+        {
+          "key": "trace_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.trace_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "id": "logging:ep:http:failed",
+      "redaction_policy_id": "builtin:v1",
+      "severity": "LOG_SEVERITY_ERROR",
+      "statuses": [
+        "RUNTIME_STATUS_ERROR",
+        "RUNTIME_STATUS_TIMEOUT",
+        "RUNTIME_STATUS_CANCELLED",
+        "RUNTIME_STATUS_UNKNOWN"
+      ],
+      "target": {
+        "id": "ep:http",
+        "kind": "TARGET_KIND_ENDPOINT"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_END"
+      }
+    },
+    {
+      "correlation_fields": [
+        "request_id",
+        "trace_id",
+        "span_id"
+      ],
+      "event_name": "http.request.started",
+      "fields": [
+        {
+          "key": "event.name",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.http.request.started",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "function",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.qualified_name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "method",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.POST",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "module",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "function.package_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "operation",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "plan.constant.post",
+            "source": "VALUE_SOURCE_PLAN_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "request_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.request_id",
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "route",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "endpoint.http_path",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "service",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "service.name",
+            "source": "VALUE_SOURCE_IR_CONSTANT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "span_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.span_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "timestamp",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "path": "runtime.clock",
+            "source": "VALUE_SOURCE_RUNTIME_CLOCK",
+            "type": "VALUE_TYPE_TIMESTAMP"
+          }
+        },
+        {
+          "key": "trace_id",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_LOW",
+            "path": "runtime.context.trace_id",
+            "required": true,
+            "source": "VALUE_SOURCE_RUNTIME_CONTEXT",
+            "type": "VALUE_TYPE_STRING"
+          }
+        },
+        {
+          "key": "version",
+          "value": {
+            "cardinality": "CARDINALITY_CLASS_CONSTANT",
+            "fallback": "unknown",
+            "path": "runtime.resource.service.version",
+            "source": "VALUE_SOURCE_RUNTIME_RESOURCE",
+            "type": "VALUE_TYPE_STRING"
+          }
+        }
+      ],
+      "id": "logging:ep:http:started",
+      "redaction_policy_id": "builtin:v1",
+      "severity": "LOG_SEVERITY_INFO",
+      "target": {
+        "id": "ep:http",
+        "kind": "TARGET_KIND_ENDPOINT"
+      },
+      "trigger": {
+        "phase": "TRIGGER_PHASE_START"
+      }
+    }
+  ],
+  "schema_version": "v1",
+  "service_name": "checkout",
+  "source_ir_schema_version": "v1"
+}

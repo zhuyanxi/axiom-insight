@@ -172,7 +172,8 @@ func convertValueBinding(binding *observabilityv1.ValueBinding) (ValueBinding, e
 	case observabilityv1.ValueSource_VALUE_SOURCE_IR_CONSTANT,
 		observabilityv1.ValueSource_VALUE_SOURCE_RUNTIME_RESULT,
 		observabilityv1.ValueSource_VALUE_SOURCE_RUNTIME_RESOURCE,
-		observabilityv1.ValueSource_VALUE_SOURCE_RUNTIME_CONTEXT:
+		observabilityv1.ValueSource_VALUE_SOURCE_RUNTIME_CONTEXT,
+		observabilityv1.ValueSource_VALUE_SOURCE_RUNTIME_CLOCK:
 		converted.Path = binding.GetPath()
 		if binding.GetPath() == "" {
 			return ValueBinding{}, fmt.Errorf("binding path is empty for source %s", source)
@@ -293,6 +294,8 @@ func valueSourceName(source observabilityv1.ValueSource) (string, error) {
 		return ValueSourceRuntimeResource, nil
 	case observabilityv1.ValueSource_VALUE_SOURCE_RUNTIME_CONTEXT:
 		return ValueSourceRuntimeContext, nil
+	case observabilityv1.ValueSource_VALUE_SOURCE_RUNTIME_CLOCK:
+		return ValueSourceRuntimeClock, nil
 	default:
 		return "", fmt.Errorf("unsupported value source %v", source)
 	}
@@ -310,6 +313,8 @@ func bindingTypeName(valueType observabilityv1.ValueType) string {
 		return ValueTypeBool
 	case observabilityv1.ValueType_VALUE_TYPE_STATUS:
 		return ValueTypeStatus
+	case observabilityv1.ValueType_VALUE_TYPE_TIMESTAMP:
+		return ValueTypeTimestamp
 	default:
 		return ""
 	}

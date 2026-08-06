@@ -91,6 +91,10 @@ message LogPlan {
   // redaction_policy_id selects a built-in redaction policy applied by the
   // Runtime; the Generator never inlines sensitive values.
   string redaction_policy_id = 8;
+  // statuses lists the runtime operation statuses that fire this event.
+  // Empty means the event fires unconditionally (e.g. start events).
+  // Completed and failed events of one target must be mutually exclusive.
+  repeated RuntimeStatus statuses = 9;
 }
 
 // TargetRef is a strongly typed reference to an IR entity. The target kind
@@ -246,6 +250,9 @@ enum ValueSource {
   // RUNTIME_RESULT: value bound at runtime from the operation result, e.g.
   // "runtime.operation.status" or "runtime.operation.duration_seconds".
   VALUE_SOURCE_RUNTIME_RESULT = 5;
+  // RUNTIME_CLOCK: timestamp written by the Runtime at emission time. The
+  // Generator never fills a concrete time.
+  VALUE_SOURCE_RUNTIME_CLOCK = 6;
 }
 
 // ValueType is the data type of a bound value.
@@ -257,6 +264,9 @@ enum ValueType {
   VALUE_TYPE_BOOL = 4;
   // STATUS is the finite runtime operation status vocabulary.
   VALUE_TYPE_STATUS = 5;
+  // TIMESTAMP marks a runtime clock value; the Runtime fills the concrete
+  // time, the Generator never does.
+  VALUE_TYPE_TIMESTAMP = 6;
 }
 
 // CardinalityClass estimates how many distinct values a binding may take.
