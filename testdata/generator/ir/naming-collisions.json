@@ -1,0 +1,69 @@
+{
+  "schema_version": "v1",
+  "service": {
+    "name": "Checkout-Service-支付",
+    "language": "go"
+  },
+  "functions": [
+    {
+      "id": "fn:cache-a",
+      "name": "CacheA",
+      "qualified_name": "cache.CacheA.Get",
+      "package_path": "internal/cache",
+      "input_endpoint_ids": ["ep:http"],
+      "dependency_ids": ["dep:redis-a", "dep:redis-b"]
+    },
+    {
+      "id": "fn:cache-b",
+      "name": "CacheB",
+      "qualified_name": "cache.CacheB.Get",
+      "package_path": "internal/cache",
+      "input_endpoint_ids": ["ep:http2"],
+      "dependency_ids": ["dep:redis-c"]
+    }
+  ],
+  "endpoints": [
+    {
+      "id": "ep:http",
+      "kind": "HTTP_HANDLER",
+      "name": "Get-Cache",
+      "function_id": "fn:cache-a",
+      "http_method": "POST",
+      "http_path": "/cache/{key}"
+    },
+    {
+      "id": "ep:http2",
+      "kind": "HTTP_HANDLER",
+      "name": "get_cache",
+      "function_id": "fn:cache-b",
+      "http_method": "post",
+      "http_path": "/cache2/{key}"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "dep:redis-a",
+      "kind": "REDIS",
+      "name": "CacheA",
+      "function_id": "fn:cache-a",
+      "operation": "GET",
+      "value_is_static": true
+    },
+    {
+      "id": "dep:redis-b",
+      "kind": "REDIS",
+      "name": "CacheB",
+      "function_id": "fn:cache-a",
+      "operation": "Get",
+      "value_is_static": true
+    },
+    {
+      "id": "dep:redis-c",
+      "kind": "REDIS",
+      "name": "CacheC",
+      "function_id": "fn:cache-b",
+      "operation": "get",
+      "value_is_static": true
+    }
+  ]
+}

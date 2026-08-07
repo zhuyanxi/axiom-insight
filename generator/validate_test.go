@@ -155,7 +155,25 @@ func TestValidateOTelRejectsStatusSettingOutOfVocabulary(t *testing.T) {
 	}
 }
 
-func TestValidateLoggingRejectsDuplicateEventName(t *testing.T) {
+func TestValidateLoggingRejectsDuplicateEventNamePerTarget(t *testing.T) {
+	// The same event name across different targets is meaningful (every
+	// dependency emits "dependency.operation.failed"); a duplicate name
+	// for the SAME target is rejected.
+	build := func(targetID string) LogEvent {
+		return LogEvent{
+			ID:        "log:" + targetID,
+			EventName: "dependency.operation.failed",
+			Target:    TargetRef{Type: TargetKindDependency, ID: targetID},
+			Trigger:   TriggerEnd,
+			Condition: Condition{StatusIn: []string{RuntimeStatusError}},
+			Severity:  Severity{Constant: LogSeverityError},
+			Fields: []Field{{
+				Key:     "status",
+				Type:    ValueTypeStatus,
+				Binding: ValueBinding{Source: ValueSourceRuntimeResult, Path: "operation.status"},
+			}},
+		}
+	}
 	document := &LoggingDocument{
 		SchemaVersion: SchemaVersionLogging,
 		DocumentType:  DocumentTypeLogging,
@@ -163,37 +181,18 @@ func TestValidateLoggingRejectsDuplicateEventName(t *testing.T) {
 		GeneratedBy:   GeneratedBy{Name: "si", Version: "v0.2.0"},
 		Redaction:     Redaction{Immutable: true, FieldNames: []string{"authorization"}},
 		Events: []LogEvent{
-			{
-				ID:        "log:a",
-				EventName: "http.request.completed",
-				Target:    TargetRef{Type: TargetKindEndpoint, ID: "endpoint:a"},
-				Trigger:   TriggerEnd,
-				Condition: Condition{StatusIn: []string{RuntimeStatusOK}},
-				Severity:  Severity{Constant: LogSeverityInfo},
-				Fields: []Field{{
-					Key:     "status",
-					Type:    ValueTypeStatus,
-					Binding: ValueBinding{Source: ValueSourceRuntimeResult, Path: "operation.status"},
-				}},
-			},
-			{
-				ID:        "log:b",
-				EventName: "http.request.completed",
-				Target:    TargetRef{Type: TargetKindEndpoint, ID: "endpoint:b"},
-				Trigger:   TriggerEnd,
-				Condition: Condition{StatusIn: []string{RuntimeStatusOK}},
-				Severity:  Severity{Constant: LogSeverityInfo},
-				Fields: []Field{{
-					Key:     "status",
-					Type:    ValueTypeStatus,
-					Binding: ValueBinding{Source: ValueSourceRuntimeResult, Path: "operation.status"},
-				}},
-			},
+			build("dependency:a"),
+			build("dependency:b"),
 		},
 	}
+	if violations := document.Validate(); len(violations) > 0 {
+		t.Fatalf("same event name across different targets must be valid, got: %v", violations)
+	}
+
+	document.Events = []LogEvent{build("dependency:a"), build("dependency:a")}
 	violations := document.Validate()
 	if !hasViolationAt(violations, "events[1].event_name") {
-		t.Fatalf("expected duplicate event name violation, got: %v", violations)
+		t.Fatalf("expected duplicate event name violation for the same target, got: %v", violations)
 	}
 }
 

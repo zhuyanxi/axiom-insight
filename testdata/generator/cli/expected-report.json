@@ -1,0 +1,40 @@
+{
+  "schema_version": "cli.generate_report/v1",
+  "status": "success",
+  "cli_version": "v0.1.0",
+  "ir_schema_version": "v1",
+  "generator_schema_version": "v0.2.0",
+  "service": "p0-http",
+  "signals": [
+    "metrics",
+    "tracing",
+    "logging"
+  ],
+  "completed_stage": "commit",
+  "planned_files": [
+    {
+      "name": "metrics.yaml",
+      "definitions": 6,
+      "sha256": "4d52c9bfd9a9dabcb67d32e2b297aa944cd67c2d6e917174526da9bcebf36701",
+      "existed_before": false
+    },
+    {
+      "name": "otel.yaml",
+      "definitions": 2,
+      "sha256": "98941816cec492ae596d645e819ca347184bf3fdfe3844b6a146271c2f438285",
+      "existed_before": false
+    },
+    {
+      "name": "logging.yaml",
+      "definitions": 4,
+      "sha256": "79d894ac4df9624bc003c8f1f8cb6711b73daa96756c32eea11d0bd67f6fda81",
+      "existed_before": false
+    }
+  ],
+  "dry_run": false,
+  "written": [
+    "metrics.yaml",
+    "otel.yaml",
+    "logging.yaml"
+  ]
+}

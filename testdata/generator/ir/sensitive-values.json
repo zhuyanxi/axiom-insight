@@ -1,0 +1,73 @@
+{
+  "schema_version": "v1",
+  "service": {
+    "name": "sensitive-shop",
+    "language": "go"
+  },
+  "functions": [
+    {
+      "id": "fn:main",
+      "name": "process",
+      "qualified_name": "sensitive.Process",
+      "package_path": "internal/sensitive",
+      "input_endpoint_ids": ["ep:http"],
+      "dependency_ids": ["dep:sql", "dep:redis", "dep:http", "dep:producer"]
+    }
+  ],
+  "endpoints": [
+    {
+      "id": "ep:http",
+      "kind": "HTTP_HANDLER",
+      "name": "process",
+      "function_id": "fn:main",
+      "http_method": "POST",
+      "http_path": "/process/{id}"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "dep:sql",
+      "kind": "SQL",
+      "name": "UserStore",
+      "function_id": "fn:main",
+      "operation": "query",
+      "value": "SELECT * FROM users WHERE password = 'canary-password-hunter2'",
+      "value_is_static": true
+    },
+    {
+      "id": "dep:redis",
+      "kind": "REDIS",
+      "name": "SessionStore",
+      "function_id": "fn:main",
+      "operation": "get",
+      "value": "user:42:session:canary-redis-key-7f3a",
+      "value_is_static": true
+    },
+    {
+      "id": "dep:http",
+      "kind": "HTTP_CLIENT",
+      "name": "ExternalAPI",
+      "function_id": "fn:main",
+      "operation": "GET",
+      "target_url": "https://canary-user:canary-pass@canary.example/orders?id=42#canary-fragment",
+      "value_is_static": true
+    },
+    {
+      "id": "dep:producer",
+      "kind": "KAFKA_PRODUCER",
+      "name": "EventsTopic",
+      "function_id": "fn:main",
+      "operation": "produce",
+      "resource": "canary-topic-9f8e7d6c",
+      "value": "{\"event\":\"canary-payload-b1a2c3\"}",
+      "value_is_static": true
+    }
+  ],
+  "diagnostics": [
+    {
+      "severity": "WARNING",
+      "code": "ANALYZER_SENSITIVE_VALUE",
+      "message": "sensitive value canary-email-4d5e6f@example.com detected"
+    }
+  ]
+}

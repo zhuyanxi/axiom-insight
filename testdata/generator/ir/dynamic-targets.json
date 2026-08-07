@@ -1,0 +1,83 @@
+{
+  "schema_version": "v1",
+  "service": {
+    "name": "dynamic-shop",
+    "language": "go"
+  },
+  "functions": [
+    {
+      "id": "fn:main",
+      "name": "dispatch",
+      "qualified_name": "dynamic.Main.dispatch",
+      "package_path": "internal/dispatch",
+      "input_endpoint_ids": ["ep:http"],
+      "dependency_ids": ["dep:http", "dep:rpc", "dep:sql", "dep:redis", "dep:producer", "dep:consumer"]
+    }
+  ],
+  "endpoints": [
+    {
+      "id": "ep:http",
+      "kind": "HTTP_HANDLER",
+      "name": "dispatch",
+      "function_id": "fn:main",
+      "http_method": "POST",
+      "http_path": "/dispatch/{id}"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "dep:http",
+      "kind": "HTTP_CLIENT",
+      "name": "DynamicClient",
+      "function_id": "fn:main",
+      "operation": "GET",
+      "target_url": "https://dynamic.example/unknown/path",
+      "value_is_static": false
+    },
+    {
+      "id": "dep:rpc",
+      "kind": "RPC_CLIENT",
+      "name": "DynamicRPC",
+      "function_id": "fn:main",
+      "operation": "Reserve",
+      "target_service": "unknown.Service",
+      "value_is_static": false
+    },
+    {
+      "id": "dep:sql",
+      "kind": "SQL",
+      "name": "DynamicSQL",
+      "function_id": "fn:main",
+      "operation": "query",
+      "value": "SELECT * FROM dynamic_unknown_table",
+      "value_is_static": false
+    },
+    {
+      "id": "dep:redis",
+      "kind": "REDIS",
+      "name": "DynamicRedis",
+      "function_id": "fn:main",
+      "operation": "get",
+      "value": "user:dynamic:key",
+      "value_is_static": false
+    },
+    {
+      "id": "dep:producer",
+      "kind": "KAFKA_PRODUCER",
+      "name": "DynamicProducer",
+      "function_id": "fn:main",
+      "operation": "produce",
+      "resource": "dynamic-topic",
+      "value_is_static": false
+    },
+    {
+      "id": "dep:consumer",
+      "kind": "KAFKA_CONSUMER",
+      "name": "DynamicConsumer",
+      "function_id": "fn:main",
+      "operation": "consume",
+      "resource": "dynamic-group",
+      "value_is_static": false
+    }
+  ]
+}

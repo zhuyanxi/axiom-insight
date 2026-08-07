@@ -1,0 +1,137 @@
+{
+  "schema_version": "v1",
+  "service": {
+    "name": "checkout",
+    "source_root": "fixtures/composite",
+    "language": "go"
+  },
+  "functions": [
+    {
+      "id": "fn:http",
+      "name": "handleOrder",
+      "qualified_name": "checkout.handleOrder",
+      "package_path": "internal/orders",
+      "input_endpoint_ids": ["ep:http"],
+      "dependency_ids": ["dep:sql", "dep:redis", "dep:http-client"],
+      "callee_function_ids": ["fn:helper"]
+    },
+    {
+      "id": "fn:grpc",
+      "name": "createOrder",
+      "qualified_name": "checkout.OrdersServer.createOrder",
+      "package_path": "internal/orders",
+      "input_endpoint_ids": ["ep:grpc"],
+      "dependency_ids": ["dep:producer", "dep:rpc-client"]
+    },
+    {
+      "id": "fn:cron",
+      "name": "cleanup",
+      "qualified_name": "checkout.Cleanup",
+      "package_path": "internal/maintenance",
+      "input_endpoint_ids": ["ep:cron"],
+      "dependency_ids": ["dep:consumer"]
+    },
+    {
+      "id": "fn:helper",
+      "name": "validate",
+      "qualified_name": "checkout.validate",
+      "package_path": "internal/orders"
+    }
+  ],
+  "endpoints": [
+    {
+      "id": "ep:http",
+      "kind": "HTTP_HANDLER",
+      "name": "createOrder",
+      "function_id": "fn:http",
+      "http_method": "POST",
+      "http_path": "/orders/{id}"
+    },
+    {
+      "id": "ep:grpc",
+      "kind": "GRPC_HANDLER",
+      "name": "createOrder",
+      "function_id": "fn:grpc",
+      "grpc_service": "OrderService",
+      "grpc_method": "CreateOrder"
+    },
+    {
+      "id": "ep:cron",
+      "kind": "CRON_JOB",
+      "name": "nightly-cleanup",
+      "function_id": "fn:cron",
+      "cron_schedule": "0 3 * * *"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "dep:producer",
+      "kind": "KAFKA_PRODUCER",
+      "name": "OrdersTopic",
+      "function_id": "fn:grpc",
+      "operation": "produce",
+      "value_is_static": true
+    },
+    {
+      "id": "dep:consumer",
+      "kind": "KAFKA_CONSUMER",
+      "name": "OrdersConsumer",
+      "function_id": "fn:cron",
+      "operation": "consume",
+      "value_is_static": true
+    },
+    {
+      "id": "dep:sql",
+      "kind": "SQL",
+      "name": "OrdersStore",
+      "function_id": "fn:http",
+      "operation": "query",
+      "value_is_static": true
+    },
+    {
+      "id": "dep:redis",
+      "kind": "REDIS",
+      "name": "SessionCache",
+      "function_id": "fn:http",
+      "operation": "get",
+      "value_is_static": true
+    },
+    {
+      "id": "dep:http-client",
+      "kind": "HTTP_CLIENT",
+      "name": "PaymentsClient",
+      "function_id": "fn:http",
+      "operation": "GET",
+      "value_is_static": true
+    },
+    {
+      "id": "dep:rpc-client",
+      "kind": "RPC_CLIENT",
+      "name": "InventoryClient",
+      "function_id": "fn:grpc",
+      "operation": "InventoryService/Reserve",
+      "value_is_static": true
+    }
+  ],
+  "call_edges": [
+    {
+      "id": "edge:http-helper",
+      "caller_function_id": "fn:http",
+      "callee_function_id": "fn:helper",
+      "resolution": "RESOLVED"
+    },
+    {
+      "id": "edge:http-dynamic",
+      "caller_function_id": "fn:http",
+      "callee_function_id": "fn:helper",
+      "resolution": "UNRESOLVED"
+    }
+  ],
+  "diagnostics": [
+    {
+      "severity": "WARNING",
+      "code": "ANALYZER_UNRESOLVED_CALL",
+      "message": "call target could not be resolved statically"
+    }
+  ]
+}

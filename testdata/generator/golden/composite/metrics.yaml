@@ -1,0 +1,1062 @@
+schema_version: generator.metrics/v1
+document_type: instrumentation.metrics
+source:
+  ir_schema_version: v1
+  service_name: checkout
+generated_by:
+  name: si
+  version: v0.2.0
+metrics:
+  - id: metrics:dep:consumer:count
+    name: checkout_internal_maintenance_checkout_cleanup_consume_kafka_operations_total
+    type: counter
+    unit: '{operation}'
+    description: Number of Kafka consumer operations completed; unit {operation}; recorded at operation end
+    target:
+      type: dependency
+      id: dep:consumer
+    record:
+      trigger: operation_end
+      value:
+        source: constant
+        number: 1
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: consume
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:dep:consumer:duration
+    name: checkout_internal_maintenance_checkout_cleanup_consume_kafka_operation_duration_seconds
+    type: histogram
+    unit: s
+    description: Duration of Kafka consumer operations; unit s; recorded at operation end
+    target:
+      type: dependency
+      id: dep:consumer
+    record:
+      trigger: operation_end
+      value:
+        source: runtime_result
+        path: runtime.operation.duration_seconds
+        type: double
+    buckets:
+      - 0.005
+      - 0.01
+      - 0.025
+      - 0.05
+      - 0.1
+      - 0.25
+      - 0.5
+      - 1
+      - 2.5
+      - 5
+      - 10
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: consume
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:dep:consumer:in_flight
+    name: checkout_internal_maintenance_checkout_cleanup_consume_kafka_operations_in_flight
+    type: gauge
+    unit: '{operation}'
+    description: Number of Kafka consumer operations in flight (in-call operations only); unit {operation}; recorded on state change
+    target:
+      type: dependency
+      id: dep:consumer
+    record:
+      trigger: state_change
+      value:
+        source: runtime_result
+        path: runtime.operation.in_flight
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: consume
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+  - id: metrics:dep:http-client:count
+    name: checkout_internal_orders_checkout_handleorder_get_http_operations_total
+    type: counter
+    unit: '{operation}'
+    description: Number of HTTP client operations completed; unit {operation}; recorded at operation end
+    target:
+      type: dependency
+      id: dep:http-client
+    record:
+      trigger: operation_end
+      value:
+        source: constant
+        number: 1
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: get
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:dep:http-client:duration
+    name: checkout_internal_orders_checkout_handleorder_get_http_operation_duration_seconds
+    type: histogram
+    unit: s
+    description: Duration of HTTP client operations; unit s; recorded at operation end
+    target:
+      type: dependency
+      id: dep:http-client
+    record:
+      trigger: operation_end
+      value:
+        source: runtime_result
+        path: runtime.operation.duration_seconds
+        type: double
+    buckets:
+      - 0.005
+      - 0.01
+      - 0.025
+      - 0.05
+      - 0.1
+      - 0.25
+      - 0.5
+      - 1
+      - 2.5
+      - 5
+      - 10
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: get
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:dep:http-client:in_flight
+    name: checkout_internal_orders_checkout_handleorder_get_http_operations_in_flight
+    type: gauge
+    unit: '{operation}'
+    description: Number of HTTP client operations in flight (in-call operations only); unit {operation}; recorded on state change
+    target:
+      type: dependency
+      id: dep:http-client
+    record:
+      trigger: state_change
+      value:
+        source: runtime_result
+        path: runtime.operation.in_flight
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: get
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+  - id: metrics:dep:producer:count
+    name: checkout_internal_orders_checkout_ordersserver_createorder_produce_kafka_operations_total
+    type: counter
+    unit: '{operation}'
+    description: Number of Kafka producer operations completed; unit {operation}; recorded at operation end
+    target:
+      type: dependency
+      id: dep:producer
+    record:
+      trigger: operation_end
+      value:
+        source: constant
+        number: 1
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: produce
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:dep:producer:duration
+    name: checkout_internal_orders_checkout_ordersserver_createorder_produce_kafka_operation_duration_seconds
+    type: histogram
+    unit: s
+    description: Duration of Kafka producer operations; unit s; recorded at operation end
+    target:
+      type: dependency
+      id: dep:producer
+    record:
+      trigger: operation_end
+      value:
+        source: runtime_result
+        path: runtime.operation.duration_seconds
+        type: double
+    buckets:
+      - 0.005
+      - 0.01
+      - 0.025
+      - 0.05
+      - 0.1
+      - 0.25
+      - 0.5
+      - 1
+      - 2.5
+      - 5
+      - 10
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: produce
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:dep:producer:in_flight
+    name: checkout_internal_orders_checkout_ordersserver_createorder_produce_kafka_operations_in_flight
+    type: gauge
+    unit: '{operation}'
+    description: Number of Kafka producer operations in flight (in-call operations only); unit {operation}; recorded on state change
+    target:
+      type: dependency
+      id: dep:producer
+    record:
+      trigger: state_change
+      value:
+        source: runtime_result
+        path: runtime.operation.in_flight
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: produce
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+  - id: metrics:dep:redis:count
+    name: checkout_internal_orders_checkout_handleorder_get_redis_operations_total
+    type: counter
+    unit: '{operation}'
+    description: Number of Redis operations completed; unit {operation}; recorded at operation end
+    target:
+      type: dependency
+      id: dep:redis
+    record:
+      trigger: operation_end
+      value:
+        source: constant
+        number: 1
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: get
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:dep:redis:duration
+    name: checkout_internal_orders_checkout_handleorder_get_redis_operation_duration_seconds
+    type: histogram
+    unit: s
+    description: Duration of Redis operations; unit s; recorded at operation end
+    target:
+      type: dependency
+      id: dep:redis
+    record:
+      trigger: operation_end
+      value:
+        source: runtime_result
+        path: runtime.operation.duration_seconds
+        type: double
+    buckets:
+      - 0.005
+      - 0.01
+      - 0.025
+      - 0.05
+      - 0.1
+      - 0.25
+      - 0.5
+      - 1
+      - 2.5
+      - 5
+      - 10
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: get
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:dep:redis:in_flight
+    name: checkout_internal_orders_checkout_handleorder_get_redis_operations_in_flight
+    type: gauge
+    unit: '{operation}'
+    description: Number of Redis operations in flight (in-call operations only); unit {operation}; recorded on state change
+    target:
+      type: dependency
+      id: dep:redis
+    record:
+      trigger: state_change
+      value:
+        source: runtime_result
+        path: runtime.operation.in_flight
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: get
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+  - id: metrics:dep:rpc-client:count
+    name: checkout_internal_orders_checkout_ordersserver_createorder_inventoryservice_reserve_rpc_operations_total
+    type: counter
+    unit: '{operation}'
+    description: Number of RPC client operations completed; unit {operation}; recorded at operation end
+    target:
+      type: dependency
+      id: dep:rpc-client
+    record:
+      trigger: operation_end
+      value:
+        source: constant
+        number: 1
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: inventoryservice_reserve
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:dep:rpc-client:duration
+    name: checkout_internal_orders_checkout_ordersserver_createorder_inventoryservice_reserve_rpc_operation_duration_seconds
+    type: histogram
+    unit: s
+    description: Duration of RPC client operations; unit s; recorded at operation end
+    target:
+      type: dependency
+      id: dep:rpc-client
+    record:
+      trigger: operation_end
+      value:
+        source: runtime_result
+        path: runtime.operation.duration_seconds
+        type: double
+    buckets:
+      - 0.005
+      - 0.01
+      - 0.025
+      - 0.05
+      - 0.1
+      - 0.25
+      - 0.5
+      - 1
+      - 2.5
+      - 5
+      - 10
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: inventoryservice_reserve
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:dep:rpc-client:in_flight
+    name: checkout_internal_orders_checkout_ordersserver_createorder_inventoryservice_reserve_rpc_operations_in_flight
+    type: gauge
+    unit: '{operation}'
+    description: Number of RPC client operations in flight (in-call operations only); unit {operation}; recorded on state change
+    target:
+      type: dependency
+      id: dep:rpc-client
+    record:
+      trigger: state_change
+      value:
+        source: runtime_result
+        path: runtime.operation.in_flight
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: inventoryservice_reserve
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+  - id: metrics:dep:sql:count
+    name: checkout_internal_orders_checkout_handleorder_query_sql_operations_total
+    type: counter
+    unit: '{operation}'
+    description: Number of SQL operations completed; unit {operation}; recorded at operation end
+    target:
+      type: dependency
+      id: dep:sql
+    record:
+      trigger: operation_end
+      value:
+        source: constant
+        number: 1
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: query
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:dep:sql:duration
+    name: checkout_internal_orders_checkout_handleorder_query_sql_operation_duration_seconds
+    type: histogram
+    unit: s
+    description: Duration of SQL operations; unit s; recorded at operation end
+    target:
+      type: dependency
+      id: dep:sql
+    record:
+      trigger: operation_end
+      value:
+        source: runtime_result
+        path: runtime.operation.duration_seconds
+        type: double
+    buckets:
+      - 0.005
+      - 0.01
+      - 0.025
+      - 0.05
+      - 0.1
+      - 0.25
+      - 0.5
+      - 1
+      - 2.5
+      - 5
+      - 10
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: query
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:dep:sql:in_flight
+    name: checkout_internal_orders_checkout_handleorder_query_sql_operations_in_flight
+    type: gauge
+    unit: '{operation}'
+    description: Number of SQL operations in flight (in-call operations only); unit {operation}; recorded on state change
+    target:
+      type: dependency
+      id: dep:sql
+    record:
+      trigger: state_change
+      value:
+        source: runtime_result
+        path: runtime.operation.in_flight
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: query
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+  - id: metrics:ep:cron:count
+    name: checkout_internal_maintenance_checkout_cleanup_nightly_cleanup_cron_runs_total
+    type: counter
+    unit: '{run}'
+    description: Number of cron runs completed; unit {run}; recorded at operation end
+    target:
+      type: endpoint
+      id: ep:cron
+    record:
+      trigger: operation_end
+      value:
+        source: constant
+        number: 1
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: nightly_cleanup
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:ep:cron:duration
+    name: checkout_internal_maintenance_checkout_cleanup_nightly_cleanup_cron_run_duration_seconds
+    type: histogram
+    unit: s
+    description: Duration of cron runs; unit s; recorded at operation end
+    target:
+      type: endpoint
+      id: ep:cron
+    record:
+      trigger: operation_end
+      value:
+        source: runtime_result
+        path: runtime.operation.duration_seconds
+        type: double
+    buckets:
+      - 0.005
+      - 0.01
+      - 0.025
+      - 0.05
+      - 0.1
+      - 0.25
+      - 0.5
+      - 1
+      - 2.5
+      - 5
+      - 10
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: nightly_cleanup
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:ep:cron:in_flight
+    name: checkout_internal_maintenance_checkout_cleanup_nightly_cleanup_cron_jobs_in_flight
+    type: gauge
+    unit: '{operation}'
+    description: Number of cron runs in flight; unit {operation}; recorded on state change
+    target:
+      type: endpoint
+      id: ep:cron
+    record:
+      trigger: state_change
+      value:
+        source: runtime_result
+        path: runtime.operation.in_flight
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: nightly_cleanup
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+  - id: metrics:ep:grpc:count
+    name: checkout_internal_orders_checkout_ordersserver_createorder_orderservice_createorder_grpc_requests_total
+    type: counter
+    unit: '{request}'
+    description: Number of gRPC requests completed; unit {request}; recorded at operation end
+    target:
+      type: endpoint
+      id: ep:grpc
+    record:
+      trigger: operation_end
+      value:
+        source: constant
+        number: 1
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: orderservice_createorder
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:ep:grpc:duration
+    name: checkout_internal_orders_checkout_ordersserver_createorder_orderservice_createorder_grpc_request_duration_seconds
+    type: histogram
+    unit: s
+    description: Duration of gRPC requests; unit s; recorded at operation end
+    target:
+      type: endpoint
+      id: ep:grpc
+    record:
+      trigger: operation_end
+      value:
+        source: runtime_result
+        path: runtime.operation.duration_seconds
+        type: double
+    buckets:
+      - 0.005
+      - 0.01
+      - 0.025
+      - 0.05
+      - 0.1
+      - 0.25
+      - 0.5
+      - 1
+      - 2.5
+      - 5
+      - 10
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: orderservice_createorder
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:ep:grpc:in_flight
+    name: checkout_internal_orders_checkout_ordersserver_createorder_orderservice_createorder_grpc_requests_in_flight
+    type: gauge
+    unit: '{operation}'
+    description: Number of gRPC requests in flight; unit {operation}; recorded on state change
+    target:
+      type: endpoint
+      id: ep:grpc
+    record:
+      trigger: state_change
+      value:
+        source: runtime_result
+        path: runtime.operation.in_flight
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: orderservice_createorder
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+  - id: metrics:ep:http:count
+    name: checkout_internal_orders_checkout_handleorder_post_http_requests_total
+    type: counter
+    unit: '{request}'
+    description: Number of HTTP requests completed; unit {request}; recorded at operation end
+    target:
+      type: endpoint
+      id: ep:http
+    record:
+      trigger: operation_end
+      value:
+        source: constant
+        number: 1
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: post
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:ep:http:duration
+    name: checkout_internal_orders_checkout_handleorder_post_http_request_duration_seconds
+    type: histogram
+    unit: s
+    description: Duration of HTTP requests; unit s; recorded at operation end
+    target:
+      type: endpoint
+      id: ep:http
+    record:
+      trigger: operation_end
+      value:
+        source: runtime_result
+        path: runtime.operation.duration_seconds
+        type: double
+    buckets:
+      - 0.005
+      - 0.01
+      - 0.025
+      - 0.05
+      - 0.1
+      - 0.25
+      - 0.5
+      - 1
+      - 2.5
+      - 5
+      - 10
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: post
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+  - id: metrics:ep:http:in_flight
+    name: checkout_internal_orders_checkout_handleorder_post_http_requests_in_flight
+    type: gauge
+    unit: '{operation}'
+    description: Number of HTTP requests in flight; unit {operation}; recorded on state change
+    target:
+      type: endpoint
+      id: ep:http
+    record:
+      trigger: state_change
+      value:
+        source: runtime_result
+        path: runtime.operation.in_flight
+        type: int
+    attributes:
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: post
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string

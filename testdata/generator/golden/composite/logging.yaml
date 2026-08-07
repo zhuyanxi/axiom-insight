@@ -1,0 +1,1364 @@
+schema_version: generator.logging/v1
+document_type: instrumentation.logging
+source:
+  ir_schema_version: v1
+  service_name: checkout
+generated_by:
+  name: si
+  version: v0.2.0
+redaction:
+  immutable: true
+  field_names:
+    - authorization
+    - cookie
+    - password
+    - secret
+    - token
+events:
+  - id: logging:dep:consumer:failed
+    event_name: dependency.operation.failed
+    target:
+      type: dependency
+      id: dep:consumer
+    trigger: operation_end
+    condition:
+      status_in:
+        - error
+        - cancelled
+        - timeout
+        - unknown
+    severity:
+      constant: error
+    fields:
+      - key: duration_seconds
+        type: double
+        binding:
+          source: runtime_result
+          path: runtime.operation.duration_seconds
+          type: double
+      - key: error.category
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.category
+          type: string
+      - key: error.type
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.type
+          type: string
+      - key: event.name
+        type: string
+        binding:
+          source: constant
+          string: dependency.operation.failed
+          type: string
+      - key: function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: module
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: consume
+          type: string
+      - key: request_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.request_id
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: span_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.span_id
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+      - key: system
+        type: string
+        binding:
+          source: constant
+          string: kafka
+          type: string
+      - key: timestamp
+        type: timestamp
+        binding:
+          source: runtime_clock
+          path: runtime.clock
+          type: timestamp
+      - key: trace_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.trace_id
+          type: string
+      - key: version
+        type: string
+        binding:
+          source: runtime_resource
+          path: runtime.resource.service.version
+          fallback: unknown
+          type: string
+  - id: logging:dep:http-client:failed
+    event_name: dependency.operation.failed
+    target:
+      type: dependency
+      id: dep:http-client
+    trigger: operation_end
+    condition:
+      status_in:
+        - error
+        - cancelled
+        - timeout
+        - unknown
+    severity:
+      constant: error
+    fields:
+      - key: duration_seconds
+        type: double
+        binding:
+          source: runtime_result
+          path: runtime.operation.duration_seconds
+          type: double
+      - key: error.category
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.category
+          type: string
+      - key: error.type
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.type
+          type: string
+      - key: event.name
+        type: string
+        binding:
+          source: constant
+          string: dependency.operation.failed
+          type: string
+      - key: function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: module
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: get
+          type: string
+      - key: request_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.request_id
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: span_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.span_id
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+      - key: system
+        type: string
+        binding:
+          source: constant
+          string: http
+          type: string
+      - key: timestamp
+        type: timestamp
+        binding:
+          source: runtime_clock
+          path: runtime.clock
+          type: timestamp
+      - key: trace_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.trace_id
+          type: string
+      - key: version
+        type: string
+        binding:
+          source: runtime_resource
+          path: runtime.resource.service.version
+          fallback: unknown
+          type: string
+  - id: logging:dep:producer:failed
+    event_name: dependency.operation.failed
+    target:
+      type: dependency
+      id: dep:producer
+    trigger: operation_end
+    condition:
+      status_in:
+        - error
+        - cancelled
+        - timeout
+        - unknown
+    severity:
+      constant: error
+    fields:
+      - key: duration_seconds
+        type: double
+        binding:
+          source: runtime_result
+          path: runtime.operation.duration_seconds
+          type: double
+      - key: error.category
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.category
+          type: string
+      - key: error.type
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.type
+          type: string
+      - key: event.name
+        type: string
+        binding:
+          source: constant
+          string: dependency.operation.failed
+          type: string
+      - key: function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: module
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: produce
+          type: string
+      - key: request_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.request_id
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: span_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.span_id
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+      - key: system
+        type: string
+        binding:
+          source: constant
+          string: kafka
+          type: string
+      - key: timestamp
+        type: timestamp
+        binding:
+          source: runtime_clock
+          path: runtime.clock
+          type: timestamp
+      - key: trace_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.trace_id
+          type: string
+      - key: version
+        type: string
+        binding:
+          source: runtime_resource
+          path: runtime.resource.service.version
+          fallback: unknown
+          type: string
+  - id: logging:dep:redis:failed
+    event_name: dependency.operation.failed
+    target:
+      type: dependency
+      id: dep:redis
+    trigger: operation_end
+    condition:
+      status_in:
+        - error
+        - cancelled
+        - timeout
+        - unknown
+    severity:
+      constant: error
+    fields:
+      - key: duration_seconds
+        type: double
+        binding:
+          source: runtime_result
+          path: runtime.operation.duration_seconds
+          type: double
+      - key: error.category
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.category
+          type: string
+      - key: error.type
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.type
+          type: string
+      - key: event.name
+        type: string
+        binding:
+          source: constant
+          string: dependency.operation.failed
+          type: string
+      - key: function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: module
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: get
+          type: string
+      - key: request_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.request_id
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: span_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.span_id
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+      - key: system
+        type: string
+        binding:
+          source: constant
+          string: redis
+          type: string
+      - key: timestamp
+        type: timestamp
+        binding:
+          source: runtime_clock
+          path: runtime.clock
+          type: timestamp
+      - key: trace_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.trace_id
+          type: string
+      - key: version
+        type: string
+        binding:
+          source: runtime_resource
+          path: runtime.resource.service.version
+          fallback: unknown
+          type: string
+  - id: logging:dep:rpc-client:failed
+    event_name: dependency.operation.failed
+    target:
+      type: dependency
+      id: dep:rpc-client
+    trigger: operation_end
+    condition:
+      status_in:
+        - error
+        - cancelled
+        - timeout
+        - unknown
+    severity:
+      constant: error
+    fields:
+      - key: duration_seconds
+        type: double
+        binding:
+          source: runtime_result
+          path: runtime.operation.duration_seconds
+          type: double
+      - key: error.category
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.category
+          type: string
+      - key: error.type
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.type
+          type: string
+      - key: event.name
+        type: string
+        binding:
+          source: constant
+          string: dependency.operation.failed
+          type: string
+      - key: function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: module
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: inventoryservice_reserve
+          type: string
+      - key: request_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.request_id
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: span_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.span_id
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+      - key: system
+        type: string
+        binding:
+          source: constant
+          string: rpc
+          type: string
+      - key: timestamp
+        type: timestamp
+        binding:
+          source: runtime_clock
+          path: runtime.clock
+          type: timestamp
+      - key: trace_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.trace_id
+          type: string
+      - key: version
+        type: string
+        binding:
+          source: runtime_resource
+          path: runtime.resource.service.version
+          fallback: unknown
+          type: string
+  - id: logging:dep:sql:failed
+    event_name: dependency.operation.failed
+    target:
+      type: dependency
+      id: dep:sql
+    trigger: operation_end
+    condition:
+      status_in:
+        - error
+        - cancelled
+        - timeout
+        - unknown
+    severity:
+      constant: error
+    fields:
+      - key: duration_seconds
+        type: double
+        binding:
+          source: runtime_result
+          path: runtime.operation.duration_seconds
+          type: double
+      - key: error.category
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.category
+          type: string
+      - key: error.type
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.type
+          type: string
+      - key: event.name
+        type: string
+        binding:
+          source: constant
+          string: dependency.operation.failed
+          type: string
+      - key: function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: module
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: query
+          type: string
+      - key: request_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.request_id
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: span_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.span_id
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+      - key: system
+        type: string
+        binding:
+          source: constant
+          string: sql
+          type: string
+      - key: timestamp
+        type: timestamp
+        binding:
+          source: runtime_clock
+          path: runtime.clock
+          type: timestamp
+      - key: trace_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.trace_id
+          type: string
+      - key: version
+        type: string
+        binding:
+          source: runtime_resource
+          path: runtime.resource.service.version
+          fallback: unknown
+          type: string
+  - id: logging:ep:cron:completed
+    event_name: cron.job.completed
+    target:
+      type: endpoint
+      id: ep:cron
+    trigger: operation_end
+    condition:
+      status_in:
+        - ok
+    severity:
+      constant: info
+    fields:
+      - key: cron.job.name
+        type: string
+        binding:
+          source: ir
+          path: endpoint.name
+          type: string
+      - key: duration_seconds
+        type: double
+        binding:
+          source: runtime_result
+          path: runtime.operation.duration_seconds
+          type: double
+      - key: event.name
+        type: string
+        binding:
+          source: constant
+          string: cron.job.completed
+          type: string
+      - key: function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: module
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: nightly_cleanup
+          type: string
+      - key: request_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.request_id
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: span_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: runtime.context.span_id
+          required: true
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+      - key: timestamp
+        type: timestamp
+        binding:
+          source: runtime_clock
+          path: runtime.clock
+          type: timestamp
+      - key: trace_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: runtime.context.trace_id
+          required: true
+          type: string
+      - key: version
+        type: string
+        binding:
+          source: runtime_resource
+          path: runtime.resource.service.version
+          fallback: unknown
+          type: string
+  - id: logging:ep:cron:failed
+    event_name: cron.job.failed
+    target:
+      type: endpoint
+      id: ep:cron
+    trigger: operation_end
+    condition:
+      status_in:
+        - error
+        - cancelled
+        - timeout
+        - unknown
+    severity:
+      constant: error
+    fields:
+      - key: cron.job.name
+        type: string
+        binding:
+          source: ir
+          path: endpoint.name
+          type: string
+      - key: duration_seconds
+        type: double
+        binding:
+          source: runtime_result
+          path: runtime.operation.duration_seconds
+          type: double
+      - key: error.category
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.category
+          type: string
+      - key: error.type
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.type
+          type: string
+      - key: event.name
+        type: string
+        binding:
+          source: constant
+          string: cron.job.failed
+          type: string
+      - key: function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: module
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: nightly_cleanup
+          type: string
+      - key: request_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.request_id
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: span_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: runtime.context.span_id
+          required: true
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+      - key: timestamp
+        type: timestamp
+        binding:
+          source: runtime_clock
+          path: runtime.clock
+          type: timestamp
+      - key: trace_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: runtime.context.trace_id
+          required: true
+          type: string
+      - key: version
+        type: string
+        binding:
+          source: runtime_resource
+          path: runtime.resource.service.version
+          fallback: unknown
+          type: string
+  - id: logging:ep:grpc:completed
+    event_name: rpc.request.completed
+    target:
+      type: endpoint
+      id: ep:grpc
+    trigger: operation_end
+    condition:
+      status_in:
+        - ok
+    severity:
+      constant: info
+    fields:
+      - key: duration_seconds
+        type: double
+        binding:
+          source: runtime_result
+          path: runtime.operation.duration_seconds
+          type: double
+      - key: event.name
+        type: string
+        binding:
+          source: constant
+          string: rpc.request.completed
+          type: string
+      - key: function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: module
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: orderservice_createorder
+          type: string
+      - key: request_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.request_id
+          type: string
+      - key: rpc.method
+        type: string
+        binding:
+          source: ir
+          path: endpoint.grpc_method
+          type: string
+      - key: rpc.service
+        type: string
+        binding:
+          source: ir
+          path: endpoint.grpc_service
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: span_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: runtime.context.span_id
+          required: true
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+      - key: timestamp
+        type: timestamp
+        binding:
+          source: runtime_clock
+          path: runtime.clock
+          type: timestamp
+      - key: trace_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: runtime.context.trace_id
+          required: true
+          type: string
+      - key: version
+        type: string
+        binding:
+          source: runtime_resource
+          path: runtime.resource.service.version
+          fallback: unknown
+          type: string
+  - id: logging:ep:grpc:failed
+    event_name: rpc.request.failed
+    target:
+      type: endpoint
+      id: ep:grpc
+    trigger: operation_end
+    condition:
+      status_in:
+        - error
+        - cancelled
+        - timeout
+        - unknown
+    severity:
+      constant: error
+    fields:
+      - key: duration_seconds
+        type: double
+        binding:
+          source: runtime_result
+          path: runtime.operation.duration_seconds
+          type: double
+      - key: error.category
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.category
+          type: string
+      - key: error.type
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.type
+          type: string
+      - key: event.name
+        type: string
+        binding:
+          source: constant
+          string: rpc.request.failed
+          type: string
+      - key: function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: module
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: orderservice_createorder
+          type: string
+      - key: request_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.request_id
+          type: string
+      - key: rpc.method
+        type: string
+        binding:
+          source: ir
+          path: endpoint.grpc_method
+          type: string
+      - key: rpc.service
+        type: string
+        binding:
+          source: ir
+          path: endpoint.grpc_service
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: span_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: runtime.context.span_id
+          required: true
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+      - key: timestamp
+        type: timestamp
+        binding:
+          source: runtime_clock
+          path: runtime.clock
+          type: timestamp
+      - key: trace_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: runtime.context.trace_id
+          required: true
+          type: string
+      - key: version
+        type: string
+        binding:
+          source: runtime_resource
+          path: runtime.resource.service.version
+          fallback: unknown
+          type: string
+  - id: logging:ep:http:completed
+    event_name: http.request.completed
+    target:
+      type: endpoint
+      id: ep:http
+    trigger: operation_end
+    condition:
+      status_in:
+        - ok
+    severity:
+      constant: info
+    fields:
+      - key: duration_seconds
+        type: double
+        binding:
+          source: runtime_result
+          path: runtime.operation.duration_seconds
+          type: double
+      - key: event.name
+        type: string
+        binding:
+          source: constant
+          string: http.request.completed
+          type: string
+      - key: function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: method
+        type: string
+        binding:
+          source: constant
+          string: POST
+          type: string
+      - key: module
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: post
+          type: string
+      - key: request_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.request_id
+          type: string
+      - key: route
+        type: string
+        binding:
+          source: ir
+          path: endpoint.http_path
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: span_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: runtime.context.span_id
+          required: true
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+      - key: timestamp
+        type: timestamp
+        binding:
+          source: runtime_clock
+          path: runtime.clock
+          type: timestamp
+      - key: trace_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: runtime.context.trace_id
+          required: true
+          type: string
+      - key: version
+        type: string
+        binding:
+          source: runtime_resource
+          path: runtime.resource.service.version
+          fallback: unknown
+          type: string
+  - id: logging:ep:http:failed
+    event_name: http.request.failed
+    target:
+      type: endpoint
+      id: ep:http
+    trigger: operation_end
+    condition:
+      status_in:
+        - error
+        - cancelled
+        - timeout
+        - unknown
+    severity:
+      constant: error
+    fields:
+      - key: duration_seconds
+        type: double
+        binding:
+          source: runtime_result
+          path: runtime.operation.duration_seconds
+          type: double
+      - key: error.category
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.category
+          type: string
+      - key: error.type
+        type: string
+        binding:
+          source: runtime_result
+          path: runtime.error.type
+          type: string
+      - key: event.name
+        type: string
+        binding:
+          source: constant
+          string: http.request.failed
+          type: string
+      - key: function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: method
+        type: string
+        binding:
+          source: constant
+          string: POST
+          type: string
+      - key: module
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: post
+          type: string
+      - key: request_id
+        type: string
+        binding:
+          source: runtime_context
+          path: runtime.context.request_id
+          type: string
+      - key: route
+        type: string
+        binding:
+          source: ir
+          path: endpoint.http_path
+          type: string
+      - key: service
+        type: string
+        binding:
+          source: ir
+          path: service.name
+          type: string
+      - key: span_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: runtime.context.span_id
+          required: true
+          type: string
+      - key: status
+        type: status
+        binding:
+          source: runtime_result
+          path: runtime.operation.status
+          allowed_values:
+            - ok
+            - error
+            - cancelled
+            - timeout
+            - unknown
+          type: status
+      - key: timestamp
+        type: timestamp
+        binding:
+          source: runtime_clock
+          path: runtime.clock
+          type: timestamp
+      - key: trace_id
+        type: string
+        required: true
+        binding:
+          source: runtime_context
+          path: runtime.context.trace_id
+          required: true
+          type: string
+      - key: version
+        type: string
+        binding:
+          source: runtime_resource
+          path: runtime.resource.service.version
+          fallback: unknown
+          type: string

@@ -208,7 +208,10 @@ func ValidateLogging(document *LoggingDocument) []*ValidationError {
 	}
 
 	eventIDs := make(map[string]bool, len(document.Events))
-	eventNames := make(map[string]bool, len(document.Events))
+	// Event names are unique per target: every dependency may emit the
+	// same "dependency.operation.failed" family, so the same name across
+	// different targets is meaningful, never a duplicate.
+	eventNames := make(map[string]map[string]bool)
 	for index, event := range document.Events {
 		field := logEventField(index)
 		if event.ID == "" {
@@ -220,10 +223,16 @@ func ValidateLogging(document *LoggingDocument) []*ValidationError {
 		}
 		if event.EventName == "" {
 			emit.emit(field+".event_name", "event name is empty")
-		} else if eventNames[event.EventName] {
-			emit.emit(field+".event_name", "duplicate event name")
 		} else {
-			eventNames[event.EventName] = true
+			targetKey := event.Target.Type + ":" + event.Target.ID
+			if eventNames[targetKey] == nil {
+				eventNames[targetKey] = make(map[string]bool)
+			}
+			if eventNames[targetKey][event.EventName] {
+				emit.emit(field+".event_name", "duplicate event name for the same target")
+			} else {
+				eventNames[targetKey][event.EventName] = true
+			}
 		}
 		validateTarget(field+".target", event.Target, emit)
 		if !oneOf(event.Trigger, TriggerStart, TriggerEnd, TriggerStateChange) {

@@ -1,0 +1,651 @@
+schema_version: generator.otel/v1
+document_type: instrumentation.tracing
+plan_kind: instrumentation
+semantic_conventions_version: 1.37.0
+source:
+  ir_schema_version: v1
+  service_name: checkout
+generated_by:
+  name: si
+  version: v0.2.0
+resources:
+  - key: service.name
+    type: string
+    binding:
+      source: ir
+      path: service.name
+      type: string
+  - key: service.version
+    type: string
+    binding:
+      source: runtime_resource
+      path: runtime.resource.service.version
+      fallback: unknown
+      type: string
+spans:
+  - id: tracing:dep:consumer:child
+    name: kafka consume
+    kind: consumer
+    target:
+      type: dependency
+      id: dep:consumer
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: current_context
+    attributes:
+      - key: code.function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: code.namespace
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: messaging.operation
+        type: string
+        binding:
+          source: constant
+          string: consume
+          type: string
+      - key: messaging.system
+        type: string
+        binding:
+          source: constant
+          string: kafka
+          type: string
+      - key: span.scope
+        type: string
+        binding:
+          source: constant
+          string: client_call
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:dep:consumer:cancelled
+        name: cancelled
+        statuses:
+          - cancelled
+      - id: tracing:dep:consumer:exception
+        name: exception
+        statuses:
+          - error
+        attributes:
+          - key: exception.type
+            type: string
+            binding:
+              source: runtime_result
+              path: runtime.error.type
+              type: string
+      - id: tracing:dep:consumer:timeout
+        name: timeout
+        statuses:
+          - timeout
+  - id: tracing:dep:http-client:child
+    name: HTTP GET
+    kind: client
+    target:
+      type: dependency
+      id: dep:http-client
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: current_context
+    attributes:
+      - key: code.function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: code.namespace
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: http.request.method
+        type: string
+        binding:
+          source: constant
+          string: GET
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:dep:http-client:cancelled
+        name: cancelled
+        statuses:
+          - cancelled
+      - id: tracing:dep:http-client:exception
+        name: exception
+        statuses:
+          - error
+        attributes:
+          - key: exception.type
+            type: string
+            binding:
+              source: runtime_result
+              path: runtime.error.type
+              type: string
+      - id: tracing:dep:http-client:timeout
+        name: timeout
+        statuses:
+          - timeout
+  - id: tracing:dep:producer:child
+    name: kafka produce
+    kind: producer
+    target:
+      type: dependency
+      id: dep:producer
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: current_context
+    attributes:
+      - key: code.function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: code.namespace
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: messaging.operation
+        type: string
+        binding:
+          source: constant
+          string: produce
+          type: string
+      - key: messaging.system
+        type: string
+        binding:
+          source: constant
+          string: kafka
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:dep:producer:cancelled
+        name: cancelled
+        statuses:
+          - cancelled
+      - id: tracing:dep:producer:exception
+        name: exception
+        statuses:
+          - error
+        attributes:
+          - key: exception.type
+            type: string
+            binding:
+              source: runtime_result
+              path: runtime.error.type
+              type: string
+      - id: tracing:dep:producer:timeout
+        name: timeout
+        statuses:
+          - timeout
+  - id: tracing:dep:redis:child
+    name: redis get
+    kind: client
+    target:
+      type: dependency
+      id: dep:redis
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: current_context
+    attributes:
+      - key: code.function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: code.namespace
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: db.operation
+        type: string
+        binding:
+          source: constant
+          string: get
+          type: string
+      - key: db.system
+        type: string
+        binding:
+          source: constant
+          string: redis
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:dep:redis:cancelled
+        name: cancelled
+        statuses:
+          - cancelled
+      - id: tracing:dep:redis:exception
+        name: exception
+        statuses:
+          - error
+        attributes:
+          - key: exception.type
+            type: string
+            binding:
+              source: runtime_result
+              path: runtime.error.type
+              type: string
+      - id: tracing:dep:redis:timeout
+        name: timeout
+        statuses:
+          - timeout
+  - id: tracing:dep:rpc-client:child
+    name: rpc inventoryservice_reserve
+    kind: client
+    target:
+      type: dependency
+      id: dep:rpc-client
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: current_context
+    attributes:
+      - key: code.function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: code.namespace
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: operation
+        type: string
+        binding:
+          source: constant
+          string: inventoryservice_reserve
+          type: string
+      - key: rpc.system
+        type: string
+        binding:
+          source: constant
+          string: rpc
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:dep:rpc-client:cancelled
+        name: cancelled
+        statuses:
+          - cancelled
+      - id: tracing:dep:rpc-client:exception
+        name: exception
+        statuses:
+          - error
+        attributes:
+          - key: exception.type
+            type: string
+            binding:
+              source: runtime_result
+              path: runtime.error.type
+              type: string
+      - id: tracing:dep:rpc-client:timeout
+        name: timeout
+        statuses:
+          - timeout
+  - id: tracing:dep:sql:child
+    name: db query
+    kind: client
+    target:
+      type: dependency
+      id: dep:sql
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: current_context
+    attributes:
+      - key: code.function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: code.namespace
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: db.operation
+        type: string
+        binding:
+          source: constant
+          string: query
+          type: string
+      - key: db.system
+        type: string
+        binding:
+          source: constant
+          string: sql
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:dep:sql:cancelled
+        name: cancelled
+        statuses:
+          - cancelled
+      - id: tracing:dep:sql:exception
+        name: exception
+        statuses:
+          - error
+        attributes:
+          - key: exception.type
+            type: string
+            binding:
+              source: runtime_result
+              path: runtime.error.type
+              type: string
+      - id: tracing:dep:sql:timeout
+        name: timeout
+        statuses:
+          - timeout
+  - id: tracing:edge:http-helper:child
+    name: checkout.validate
+    kind: internal
+    target:
+      type: call_edge
+      id: edge:http-helper
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: current_context
+    attributes:
+      - key: code.function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: code.namespace
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:edge:http-helper:cancelled
+        name: cancelled
+        statuses:
+          - cancelled
+      - id: tracing:edge:http-helper:exception
+        name: exception
+        statuses:
+          - error
+        attributes:
+          - key: exception.type
+            type: string
+            binding:
+              source: runtime_result
+              path: runtime.error.type
+              type: string
+      - id: tracing:edge:http-helper:timeout
+        name: timeout
+        statuses:
+          - timeout
+  - id: tracing:ep:cron:root
+    name: cron nightly-cleanup
+    kind: internal
+    target:
+      type: endpoint
+      id: ep:cron
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: new_root
+    attributes:
+      - key: code.function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: code.namespace
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: cron.job.name
+        type: string
+        binding:
+          source: ir
+          path: endpoint.name
+          type: string
+      - key: cron.job.schedule
+        type: string
+        binding:
+          source: ir
+          path: endpoint.cron_schedule
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:ep:cron:cancelled
+        name: cancelled
+        statuses:
+          - cancelled
+      - id: tracing:ep:cron:exception
+        name: exception
+        statuses:
+          - error
+        attributes:
+          - key: exception.type
+            type: string
+            binding:
+              source: runtime_result
+              path: runtime.error.type
+              type: string
+      - id: tracing:ep:cron:timeout
+        name: timeout
+        statuses:
+          - timeout
+  - id: tracing:ep:grpc:root
+    name: OrderService/CreateOrder
+    kind: server
+    target:
+      type: endpoint
+      id: ep:grpc
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: extract_or_root
+      carrier: grpc_metadata
+    attributes:
+      - key: code.function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: code.namespace
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: rpc.method
+        type: string
+        binding:
+          source: ir
+          path: endpoint.grpc_method
+          type: string
+      - key: rpc.service
+        type: string
+        binding:
+          source: ir
+          path: endpoint.grpc_service
+          type: string
+      - key: rpc.system
+        type: string
+        binding:
+          source: constant
+          string: grpc
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:ep:grpc:cancelled
+        name: cancelled
+        statuses:
+          - cancelled
+      - id: tracing:ep:grpc:exception
+        name: exception
+        statuses:
+          - error
+        attributes:
+          - key: exception.type
+            type: string
+            binding:
+              source: runtime_result
+              path: runtime.error.type
+              type: string
+      - id: tracing:ep:grpc:timeout
+        name: timeout
+        statuses:
+          - timeout
+  - id: tracing:ep:http:root
+    name: POST /orders/{id}
+    kind: server
+    target:
+      type: endpoint
+      id: ep:http
+    lifecycle:
+      start: operation_start
+      end: operation_end
+    parent:
+      strategy: extract_or_root
+      carrier: http_headers
+    attributes:
+      - key: code.function
+        type: string
+        binding:
+          source: ir
+          path: function.qualified_name
+          type: string
+      - key: code.namespace
+        type: string
+        binding:
+          source: ir
+          path: function.package_path
+          type: string
+      - key: http.request.method
+        type: string
+        binding:
+          source: constant
+          string: POST
+          type: string
+      - key: http.route
+        type: string
+        binding:
+          source: ir
+          path: endpoint.http_path
+          type: string
+    status:
+      mapping:
+        cancelled: error
+        error: error
+        ok: unset
+        timeout: error
+        unknown: unset
+    events:
+      - id: tracing:ep:http:cancelled
+        name: cancelled
+        statuses:
+          - cancelled
+      - id: tracing:ep:http:exception
+        name: exception
+        statuses:
+          - error
+        attributes:
+          - key: exception.type
+            type: string
+            binding:
+              source: runtime_result
+              path: runtime.error.type
+              type: string
+      - id: tracing:ep:http:timeout
+        name: timeout
+        statuses:
+          - timeout

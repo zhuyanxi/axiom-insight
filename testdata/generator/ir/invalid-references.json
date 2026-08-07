@@ -1,0 +1,43 @@
+{
+  "schema_version": "v1",
+  "service": {
+    "name": "broken-shop",
+    "language": "go"
+  },
+  "functions": [
+    {
+      "id": "fn:main",
+      "name": "run",
+      "qualified_name": "broken.Run",
+      "package_path": "internal/broken"
+    }
+  ],
+  "endpoints": [
+    {
+      "id": "ep:http",
+      "kind": "HTTP_HANDLER",
+      "name": "run",
+      "function_id": "fn:missing",
+      "http_method": "POST",
+      "http_path": "/run"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "dep:sql",
+      "kind": "SQL",
+      "name": "Store",
+      "function_id": "fn:also-missing",
+      "operation": "query",
+      "value_is_static": true
+    }
+  ],
+  "call_edges": [
+    {
+      "id": "edge:dangling",
+      "caller_function_id": "fn:main",
+      "callee_function_id": "fn:ghost",
+      "resolution": "RESOLVED"
+    }
+  ]
+}
