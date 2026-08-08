@@ -13,7 +13,7 @@ import (
 )
 
 // TestDocumentationYAMLSyntax parses every ```yaml fenced block in
-// docs/04-phase-1-jira-stories.md. This keeps documentation examples from
+// docs/jira/phase-1-jira-stories.md. This keeps documentation examples from
 // drifting out of valid YAML.
 func TestDocumentationYAMLSyntax(t *testing.T) {
 	content := readDocumentation(t)
@@ -89,7 +89,7 @@ func TestDocumentationSection8Examples(t *testing.T) {
 
 func readDocumentation(t *testing.T) string {
 	t.Helper()
-	path := filepath.Join("..", "docs", "04-phase-1-jira-stories.md")
+	path := filepath.Join("..", "docs", "jira", "phase-1-jira-stories.md")
 	data, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("read documentation: %v", err)
