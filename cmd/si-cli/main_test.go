@@ -271,7 +271,7 @@ func hasJSONFunction(functions []struct {
 	return false
 }
 
-func writeCLIProject(t *testing.T, files map[string]string) string {
+func writeCLIProject(t testing.TB, files map[string]string) string {
 	t.Helper()
 	root := t.TempDir()
 	for name, contents := range files {

@@ -226,3 +226,46 @@ make quality
 This runs tests, vet, fixture E2E tests, race detection, protobuf generation
 consistency, and the small-fixture performance budget. Release verification
 steps are documented in [the Phase 0 release checklist](docs/phase-0-release-checklist.md).
+## Phase 1 Output Contracts
+
+`si generate` produces three versioned, strictly validated files into
+`<source-root>/generate` by default:
+
+| File | Contract | Contents |
+| --- | --- | --- |
+| `metrics.yaml` | `generator.metrics/v1` | Counter/Histogram/Gauge/Summary definitions, record triggers, value bindings, `service`/`operation`/`status` attributes |
+| `otel.yaml` | `generator.otel/v1` | Root/Child span definitions, kinds, parent strategies and carriers, semconv `1.37.0` attributes, status mappings, controlled error events |
+| `logging.yaml` | `generator.logging/v1` | Structured event families, conditions, severity, correlation fields, immutable redaction rules |
+
+All three are **instrumentation plans**, never runtime configuration:
+`otel.yaml` carries `plan_kind: instrumentation` and no Collector
+(receivers/processors/exporters/pipelines) fields; no file contains
+generated timestamps, fake request/trace/span IDs, or host information.
+
+Configuration lives in the optional `generation` node of `si.yaml`
+(see `docs/05-generation-config.md`); merge priority is
+CLI flags > si.yaml > built-in defaults. Determinism is a contract:
+identical inputs produce byte-identical files on any machine.
+
+Known limitations (Phase 1):
+
+- No source modification, auto-instrumentation or compile-time injection.
+- No OpenTelemetry Collector configuration is produced or deployed.
+- Kafka consumer handler roots are not inferred.
+- Runtime telemetry is not verified; the files are plans for a future
+  Runtime/codegen layer.
+- File commit guarantees single-file atomic replacement and in-process
+  multi-file rollback, not cross-file crash-atomicity.
+
+Exit codes: `si generate` returns `0` success, `1` pipeline failure
+(`CLI_GENERATE_ERROR`), `2` invalid path/arguments/format/configuration.
+
+## Phase 1 Quality
+
+```sh
+make phase1-quality
+```
+
+Runs build, vet, all tests, Phase 0 fixture regression, Generator tests,
+race, Proto/Schema regeneration consistency, Golden consistency, security
+canary and performance budget checks (see `docs/phase-1-release-checklist.md`).

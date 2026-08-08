@@ -73,6 +73,8 @@ func (InternalCallSpanPlanner) PlanTracing(ctx context.Context, input *planner.S
 		result.Items = append(result.Items, span)
 	}
 
+	disambiguateNames(result)
+
 	sort.Slice(result.Items, func(left, right int) bool {
 		return result.Items[left].GetId() < result.Items[right].GetId()
 	})

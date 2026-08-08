@@ -1,7 +1,7 @@
 {
   "schema_version": "cli.generate_report/v1",
   "status": "success",
-  "cli_version": "v0.1.0",
+  "cli_version": "v0.2.0",
   "ir_schema_version": "v1",
   "generator_schema_version": "v0.2.0",
   "service": "p0-http",

@@ -22,7 +22,7 @@ import (
 const (
 	exitScanError          = 1
 	exitUsageError         = 2
-	defaultCLIVersion      = "v0.1.0"
+	defaultCLIVersion      = "v0.2.0"
 	cliUsageMessageCode    = "CLI_INVALID_ARGUMENT"
 	cliScanMessageCode     = "CLI_SCAN_ERROR"
 	cliInternalMessageCode = "CLI_INTERNAL_ERROR"

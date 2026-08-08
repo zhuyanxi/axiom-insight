@@ -1,0 +1,77 @@
+name: phase1-quality
+
+# Phase 1 required check (P1-16): any failing job blocks merging.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  # Fixed toolchain versions; dependency additions require explicit
+  # version pinning and a license/security review.
+  GO_VERSION: "1.26.1"
+  PROTOC_GEN_GO_VERSION: "v1.36.6"
+
+jobs:
+  quality:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+      - name: Install protoc-gen-go (pinned)
+        shell: bash
+        run: go install google.golang.org/protobuf/cmd/protoc-gen-go@${{ env.PROTOC_GEN_GO_VERSION }}
+      - name: Build
+        run: go build ./...
+      - name: Vet
+        run: go vet ./...
+      - name: Unit and contract tests
+        run: go test ./... -count=1
+      - name: Phase 0 fixture regression
+        run: go test ./cmd/si-cli -run TestScanFixtures -count=1
+      - name: Generator tests (incl. boundary and canary)
+        run: go test ./generator/... ./ir/... -count=1
+      - name: Golden consistency (never implicitly updated)
+        run: go test ./generator/ ./generator/e2e/ -run 'Golden|Schema' -count=1
+      - name: Race
+        run: go test -race ./generator/... ./cmd/... -count=1
+      - name: Protobuf generation consistency
+        run: |
+          PATH="$HOME/go/bin:$PATH" protoc --proto_path=. --go_out=. \
+            --go_opt=paths=source_relative \
+            --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+            ir/v1/observability.proto ir/v1/generation.proto ir/v1/language_analyzer.proto
+          git diff --exit-code -- ir/v1/*.pb.go
+      - name: Offline determinism and canary jobs
+        env:
+          GOPROXY: "off"
+          GOSUMDB: "off"
+        run: go test ./generator/e2e/ -run 'Permutation|Determinism|Canary|Golden' -count=1
+
+  performance-budget:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+      - name: Enforce 1,000-entity budget
+        env:
+          SI_ENFORCE_PERF_BUDGET: "1"
+        run: go test ./generator/e2e/ -run TestPerformanceBudget1000Entities -count=1 -v
+      - name: Record benchmarks
+        run: |
+          go test ./generator/e2e/ -run '^$$' -bench BenchmarkGenerateFromIR -benchmem -count=1 | tee perf-generate.log
+          go test ./cmd/si-cli -run '^$$' -bench BenchmarkScanAndGenerateComposite -benchmem -count=1 | tee perf-cli.log
+      - uses: actions/upload-artifact@v4
+        with:
+          name: perf-baselines
+          path: perf-*.log

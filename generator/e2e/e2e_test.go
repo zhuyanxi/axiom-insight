@@ -73,7 +73,7 @@ func planAndRenderPermuted(t *testing.T, document *observabilityv1.Observability
 	return planAndRenderDocument(t, document, nil)
 }
 
-func planAndRenderDocument(t *testing.T, document *observabilityv1.ObservabilityDocument, overrides []policy.Overrides) (*observabilityv1.GenerationPlan, map[string][]byte) {
+func planAndRenderDocument(t testing.TB, document *observabilityv1.ObservabilityDocument, overrides []policy.Overrides) (*observabilityv1.GenerationPlan, map[string][]byte) {
 	t.Helper()
 	resolved, err := policy.Resolve(nil, nil)
 	if err != nil {

@@ -83,6 +83,8 @@ func (DependencyChildSpanPlanner) PlanTracing(ctx context.Context, input *planne
 		result.Diagnostics = append(result.Diagnostics, diagnostics...)
 	}
 
+	disambiguateNames(result)
+
 	sort.Slice(result.Items, func(left, right int) bool {
 		return result.Items[left].GetId() < result.Items[right].GetId()
 	})
