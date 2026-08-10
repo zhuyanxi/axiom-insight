@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 41,
+  "title": "minimal",
+  "uid": "minimal-uid",
+  "id": null,
+  "version": 0,
+  "editable": true,
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": { "text": "prometheus", "value": "prometheus" }
+      },
+      {
+        "name": "service",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "query": "min_requests_total",
+        "current": { "text": "min", "value": "min" }
+      }
+    ]
+  },
+  "rows": [],
+  "annotations": { "list": [] }
+}

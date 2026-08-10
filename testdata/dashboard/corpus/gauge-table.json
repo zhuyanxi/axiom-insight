@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 41,
+  "title": "corpus-gauge-table",
+  "uid": "corpus-gauge-table",
+  "id": null,
+  "version": 0,
+  "editable": true,
+  "templating": { "list": [ { "name": "datasource", "type": "datasource", "query": "prometheus" } ] },
+  "rows": [],
+  "panels": [
+    {
+      "id": 21,
+      "title": "in flight",
+      "type": "gauge",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum(x_in_flight)", "format": "time_series" }
+      ],
+      "fieldConfig": { "defaults": {} }
+    },
+    {
+      "id": 22,
+      "title": "operations",
+      "type": "table",
+      "gridPos": { "x": 6, "y": 0, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "topk(10, sum(rate(x_total[$__rate_interval])) by (operation))", "format": "time_series" }
+      ],
+      "fieldConfig": { "defaults": {} }
+    }
+  ],
+  "annotations": { "list": [] }
+}

@@ -1,0 +1,1 @@
+{"schemaVersion": 41, "title": "x", "id": null, "version": 0, "editable": true, "templating": {"list": []}, "rows": [], "annotations": {"list": []}, "panels": [{"id": 1, "title": "p", "type": "timeseries", "gridPos": {"x": 0, "y": 0, "w": 6, "h": 6}, "targets": [{"refId": "1", "expr": "x", "format": "time_series"}], "fieldConfig": {}}]}

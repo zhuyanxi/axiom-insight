@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 41,
+  "title": "corpus",
+  "uid": "corpus-uid",
+  "id": null,
+  "version": 0,
+  "editable": true,
+  "templating": {
+    "list": [
+      { "name": "datasource", "type": "datasource", "query": "prometheus" }
+    ]
+  },
+  "rows": [
+    {
+      "id": 201,
+      "title": "Row with timeseries and stat",
+      "panels": [
+        {
+          "id": 11,
+          "title": "rate",
+          "type": "timeseries",
+          "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            { "refId": "A", "expr": "sum(rate(x_total[$__rate_interval]))", "format": "time_series" }
+          ],
+          "fieldConfig": { "defaults": {} }
+        },
+        {
+          "id": 12,
+          "title": "errors",
+          "type": "stat",
+          "gridPos": { "x": 12, "y": 0, "w": 6, "h": 8 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            { "refId": "A", "expr": "sum(rate(x_total{status=\"error\"}[$__rate_interval]))", "format": "time_series" }
+          ],
+          "fieldConfig": { "defaults": {} }
+        }
+      ]
+    }
+  ],
+  "annotations": { "list": [] }
+}

@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 41,
+  "title": "checkout Observability",
+  "uid": "checkout-observability",
+  "id": null,
+  "version": 0,
+  "editable": true,
+  "tags": ["axiom-insight", "checkout"],
+  "timezone": "browser",
+  "refresh": "30s",
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": { "text": "prometheus", "value": "prometheus" }
+      },
+      {
+        "name": "service",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "query": "checkout_http_requests_total",
+        "current": { "text": "checkout", "value": "checkout" },
+        "multi": true,
+        "includeAll": true
+      },
+      {
+        "name": "operation",
+        "type": "custom",
+        "options": [
+          { "text": "post", "value": "post" },
+          { "text": "get", "value": "get" }
+        ],
+        "current": { "text": "post", "value": "post" }
+      }
+    ]
+  },
+  "rows": [
+    {
+      "id": 101,
+      "title": "HTTP",
+      "panels": [
+        {
+          "id": 1,
+          "title": "HTTP request rate",
+          "type": "timeseries",
+          "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "sum(rate(checkout_http_requests_total[${__rate_interval}])) by (operation)",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": { "plan_id": "metrics:ep:http:count", "target_id": "ep:http", "kind": "rate" }
+            }
+          ],
+          "fieldConfig": { "defaults": { "unit": "ops" } }
+        },
+        {
+          "id": 2,
+          "title": "HTTP error ratio",
+          "type": "stat",
+          "gridPos": { "x": 12, "y": 0, "w": 6, "h": 8 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "sum(rate(checkout_http_requests_total{status=~\"error|timeout|cancelled|unknown\"}[${__rate_interval}])) / sum(rate(checkout_http_requests_total[${__rate_interval}]))",
+              "format": "time_series"
+            }
+          ],
+          "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1 } }
+        }
+      ]
+    },
+    {
+      "id": 102,
+      "title": "Latency",
+      "panels": [
+        {
+          "id": 3,
+          "title": "HTTP latency p50/p95/p99",
+          "type": "timeseries",
+          "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "histogram_quantile(0.99, sum(rate(checkout_http_request_duration_seconds_bucket[${__rate_interval}])) by (le, operation))",
+              "format": "time_series"
+            }
+          ],
+          "fieldConfig": { "defaults": { "unit": "s" } }
+        },
+        {
+          "id": 4,
+          "title": "HTTP requests in flight",
+          "type": "gauge",
+          "gridPos": { "x": 12, "y": 8, "w": 6, "h": 8 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "sum(checkout_http_requests_in_flight)",
+              "format": "time_series"
+            }
+          ],
+          "fieldConfig": { "defaults": {} }
+        },
+        {
+          "id": 5,
+          "title": "HTTP operations table",
+          "type": "table",
+          "gridPos": { "x": 0, "y": 16, "w": 18, "h": 8 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "topk(10, sum(rate(checkout_http_requests_total[${__rate_interval}])) by (operation))",
+              "format": "time_series"
+            }
+          ],
+          "fieldConfig": { "defaults": {} }
+        }
+      ]
+    }
+  ],
+  "links": [
+    { "title": "Traces", "url": "/d/${uid}", "targetBlank": true }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "name": "Errors",
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "enable": true,
+        "iconColor": "red",
+        "target": {
+          "refId": "A",
+          "expr": "checkout_http_requests_total{status=~\"error|timeout\"}",
+          "format": "time_series"
+        }
+      }
+    ]
+  }
+}

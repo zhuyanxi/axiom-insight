@@ -1,0 +1,1 @@
+{"schemaVersion": 41, "title": "x", "id": null, "version": 0, "editable": true, "templating": {"list": [{"name": "svc", "type": "query", "query": "label_values(up, service)"}]}, "rows": [], "annotations": {"list": []}}

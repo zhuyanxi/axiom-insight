@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://axiom-insight.dev/schemas/dashboard/v1/grafana-dashboard.schema.json",
+  "title": "Axiom Insight Grafana dashboard contract v1",
+  "description": "Closed v1 contract of dashboard.json. Unknown fields, wrong scalar types, unsupported panel types, external datasource refs and arbitrary options are rejected. The contract pins Grafana Schema 41.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "title", "id", "version", "editable", "templating", "rows", "annotations"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 41 },
+    "title": { "type": "string", "minLength": 1, "maxLength": 255 },
+    "uid": { "type": "string", "pattern": "^[A-Za-z0-9_-]{1,40}$" },
+    "id": { "type": "null" },
+    "version": { "type": "integer", "const": 0 },
+    "editable": { "type": "boolean", "const": true },
+    "tags": { "type": "array", "items": { "type": "string" }, "maxItems": 50 },
+    "timezone": { "type": "string", "enum": ["browser", "utc"] },
+    "refresh": { "type": "string", "enum": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "off"] },
+    "templating": { "$ref": "#/$defs/templating" },
+    "rows": { "type": "array", "items": { "$ref": "#/$defs/row" } },
+    "panels": { "type": "array", "items": { "$ref": "#/$defs/panel" } },
+    "links": { "type": "array", "items": { "$ref": "#/$defs/link" }, "maxItems": 20 },
+    "annotations": { "$ref": "#/$defs/annotations" }
+  },
+  "$defs": {
+    "templating": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["list"],
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/variable" },
+          "maxItems": 20
+        }
+      }
+    },
+    "variable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,31}$" },
+        "label": { "type": "string", "maxLength": 64 },
+        "type": { "type": "string", "enum": ["query", "custom", "datasource"] },
+        "datasource": { "$ref": "#/$defs/datasource" },
+        "query": { "type": "string", "maxLength": 512 },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["text", "value"],
+            "properties": {
+              "text": { "type": "string", "maxLength": 128 },
+              "value": { "type": "string", "maxLength": 128 }
+            }
+          }
+        },
+        "current": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["text", "value"],
+          "properties": {
+            "text": { "type": "string", "maxLength": 128 },
+            "value": { "type": "string", "maxLength": 128 }
+          }
+        },
+        "multi": { "type": "boolean" },
+        "includeAll": { "type": "boolean" }
+      }
+    },
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title"],
+      "properties": {
+        "id": { "type": "integer", "minimum": 1, "maximum": 999999 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "panels": { "type": "array", "items": { "$ref": "#/$defs/panel" } }
+      }
+    },
+    "panel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "type", "gridPos", "fieldConfig"],
+      "properties": {
+        "id": { "type": "integer", "minimum": 1, "maximum": 999999 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "type": { "type": "string", "enum": ["timeseries", "stat", "gauge", "table", "row"] },
+        "gridPos": { "$ref": "#/$defs/gridPos" },
+        "datasource": { "$ref": "#/$defs/datasource" },
+        "targets": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/target" },
+          "maxItems": 26
+        },
+        "fieldConfig": { "$ref": "#/$defs/fieldConfig" },
+        "links": { "type": "array", "items": { "$ref": "#/$defs/link" }, "maxItems": 10 }
+      }
+    },
+    "gridPos": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "w", "h"],
+      "properties": {
+        "x": { "type": "integer", "minimum": 0, "maximum": 23 },
+        "y": { "type": "integer", "minimum": 0 },
+        "w": { "type": "integer", "minimum": 1, "maximum": 24 },
+        "h": { "type": "integer", "minimum": 1, "maximum": 24 }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["refId", "expr", "format"],
+      "properties": {
+        "refId": { "type": "string", "pattern": "^[A-Z]$" },
+        "datasource": { "$ref": "#/$defs/datasource" },
+        "expr": { "type": "string", "minLength": 1, "maxLength": 2048 },
+        "format": { "type": "string", "const": "time_series" },
+        "queryType": { "type": "string", "maxLength": 64 },
+        "legendFormat": { "type": "string", "maxLength": 128 },
+        "metadata": { "$ref": "#/$defs/queryMetadata" }
+      }
+    },
+    "queryMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plan_id", "target_id", "kind"],
+      "properties": {
+        "plan_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "target_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "kind": { "type": "string", "minLength": 1, "maxLength": 32 }
+      }
+    },
+    "datasource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "uid"],
+      "properties": {
+        "type": { "type": "string", "enum": ["prometheus", "tempo"] },
+        "uid": { "type": "string", "const": "${datasource}" }
+      }
+    },
+    "fieldConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "defaults": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "unit": { "type": "string", "maxLength": 32 },
+            "min": { "type": "number" },
+            "max": { "type": "number" }
+          }
+        },
+        "overrides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["matcher"],
+            "properties": {
+              "matcher": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id"],
+                "properties": { "id": { "type": "string", "maxLength": 64 } }
+              },
+              "properties": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["id", "value"],
+                  "properties": {
+                    "id": { "type": "string", "maxLength": 64 },
+                    "value": { "type": ["string", "number", "boolean", "null"] }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "url"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "url": { "type": "string", "minLength": 1, "maxLength": 512, "not": { "pattern": "://" } },
+        "targetBlank": { "type": "boolean" }
+      }
+    },
+    "annotations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["list"],
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1, "maxLength": 128 },
+              "datasource": { "$ref": "#/$defs/datasource" },
+              "enable": { "type": "boolean" },
+              "hide": { "type": "boolean" },
+              "iconColor": { "type": "string", "maxLength": 32 },
+              "target": { "$ref": "#/$defs/target" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
