@@ -1,0 +1,430 @@
+{
+  "hash_version": "si-hash-v1",
+  "uid": "si-payment-service-v1",
+  "panel_ids": {
+    "panel:cache:item:cache:session:error_ratio": 520581049,
+    "panel:cache:item:cache:session:inflight": 74607672,
+    "panel:cache:item:cache:session:p95": 854048265,
+    "panel:cache:item:cache:session:rate": 1517631569,
+    "panel:database:item:database:orders:error_ratio": 1960380332,
+    "panel:database:item:database:orders:inflight": 694657127,
+    "panel:database:item:database:orders:p95": 1095322164,
+    "panel:database:item:database:orders:rate": 21307254,
+    "panel:database:item:database:users:error_ratio": 1017153359,
+    "panel:database:item:database:users:inflight": 767409634,
+    "panel:database:item:database:users:p95": 1028850251,
+    "panel:database:item:database:users:rate": 1719503555,
+    "panel:http:item:http:create_order:error_ratio": 373443850,
+    "panel:http:item:http:create_order:inflight": 1894851217,
+    "panel:http:item:http:create_order:p95": 1310555078,
+    "panel:http:item:http:create_order:rate": 328919024,
+    "panel:http:item:http:get_user:error_ratio": 1846752985,
+    "panel:http:item:http:get_user:inflight": 1382914456,
+    "panel:http:item:http:get_user:p95": 636763369,
+    "panel:http:item:http:get_user:rate": 1688750769,
+    "panel:http:item:http:getuser:error_ratio": 1017147862,
+    "panel:http:item:http:getuser:inflight": 1500455157,
+    "panel:http:item:http:getuser:p95": 294248290,
+    "panel:http:item:http:getuser:rate": 258740236,
+    "panel:kafka:item:kafka:orders_ingest:error_ratio": 1421901267,
+    "panel:kafka:item:kafka:orders_ingest:inflight": 1834842846,
+    "panel:kafka:item:kafka:orders_ingest:p95": 1302776879,
+    "panel:kafka:item:kafka:orders_ingest:rate": 1111799127,
+    "panel:rpc:item:rpc:get_user:error_ratio": 89627141,
+    "panel:rpc:item:rpc:get_user:inflight": 1703400156,
+    "panel:rpc:item:rpc:get_user:p95": 484618805,
+    "panel:rpc:item:rpc:get_user:rate": 794275245,
+    "panel:rpc:item:rpc:list_orders:error_ratio": 2017269895,
+    "panel:rpc:item:rpc:list_orders:inflight": 1974326778,
+    "panel:rpc:item:rpc:list_orders:p95": 226294611,
+    "panel:rpc:item:rpc:list_orders:rate": 838921163,
+    "panel:service_overview:item:service_overview:summary:error_ratio": 281814303,
+    "panel:service_overview:item:service_overview:summary:inflight": 200790386,
+    "panel:service_overview:item:service_overview:summary:p95": 1821221691,
+    "panel:service_overview:item:service_overview:summary:rate": 376443891,
+    "row:cache:summary": 1445200378,
+    "row:database:summary": 13467161,
+    "row:http:summary": 439958014,
+    "row:kafka:summary": 193865602,
+    "row:rpc:summary": 878056033,
+    "row:service_overview:summary": 1680260379
+  },
+  "ref_ids": {
+    "panel:cache:item:cache:session:error_ratio": "A",
+    "panel:cache:item:cache:session:inflight": "B",
+    "panel:cache:item:cache:session:p95": "C",
+    "panel:cache:item:cache:session:rate": "D",
+    "panel:database:item:database:orders:error_ratio": "A",
+    "panel:database:item:database:orders:inflight": "B",
+    "panel:database:item:database:orders:p95": "C",
+    "panel:database:item:database:orders:rate": "D",
+    "panel:database:item:database:users:error_ratio": "A",
+    "panel:database:item:database:users:inflight": "B",
+    "panel:database:item:database:users:p95": "C",
+    "panel:database:item:database:users:rate": "D",
+    "panel:http:item:http:create_order:error_ratio": "A",
+    "panel:http:item:http:create_order:inflight": "B",
+    "panel:http:item:http:create_order:p95": "C",
+    "panel:http:item:http:create_order:rate": "D",
+    "panel:http:item:http:get_user:error_ratio": "A",
+    "panel:http:item:http:get_user:inflight": "B",
+    "panel:http:item:http:get_user:p95": "C",
+    "panel:http:item:http:get_user:rate": "D",
+    "panel:http:item:http:getuser:error_ratio": "A",
+    "panel:http:item:http:getuser:inflight": "B",
+    "panel:http:item:http:getuser:p95": "C",
+    "panel:http:item:http:getuser:rate": "D",
+    "panel:kafka:item:kafka:orders_ingest:error_ratio": "A",
+    "panel:kafka:item:kafka:orders_ingest:inflight": "B",
+    "panel:kafka:item:kafka:orders_ingest:p95": "C",
+    "panel:kafka:item:kafka:orders_ingest:rate": "D",
+    "panel:rpc:item:rpc:get_user:error_ratio": "A",
+    "panel:rpc:item:rpc:get_user:inflight": "B",
+    "panel:rpc:item:rpc:get_user:p95": "C",
+    "panel:rpc:item:rpc:get_user:rate": "D",
+    "panel:rpc:item:rpc:list_orders:error_ratio": "A",
+    "panel:rpc:item:rpc:list_orders:inflight": "B",
+    "panel:rpc:item:rpc:list_orders:p95": "C",
+    "panel:rpc:item:rpc:list_orders:rate": "D",
+    "panel:service_overview:item:service_overview:summary:error_ratio": "A",
+    "panel:service_overview:item:service_overview:summary:inflight": "B",
+    "panel:service_overview:item:service_overview:summary:p95": "C",
+    "panel:service_overview:item:service_overview:summary:rate": "D"
+  },
+  "titles": {
+    "item:cache:session": "Cache rate item:cache:session",
+    "item:database:orders": "Database rate item:database:orders",
+    "item:database:users": "Database rate item:database:users",
+    "item:http:create_order": "HTTP rate item:http:create_order",
+    "item:http:get_user": "HTTP rate item:http:get_user",
+    "item:http:getuser": "HTTP rate item:http:getuser",
+    "item:kafka:orders_ingest": "Kafka rate item:kafka:orders_ingest",
+    "item:rpc:get_user": "RPC rate item:rpc:get_user",
+    "item:rpc:list_orders": "RPC rate item:rpc:list_orders",
+    "item:service_overview:summary": "Service Overview rate item:service_overview:summary"
+  },
+  "rows": [
+    {
+      "category": "service_overview",
+      "row_id": 1680260379,
+      "y": 0,
+      "panels": [
+        {
+          "id": 200790386,
+          "x": 0,
+          "y": 1,
+          "w": 24,
+          "h": 8
+        },
+        {
+          "id": 281814303,
+          "x": 0,
+          "y": 9,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 376443891,
+          "x": 12,
+          "y": 9,
+          "w": 6,
+          "h": 8
+        },
+        {
+          "id": 1821221691,
+          "x": 0,
+          "y": 17,
+          "w": 12,
+          "h": 8
+        }
+      ]
+    },
+    {
+      "category": "http",
+      "row_id": 439958014,
+      "y": 25,
+      "panels": [
+        {
+          "id": 258740236,
+          "x": 0,
+          "y": 26,
+          "w": 6,
+          "h": 8
+        },
+        {
+          "id": 294248290,
+          "x": 6,
+          "y": 26,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 328919024,
+          "x": 18,
+          "y": 26,
+          "w": 6,
+          "h": 8
+        },
+        {
+          "id": 373443850,
+          "x": 0,
+          "y": 34,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 636763369,
+          "x": 12,
+          "y": 34,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 1017147862,
+          "x": 0,
+          "y": 42,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 1310555078,
+          "x": 12,
+          "y": 42,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 1382914456,
+          "x": 0,
+          "y": 50,
+          "w": 24,
+          "h": 8
+        },
+        {
+          "id": 1500455157,
+          "x": 0,
+          "y": 58,
+          "w": 24,
+          "h": 8
+        },
+        {
+          "id": 1688750769,
+          "x": 0,
+          "y": 66,
+          "w": 6,
+          "h": 8
+        },
+        {
+          "id": 1846752985,
+          "x": 6,
+          "y": 66,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 1894851217,
+          "x": 0,
+          "y": 74,
+          "w": 24,
+          "h": 8
+        }
+      ]
+    },
+    {
+      "category": "rpc",
+      "row_id": 878056033,
+      "y": 82,
+      "panels": [
+        {
+          "id": 89627141,
+          "x": 0,
+          "y": 83,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 226294611,
+          "x": 12,
+          "y": 83,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 484618805,
+          "x": 0,
+          "y": 91,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 794275245,
+          "x": 12,
+          "y": 91,
+          "w": 6,
+          "h": 8
+        },
+        {
+          "id": 838921163,
+          "x": 18,
+          "y": 91,
+          "w": 6,
+          "h": 8
+        },
+        {
+          "id": 1703400156,
+          "x": 0,
+          "y": 99,
+          "w": 24,
+          "h": 8
+        },
+        {
+          "id": 1974326778,
+          "x": 0,
+          "y": 107,
+          "w": 24,
+          "h": 8
+        },
+        {
+          "id": 2017269895,
+          "x": 0,
+          "y": 115,
+          "w": 12,
+          "h": 8
+        }
+      ]
+    },
+    {
+      "category": "kafka",
+      "row_id": 193865602,
+      "y": 123,
+      "panels": [
+        {
+          "id": 1111799127,
+          "x": 0,
+          "y": 124,
+          "w": 6,
+          "h": 8
+        },
+        {
+          "id": 1302776879,
+          "x": 6,
+          "y": 124,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 1421901267,
+          "x": 0,
+          "y": 132,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 1834842846,
+          "x": 0,
+          "y": 140,
+          "w": 24,
+          "h": 8
+        }
+      ]
+    },
+    {
+      "category": "database",
+      "row_id": 13467161,
+      "y": 148,
+      "panels": [
+        {
+          "id": 21307254,
+          "x": 0,
+          "y": 149,
+          "w": 6,
+          "h": 8
+        },
+        {
+          "id": 694657127,
+          "x": 0,
+          "y": 157,
+          "w": 24,
+          "h": 8
+        },
+        {
+          "id": 767409634,
+          "x": 0,
+          "y": 165,
+          "w": 24,
+          "h": 8
+        },
+        {
+          "id": 1017153359,
+          "x": 0,
+          "y": 173,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 1028850251,
+          "x": 12,
+          "y": 173,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 1095322164,
+          "x": 0,
+          "y": 181,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 1719503555,
+          "x": 12,
+          "y": 181,
+          "w": 6,
+          "h": 8
+        },
+        {
+          "id": 1960380332,
+          "x": 0,
+          "y": 189,
+          "w": 12,
+          "h": 8
+        }
+      ]
+    },
+    {
+      "category": "cache",
+      "row_id": 1445200378,
+      "y": 197,
+      "panels": [
+        {
+          "id": 74607672,
+          "x": 0,
+          "y": 198,
+          "w": 24,
+          "h": 8
+        },
+        {
+          "id": 520581049,
+          "x": 0,
+          "y": 206,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 854048265,
+          "x": 12,
+          "y": 206,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": 1517631569,
+          "x": 0,
+          "y": 214,
+          "w": 6,
+          "h": 8
+        }
+      ]
+    }
+  ]
+}

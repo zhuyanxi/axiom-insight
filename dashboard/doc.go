@@ -18,4 +18,11 @@
 // GenerationPlan protobuf messages and the immutable DashboardPolicy
 // (P2-03), which is resolved from the si.yaml `dashboard` node with
 // defaults and CLI overrides before any builder runs.
+//
+// P2-04 adds the deterministic naming and layout layer: dashboard UIDs,
+// panel/row IDs, refIds, safe titles and the 24-column grid. All of it is
+// pure with respect to its inputs (ids.go, names.go, layout.go) and never
+// depends on input order, the clock, the filesystem, global RNG or the
+// environment; collisions are disambiguated by stable hash suffixes and
+// reported as DASHBOARD_NAME_COLLISION diagnostics.
 package dashboard
