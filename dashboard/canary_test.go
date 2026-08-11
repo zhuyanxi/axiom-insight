@@ -79,7 +79,7 @@ func TestCatalogCanaryAC4(t *testing.T) {
 	if err != nil {
 		t.Fatalf("plan: %v", err)
 	}
-	catalog, err := BuildCatalog(document, plan, Policy{IncludeClientDependencies: true})
+	catalog, err := BuildCatalog(document, plan, DashboardPolicy{IncludeClientDependencies: true})
 	if err != nil {
 		t.Fatalf("BuildCatalog: %v", err)
 	}
@@ -108,7 +108,7 @@ func TestCatalogPermutationAC5(t *testing.T) {
 	if err != nil {
 		t.Fatalf("plan: %v", err)
 	}
-	baseline, err := BuildCatalog(base, basePlan, Policy{IncludeClientDependencies: true})
+	baseline, err := BuildCatalog(base, basePlan, DashboardPolicy{IncludeClientDependencies: true})
 	if err != nil {
 		t.Fatalf("BuildCatalog: %v", err)
 	}
@@ -129,7 +129,7 @@ func TestCatalogPermutationAC5(t *testing.T) {
 		if err != nil {
 			t.Fatalf("plan: %v", err)
 		}
-		catalog, err := BuildCatalog(document, plan, Policy{IncludeClientDependencies: true})
+		catalog, err := BuildCatalog(document, plan, DashboardPolicy{IncludeClientDependencies: true})
 		if err != nil {
 			t.Fatalf("permutation %d: %v", iteration, err)
 		}
@@ -151,10 +151,10 @@ func TestCatalogStrictMode(t *testing.T) {
 	if err != nil {
 		t.Fatalf("plan: %v", err)
 	}
-	if _, err := BuildCatalog(document, plan, Policy{IncludeClientDependencies: true}); err != nil {
+	if _, err := BuildCatalog(document, plan, DashboardPolicy{IncludeClientDependencies: true}); err != nil {
 		t.Fatalf("non-strict build must keep warnings: %v", err)
 	}
-	_, err = BuildCatalog(document, plan, Policy{IncludeClientDependencies: true, Strict: true})
+	_, err = BuildCatalog(document, plan, DashboardPolicy{IncludeClientDependencies: true, Strict: true})
 	if err == nil {
 		t.Fatal("strict build must fail on warnings")
 	}

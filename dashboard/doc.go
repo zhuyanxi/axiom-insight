@@ -15,6 +15,7 @@
 // Ownership boundary: this package never imports compiler/goanalyzer,
 // go/ast, go/types, go/packages, the plugin transport or any
 // generated-document YAML contract. It consumes only the IR and
-// GenerationPlan protobuf messages and the minimal immutable Dashboard
-// Policy.
+// GenerationPlan protobuf messages and the immutable DashboardPolicy
+// (P2-03), which is resolved from the si.yaml `dashboard` node with
+// defaults and CLI overrides before any builder runs.
 package dashboard

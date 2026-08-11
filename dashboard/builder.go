@@ -63,7 +63,7 @@ var labelVocabulary = map[string]bool{
 // dangling or mismatched references, invalid labels) return a
 // *CatalogErrors and no partial catalog; capability gaps and unmappable
 // entities become diagnostics inside the catalog.
-func BuildCatalog(document *observabilityv1.ObservabilityDocument, plan *observabilityv1.GenerationPlan, policy Policy) (*DashboardCatalog, error) {
+func BuildCatalog(document *observabilityv1.ObservabilityDocument, plan *observabilityv1.GenerationPlan, policy DashboardPolicy) (*DashboardCatalog, error) {
 	var violations []CatalogError
 	if document == nil {
 		return nil, &CatalogErrors{violations: []CatalogError{{

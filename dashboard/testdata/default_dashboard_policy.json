@@ -1,0 +1,14 @@
+{
+  "output_dir": "dashboards",
+  "title_suffix": "Observability",
+  "datasource_variable_name": "datasource",
+  "include_trace_links": true,
+  "include_client_dependencies": true,
+  "rate_interval": "$__rate_interval",
+  "timezone": "browser",
+  "refresh": "30s",
+  "max_panels": 200,
+  "max_queries": 500,
+  "strict": false,
+  "digest": "794da3860d1bea59c56be5871e72fdd7ac52b60e9376ec3eb3b949d0d32284c6"
+}

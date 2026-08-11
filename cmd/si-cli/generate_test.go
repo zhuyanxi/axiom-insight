@@ -327,6 +327,51 @@ func TestGenerateJSONReportAC10(t *testing.T) {
 		}
 	})
 
+	t.Run("dashboard config error", func(t *testing.T) {
+		root := writeCLIProject(t, map[string]string{
+			"go.mod": "module example.com/gen-config\n\ngo 1.26.1\n",
+			"run.go": "package genconfig\n",
+			"si.yaml": "generation:\n  output_dir: generate\ndashboard:\n  refresh: 45s\n",
+		})
+		var stdout, stderr bytes.Buffer
+		code := run([]string{"generate", root, "--format", "json"}, &stdout, &stderr)
+		if code != 2 {
+			t.Fatalf("exit code = %d, want 2", code)
+		}
+		report := parseReport(t, stdout.Bytes())
+		if report.Status != "failure" || report.Error == nil {
+			t.Errorf("report = %+v", report)
+		}
+		if !strings.Contains(report.Error.Message, "dashboard.refresh") {
+			t.Errorf("error lacks field path: %+v", report.Error)
+		}
+		if stderr.Len() != 0 {
+			t.Errorf("stderr = %q, want empty", stderr.String())
+		}
+	})
+
+	t.Run("dashboard config scan rejection", func(t *testing.T) {
+		root := writeCLIProject(t, map[string]string{
+			"go.mod": "module example.com/gen-config\n\ngo 1.26.1\n",
+			"run.go": "package genconfig\n",
+			"si.yaml": "dashboard:\n  refresh: s3cr3t-value\n",
+		})
+		var stdout, stderr bytes.Buffer
+		code := run([]string{"scan", root}, &stdout, &stderr)
+		if code != 2 {
+			t.Fatalf("exit code = %d, want 2", code)
+		}
+		if !strings.Contains(stderr.String(), "DASHBOARD_INVALID_CONFIG") {
+			t.Errorf("stderr lacks DASHBOARD_INVALID_CONFIG: %q", stderr.String())
+		}
+		if !strings.Contains(stderr.String(), "dashboard.refresh") {
+			t.Errorf("stderr lacks field path: %q", stderr.String())
+		}
+		if strings.Contains(stderr.String(), "s3cr3t-value") {
+			t.Errorf("stderr must not echo rejected values: %q", stderr.String())
+		}
+	})
+
 	t.Run("writer error", func(t *testing.T) {
 		root := generateFixture(t)
 		outputDir := filepath.Join(root, "generate")

@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zhuyanxi/axiom-insight/compiler/semantic"
+	"github.com/zhuyanxi/axiom-insight/dashboard"
 	"github.com/zhuyanxi/axiom-insight/generator/policy"
 	observabilityv1 "github.com/zhuyanxi/axiom-insight/ir/v1"
 	"github.com/zhuyanxi/axiom-insight/plugins"
@@ -78,6 +79,11 @@ type scanConfig struct {
 	// only, and loadScanConfig fills this field from the strict decoder so
 	// unknown generation fields are rejected with GEN_INVALID_CONFIG.
 	Generation *policy.GenerationConfig
+	// Dashboard holds the strictly decoded si.yaml `dashboard` node. It has
+	// no mapstructure tag on purpose: loadScanConfig fills this field from
+	// the strict decoder so unknown dashboard fields are rejected with
+	// DASHBOARD_INVALID_CONFIG.
+	Dashboard *dashboard.DashboardConfig
 }
 
 type jsonSummaryItem struct {
@@ -207,6 +213,12 @@ func executeScan(command *cobra.Command, args []string, options scanOptions) err
 	if _, err := policy.Resolve(config.Generation, nil); err != nil {
 		return usageFailure(err)
 	}
+	// The dashboard node is part of the si.yaml contract too: an invalid
+	// value must fail the command with DASHBOARD_INVALID_CONFIG instead of
+	// being silently ignored. scan itself does not consume the policy.
+	if _, err := dashboard.Resolve(config.Dashboard, nil); err != nil {
+		return usageFailure(err)
+	}
 
 	request := buildAnalyzeRequest(root, configYAML, config, command, options)
 	document, err := analyzeDocument(command.Context(), request)
@@ -314,6 +326,11 @@ func loadScanConfig(root, configPath string) (scanConfig, string, error) {
 		return scanConfig{}, "", fmt.Errorf("%s: decode generation config: %w", policy.CodeInvalidConfig, err)
 	}
 	config.Generation = generation
+	dashConfig, err := dashboard.DecodeDashboardConfigFile(contents)
+	if err != nil {
+		return scanConfig{}, "", fmt.Errorf("%s: decode dashboard config: %w", dashboard.CodeInvalidConfig, err)
+	}
+	config.Dashboard = dashConfig
 	return config, string(contents), nil
 }
 

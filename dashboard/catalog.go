@@ -126,17 +126,6 @@ type Diagnostic struct {
 	Message string
 }
 
-// Policy is the minimal immutable dashboard policy the catalog builder
-// consumes. P2-03 extends the dashboard configuration; this type is the
-// contract subset the catalog depends on.
-type Policy struct {
-	// IncludeClientDependencies admits HTTP/RPC client items into the
-	// catalog when true.
-	IncludeClientDependencies bool
-	// Strict promotes warning diagnostics to failures.
-	Strict bool
-}
-
 // Capability helpers used by the builder.
 func capability(available bool, reason string) QueryCapability {
 	return QueryCapability{Available: available, Reason: reason}

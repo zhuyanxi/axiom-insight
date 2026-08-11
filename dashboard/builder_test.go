@@ -68,7 +68,7 @@ func buildCompositeCatalog(t *testing.T) *DashboardCatalog {
 	if err != nil {
 		t.Fatalf("plan: %v", err)
 	}
-	catalog, err := BuildCatalog(document, plan, Policy{IncludeClientDependencies: true})
+	catalog, err := BuildCatalog(document, plan, DashboardPolicy{IncludeClientDependencies: true})
 	if err != nil {
 		t.Fatalf("BuildCatalog: %v", err)
 	}
@@ -163,7 +163,7 @@ func TestCatalogCapabilitiesAC3(t *testing.T) {
 			},
 		}},
 	}
-	catalog, err := BuildCatalog(document, plan, Policy{})
+	catalog, err := BuildCatalog(document, plan, DashboardPolicy{})
 	if err != nil {
 		t.Fatalf("BuildCatalog: %v", err)
 	}
@@ -232,7 +232,7 @@ func TestCatalogRejectsInvalidReferencesAC2(t *testing.T) {
 	plan.Metrics[0].Target = &observabilityv1.TargetRef{
 		Kind: observabilityv1.TargetKind_TARGET_KIND_DEPENDENCY, Id: "dep:missing",
 	}
-	catalog, err := BuildCatalog(document, plan, Policy{IncludeClientDependencies: true})
+	catalog, err := BuildCatalog(document, plan, DashboardPolicy{IncludeClientDependencies: true})
 	if err == nil {
 		t.Fatal("dangling reference must fail")
 	}
@@ -265,7 +265,7 @@ func TestCatalogRejectsKindMismatchAC2(t *testing.T) {
 	plan.Metrics[0].Target = &observabilityv1.TargetRef{
 		Kind: observabilityv1.TargetKind_TARGET_KIND_DEPENDENCY, Id: "ep:http",
 	}
-	_, err = BuildCatalog(document, plan, Policy{IncludeClientDependencies: true})
+	_, err = BuildCatalog(document, plan, DashboardPolicy{IncludeClientDependencies: true})
 	var failures *CatalogErrors
 	if !errors.As(err, &failures) {
 		t.Fatalf("error type = %T", err)
@@ -286,23 +286,23 @@ func TestCatalogRejectsNilAndBadSchema(t *testing.T) {
 	if err != nil {
 		t.Fatalf("plan: %v", err)
 	}
-	if _, err := BuildCatalog(nil, plan, Policy{}); err == nil ||
+	if _, err := BuildCatalog(nil, plan, DashboardPolicy{}); err == nil ||
 		!strings.Contains(err.Error(), CodeInvalidIR) {
 		t.Fatalf("nil document must fail with %s", CodeInvalidIR)
 	}
-	if _, err := BuildCatalog(document, nil, Policy{}); err == nil ||
+	if _, err := BuildCatalog(document, nil, DashboardPolicy{}); err == nil ||
 		!strings.Contains(err.Error(), CodeInvalidIR) {
 		t.Fatalf("nil plan must fail with %s", CodeInvalidIR)
 	}
 	badDocument := compositeDocument()
 	badDocument.SchemaVersion = "v99"
-	if _, err := BuildCatalog(badDocument, plan, Policy{}); err == nil ||
+	if _, err := BuildCatalog(badDocument, plan, DashboardPolicy{}); err == nil ||
 		!strings.Contains(err.Error(), CodeUnsupportedSchema) {
 		t.Fatalf("unsupported IR schema must fail with %s", CodeUnsupportedSchema)
 	}
 	badPlan, _ := plannedDocument(t, document)
 	badPlan.SchemaVersion = "v99"
-	if _, err := BuildCatalog(document, badPlan, Policy{}); err == nil ||
+	if _, err := BuildCatalog(document, badPlan, DashboardPolicy{}); err == nil ||
 		!strings.Contains(err.Error(), CodeUnsupportedSchema) {
 		t.Fatalf("unsupported plan schema must fail with %s", CodeUnsupportedSchema)
 	}
@@ -316,14 +316,14 @@ func TestCatalogClientDependenciesPolicy(t *testing.T) {
 	if err != nil {
 		t.Fatalf("plan: %v", err)
 	}
-	without, err := BuildCatalog(document, plan, Policy{IncludeClientDependencies: false})
+	without, err := BuildCatalog(document, plan, DashboardPolicy{IncludeClientDependencies: false})
 	if err != nil {
 		t.Fatalf("BuildCatalog: %v", err)
 	}
 	if itemFor(without, "dep:http-client") != nil || itemFor(without, "dep:rpc-client") != nil {
 		t.Error("client dependencies must be excluded when the policy disables them")
 	}
-	with, err := BuildCatalog(document, plan, Policy{IncludeClientDependencies: true})
+	with, err := BuildCatalog(document, plan, DashboardPolicy{IncludeClientDependencies: true})
 	if err != nil {
 		t.Fatalf("BuildCatalog: %v", err)
 	}
@@ -342,7 +342,7 @@ func TestCatalogDoesNotMutateInput(t *testing.T) {
 	}
 	documentBefore, _ := protojson.MarshalOptions{UseProtoNames: true}.Marshal(document)
 	planBefore, _ := protojson.MarshalOptions{UseProtoNames: true}.Marshal(plan)
-	if _, err := BuildCatalog(document, plan, Policy{IncludeClientDependencies: true}); err != nil {
+	if _, err := BuildCatalog(document, plan, DashboardPolicy{IncludeClientDependencies: true}); err != nil {
 		t.Fatalf("BuildCatalog: %v", err)
 	}
 	documentAfter, _ := protojson.MarshalOptions{UseProtoNames: true}.Marshal(document)

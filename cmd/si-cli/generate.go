@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/zhuyanxi/axiom-insight/dashboard"
 	"github.com/zhuyanxi/axiom-insight/generator"
 	"github.com/zhuyanxi/axiom-insight/generator/commit"
 	"github.com/zhuyanxi/axiom-insight/generator/planner"
@@ -194,6 +195,12 @@ func executeGenerate(command *cobra.Command, args []string, options generateOpti
 	overrides := buildPolicyOverrides(command, options)
 	resolvedPolicy, err := policy.Resolve(config.Generation, overrides)
 	if err != nil {
+		return finish(usageFailure(err))
+	}
+	// The dashboard node is part of the si.yaml contract: an invalid value
+	// must fail the command with DASHBOARD_INVALID_CONFIG. generate itself
+	// does not consume the dashboard policy yet.
+	if _, err := dashboard.Resolve(config.Dashboard, nil); err != nil {
 		return finish(usageFailure(err))
 	}
 	report.Signals = append([]string(nil), resolvedPolicy.Signals...)
