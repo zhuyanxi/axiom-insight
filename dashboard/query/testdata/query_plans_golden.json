@@ -1,0 +1,168 @@
+{
+  "hash_version": "si-hash-v1",
+  "rate_interval": "$__rate_interval",
+  "error_status_pattern": "5[0-9]{2}|error",
+  "queries": [
+    {
+      "canonical_key": "query:error_ratio:item:http:get_user:error_ratio",
+      "kind": "error_ratio",
+      "item_id": "item:http:get_user",
+      "purpose": "error_ratio",
+      "plan_ids": [
+        "m_counter"
+      ],
+      "expr": "(sum by (operation) (rate(http_requests_total{operation=\"get\",service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(http_requests_total{service=\"payment\",operation=\"get\"}[$__rate_interval])))",
+      "metadata": {
+        "kind": "error_ratio",
+        "canonical_key": "query:error_ratio:item:http:get_user:error_ratio",
+        "plan_ids": [
+          "m_counter"
+        ],
+        "provenance": [
+          "endpoints[get_user]",
+          "metrics[m_counter]"
+        ],
+        "rate_interval": "$__rate_interval",
+        "error_status_pattern": "5[0-9]{2}|error",
+        "hash_version": "si-hash-v1"
+      }
+    },
+    {
+      "canonical_key": "query:in_flight:item:http:get_user:in_flight",
+      "kind": "in_flight",
+      "item_id": "item:http:get_user",
+      "purpose": "in_flight",
+      "plan_ids": [
+        "m_gauge"
+      ],
+      "expr": "sum by (operation) (http_in_flight{operation=\"get\",service=\"payment\"})",
+      "metadata": {
+        "kind": "in_flight",
+        "canonical_key": "query:in_flight:item:http:get_user:in_flight",
+        "plan_ids": [
+          "m_gauge"
+        ],
+        "provenance": [
+          "endpoints[get_user]",
+          "metrics[m_gauge]"
+        ],
+        "hash_version": "si-hash-v1"
+      }
+    },
+    {
+      "canonical_key": "query:percentile:item:http:get_user:p50",
+      "kind": "percentile",
+      "item_id": "item:http:get_user",
+      "purpose": "p50",
+      "plan_ids": [
+        "m_hist"
+      ],
+      "expr": "histogram_quantile(0.5, sum by (le) (rate(http_request_duration{le!=\"+Inf\",operation=\"get\",service=\"payment\"}[$__rate_interval])))",
+      "metadata": {
+        "kind": "percentile",
+        "canonical_key": "query:percentile:item:http:get_user:p50",
+        "plan_ids": [
+          "m_hist"
+        ],
+        "provenance": [
+          "endpoints[get_user]",
+          "metrics[m_hist]"
+        ],
+        "rate_interval": "$__rate_interval",
+        "quantiles": [
+          0.5
+        ],
+        "hash_version": "si-hash-v1"
+      }
+    },
+    {
+      "canonical_key": "query:percentile:item:http:get_user:p95",
+      "kind": "percentile",
+      "item_id": "item:http:get_user",
+      "purpose": "p95",
+      "plan_ids": [
+        "m_hist"
+      ],
+      "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration{le!=\"+Inf\",operation=\"get\",service=\"payment\"}[$__rate_interval])))",
+      "metadata": {
+        "kind": "percentile",
+        "canonical_key": "query:percentile:item:http:get_user:p95",
+        "plan_ids": [
+          "m_hist"
+        ],
+        "provenance": [
+          "endpoints[get_user]",
+          "metrics[m_hist]"
+        ],
+        "rate_interval": "$__rate_interval",
+        "quantiles": [
+          0.95
+        ],
+        "hash_version": "si-hash-v1"
+      }
+    },
+    {
+      "canonical_key": "query:percentile:item:http:get_user:p99",
+      "kind": "percentile",
+      "item_id": "item:http:get_user",
+      "purpose": "p99",
+      "plan_ids": [
+        "m_hist"
+      ],
+      "expr": "histogram_quantile(0.99, sum by (le) (rate(http_request_duration{le!=\"+Inf\",operation=\"get\",service=\"payment\"}[$__rate_interval])))",
+      "metadata": {
+        "kind": "percentile",
+        "canonical_key": "query:percentile:item:http:get_user:p99",
+        "plan_ids": [
+          "m_hist"
+        ],
+        "provenance": [
+          "endpoints[get_user]",
+          "metrics[m_hist]"
+        ],
+        "rate_interval": "$__rate_interval",
+        "quantiles": [
+          0.99
+        ],
+        "hash_version": "si-hash-v1"
+      }
+    },
+    {
+      "canonical_key": "query:rate:item:http:get_user:rate",
+      "kind": "rate",
+      "item_id": "item:http:get_user",
+      "purpose": "rate",
+      "plan_ids": [
+        "m_counter"
+      ],
+      "expr": "sum by (operation) (rate(http_requests_total{operation=\"get\",service=\"payment\"}[$__rate_interval]))",
+      "metadata": {
+        "kind": "rate",
+        "canonical_key": "query:rate:item:http:get_user:rate",
+        "plan_ids": [
+          "m_counter"
+        ],
+        "provenance": [
+          "endpoints[get_user]",
+          "metrics[m_counter]"
+        ],
+        "rate_interval": "$__rate_interval",
+        "hash_version": "si-hash-v1"
+      }
+    }
+  ],
+  "trace_links": [
+    {
+      "canonical_key": "trace:item:http:get_user",
+      "item_id": "item:http:get_user",
+      "plan_ids": [
+        "s_span"
+      ],
+      "datasource_variable": "datasource",
+      "service_name": "payment",
+      "operation": "get",
+      "span_name": "GET /users"
+    }
+  ],
+  "diagnostics": null
+}
