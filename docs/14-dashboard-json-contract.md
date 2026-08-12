@@ -11,6 +11,14 @@ Grafana dashboard API/export model 的离线子集，固定 Grafana Schema **41*
   plugin type、未识别 type 与任意 options passthrough。
 - 所有 target 的 datasource 为受控常量 `${datasource}`，`format` 为 `time_series`，
   `refId` 为 `A`–`Z` 受控分配；单 Panel target 数上限 26。
+- Panel 可携带静态 `description`（≤255 字符）与
+  `fieldConfig.defaults.noValue`（≤64 字符）；datasource variable 可显式携带
+  `hide: 0`（可见）。
+- Query metadata 有两种受控形态：per-item 形态
+  `{plan_id, target_id, kind}`，以及 Overview 聚合形态
+  `{kind, categories, item_ids, plan_ids}`（P2-06 跨 category 聚合 Query 使用；
+  两形态互斥，不能只填 `plan_id`/`target_id` 之一，也不能同时混用两形态；
+  `categories`/`item_ids`/`plan_ids` 的数组条目均不得为空字符串）。
 - 顶层与 Panel 一律使用 typed model，禁止 `map[string]any` 与任意 options。
 - 禁止生成时间、随机 UUID、服务器 ID、主机名、绝对路径、`__inputs`/`__requires`、
   HTML/JavaScript 与外部数据源 endpoint/token/tenant/credential。

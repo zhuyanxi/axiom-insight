@@ -229,3 +229,140 @@ func TestDecodeRejectsSizeAndDepthLimits(t *testing.T) {
 		t.Fatal("invalid UTF-8 must fail")
 	}
 }
+
+// TestExtendedFieldValidation bounds the P2-06 model extensions: panel
+// description length, no-value text length and variable hide range.
+func TestExtendedFieldValidation(t *testing.T) {
+	base := func() *Dashboard {
+		return &Dashboard{
+			SchemaVersion: SchemaVersion,
+			Title:         "x",
+			UID:           "x-uid",
+			ID:            nil,
+			Version:       0,
+			Editable:      true,
+			Templating: Templating{List: []Variable{{
+				Name: "datasource", Type: VariableTypeDatasource, Query: "prometheus",
+			}}},
+			Rows: []Row{{
+				ID: 1, Title: "row",
+				Panels: []Panel{{
+					ID: 1, Title: "panel", Type: PanelTypeStat,
+					GridPos:     GridPos{X: 0, Y: 0, W: 6, H: 8},
+					Datasource:  &DatasourceRef{Type: DatasourceTypePrometheus, UID: DatasourceVariable},
+					FieldConfig: FieldConfig{Defaults: FieldConfigDefaults{}},
+				}},
+			}},
+			Annotations: Annotations{},
+		}
+	}
+
+	long := strings.Repeat("d", MaxDescriptionLength+1)
+	tooLongDescription := base()
+	tooLongDescription.Rows[0].Panels[0].Description = long
+	if !violationAt(Validate(tooLongDescription), "description") {
+		t.Error("overlong description accepted")
+	}
+
+	tooLongNoValue := base()
+	tooLongNoValue.Rows[0].Panels[0].FieldConfig.Defaults.NoValue = strings.Repeat("0", MaxNoValueLength+1)
+	if !violationAt(Validate(tooLongNoValue), "noValue") {
+		t.Error("overlong noValue accepted")
+	}
+
+	badHide := base()
+	hide := 3
+	badHide.Templating.List[0].Hide = &hide
+	if !violationAt(Validate(badHide), "hide") {
+		t.Error("hide=3 accepted")
+	}
+
+	validHide := base()
+	validHide.Templating.List[0].Hide = new(int)
+	if violations := Validate(validHide); len(violations) != 0 {
+		t.Errorf("hide=0 rejected: %v", violations)
+	}
+}
+
+func violationAt(violations []*ValidationError, fieldPart string) bool {
+	for _, violation := range violations {
+		if strings.Contains(violation.Field, fieldPart) {
+			return true
+		}
+	}
+	return false
+}
+
+// TestQueryMetadataForms pins the mutually exclusive metadata contract:
+// legacy (plan_id+target_id+kind), overview (kind+categories+item_ids+
+// plan_ids), never mixed, never with empty references.
+func TestQueryMetadataForms(t *testing.T) {
+	valid := func() *Dashboard {
+		return &Dashboard{
+			SchemaVersion: SchemaVersion,
+			Title:         "x",
+			UID:           "x-uid",
+			ID:            nil,
+			Version:       0,
+			Editable:      true,
+			Templating: Templating{List: []Variable{{
+				Name: "datasource", Type: VariableTypeDatasource, Query: "prometheus",
+			}}},
+			Rows: []Row{{
+				ID: 1, Title: "row",
+				Panels: []Panel{{
+					ID: 1, Title: "panel", Type: PanelTypeStat,
+					GridPos:     GridPos{X: 0, Y: 0, W: 6, H: 8},
+					Datasource:  &DatasourceRef{Type: DatasourceTypePrometheus, UID: DatasourceVariable},
+					FieldConfig: FieldConfig{Defaults: FieldConfigDefaults{}},
+				}},
+			}},
+			Annotations: Annotations{},
+		}
+	}
+	withMetadata := func(base *Dashboard, metadata *QueryMetadata) *Dashboard {
+		base.Rows[0].Panels[0].Targets = []Target{{
+			RefID: "A", Expr: "sum(rate(x[$__rate_interval])) by (operation)",
+			Format: "time_series", Metadata: metadata,
+		}}
+		return base
+	}
+
+	legacy := withMetadata(valid(), &QueryMetadata{PlanID: "m", TargetID: "e", Kind: "rate"})
+	if violations := Validate(legacy); len(violations) != 0 {
+		t.Errorf("legacy metadata rejected: %v", violations)
+	}
+	overview := withMetadata(valid(), &QueryMetadata{
+		Kind: "rate", Categories: []string{"http"}, ItemIDs: []string{"e"}, PlanIDs: []string{"m"},
+	})
+	if violations := Validate(overview); len(violations) != 0 {
+		t.Errorf("overview metadata rejected: %v", violations)
+	}
+
+	mixed := withMetadata(valid(), &QueryMetadata{
+		PlanID: "m", TargetID: "e", Kind: "rate",
+		Categories: []string{"http"}, ItemIDs: []string{"e"}, PlanIDs: []string{"m"},
+	})
+	if !violationAt(Validate(mixed), "metadata") {
+		t.Error("mixed metadata accepted")
+	}
+
+	emptyCategory := withMetadata(valid(), &QueryMetadata{
+		Kind: "rate", Categories: []string{""}, ItemIDs: []string{"e"}, PlanIDs: []string{"m"},
+	})
+	if !violationAt(Validate(emptyCategory), "categories") {
+		t.Error("empty category reference accepted")
+	}
+	emptyItem := withMetadata(valid(), &QueryMetadata{
+		Kind: "rate", Categories: []string{"http"}, ItemIDs: []string{""}, PlanIDs: []string{"m"},
+	})
+	if !violationAt(Validate(emptyItem), "item_ids") {
+		t.Error("empty item reference accepted")
+	}
+	emptyPlan := withMetadata(valid(), &QueryMetadata{
+		Kind: "rate", Categories: []string{"http"}, ItemIDs: []string{"e"}, PlanIDs: []string{""},
+	})
+	if !violationAt(Validate(emptyPlan), "plan_ids") {
+		t.Error("empty plan reference accepted")
+	}
+}

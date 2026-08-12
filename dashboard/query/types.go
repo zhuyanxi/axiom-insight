@@ -30,6 +30,9 @@ const (
 	QueryKindPercentile QueryKind = "percentile"
 	QueryKindInFlight   QueryKind = "in_flight"
 	QueryKindBreakdown  QueryKind = "operation_breakdown"
+	// QueryKindTopFailing is the overview error-rate-per-operation query
+	// (P2-06): one family target for the Top Failing Operations table.
+	QueryKindTopFailing QueryKind = "top_failing"
 )
 
 // Expression is one typed PromQL expression node. The marker method

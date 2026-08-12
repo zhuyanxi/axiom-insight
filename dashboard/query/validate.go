@@ -54,6 +54,23 @@ var metricNamePattern = regexp.MustCompile(`^[A-Za-z_:][A-Za-z0-9_:]{0,199}$`)
 // control characters.
 var spanNamePattern = regexp.MustCompile(`^[A-Za-z0-9_. /-]{1,128}$`)
 
+// ValidMetricName reports whether a value is a controlled Prometheus
+// metric name. The allowlist lives here so the planner, the overview
+// builder and the validator cannot drift.
+func ValidMetricName(value string) bool { return metricNamePattern.MatchString(value) }
+
+// ValidOperationValue reports whether a value is a controlled normalized
+// operation (machine-name shape).
+func ValidOperationValue(value string) bool { return operationValuePattern.MatchString(value) }
+
+// ValidServiceValue reports whether a value is a controlled service
+// matcher value (dotted names allowed).
+func ValidServiceValue(value string) bool { return matcherValuePattern.MatchString(value) }
+
+// ValidSpanName reports whether a value is a controlled trace-link span
+// name.
+func ValidSpanName(value string) bool { return spanNamePattern.MatchString(value) }
+
 // ValidatePlan verifies a generated query against the catalog item it was
 // built from (AC1/AC7 cross-check). Every selector metric name must be an
 // exact declared MetricPlan name, every matcher label must belong to the
@@ -112,6 +129,10 @@ type validateContext struct {
 	serviceName  string
 	inErrorRatio bool
 	inFlight     bool
+	// statusMatcherAllowed gates the fixed error-status matcher: true on
+	// the numerator side of an error ratio and on overview top-failing
+	// error selectors.
+	statusMatcherAllowed bool
 	// errorRatioSide is 1 on the numerator side, 2 on the denominator
 	// side of an error-ratio expression; 0 elsewhere.
 	errorRatioSide int
@@ -167,6 +188,7 @@ func validateExpression(violations *[]*ValidationError, context *validateContext
 			}
 			leftContext := *context
 			leftContext.errorRatioSide = 1
+			leftContext.statusMatcherAllowed = true
 			rightContext := *context
 			rightContext.errorRatioSide = 2
 			validateExpression(violations, &leftContext, node.Left, field+".left", depth+1)
@@ -234,7 +256,7 @@ func validateSelector(violations *[]*ValidationError, context *validateContext, 
 				Field: matcherField + ".value", Message: "matcher value is not a controlled value",
 			})
 		}
-		if matcher.Label == "status" && !(context.inErrorRatio && context.errorRatioSide == 1) {
+		if matcher.Label == "status" && !context.statusMatcherAllowed {
 			*violations = append(*violations, &ValidationError{
 				Field: matcherField, Message: "status matchers are only allowed in the error-ratio numerator",
 			})

@@ -17,6 +17,10 @@ const (
 	MaxTargetsPerPanel = 26
 	// MaxPanelTitleLength bounds panel and row titles.
 	MaxPanelTitleLength = 255
+	// MaxDescriptionLength bounds panel descriptions.
+	MaxDescriptionLength = 255
+	// MaxNoValueLength bounds the field-config no-value text.
+	MaxNoValueLength = 64
 	// MaxUIDLength bounds dashboard UIDs.
 	MaxUIDLength = 40
 )
@@ -91,6 +95,10 @@ type Variable struct {
 	Label string `json:"label,omitempty"`
 	// Type is query, custom or datasource.
 	Type string `json:"type"`
+	// Hide is the Grafana variable visibility: 0 visible, 1 label-only
+	// hide, 2 full hide. The pointer keeps "explicitly 0" distinct from
+	// "absent" so the datasource variable serializes hide 0.
+	Hide *int `json:"hide,omitempty"`
 	// Datasource is the controlled datasource reference for query
 	// variables.
 	Datasource *DatasourceRef `json:"datasource,omitempty"`
@@ -135,6 +143,9 @@ type Panel struct {
 	ID int `json:"id"`
 	// Title is the panel title.
 	Title string `json:"title"`
+	// Description explains the panel; it is static controlled text, never
+	// user content.
+	Description string `json:"description,omitempty"`
 	// Type is timeseries, stat, gauge, table or row.
 	Type string `json:"type"`
 	// GridPos is the panel grid position.
@@ -178,11 +189,21 @@ type Target struct {
 // QueryMetadata traces a target to its plan declaration.
 type QueryMetadata struct {
 	// PlanID is the GenerationPlan item ID the query is derived from.
-	PlanID string `json:"plan_id"`
-	// TargetID is the IR entity ID.
-	TargetID string `json:"target_id"`
+	// Set for per-item queries (the legacy v1 form).
+	PlanID string `json:"plan_id,omitempty"`
+	// TargetID is the IR entity ID; set with PlanID for per-item queries.
+	TargetID string `json:"target_id,omitempty"`
 	// Kind is the query kind, e.g. "rate" or "percentile".
 	Kind string `json:"kind"`
+	// Categories are the overview category references of an aggregated
+	// overview query, sorted and deduplicated.
+	Categories []string `json:"categories,omitempty"`
+	// ItemIDs are the catalog item references of an aggregated overview
+	// query, sorted and deduplicated.
+	ItemIDs []string `json:"item_ids,omitempty"`
+	// PlanIDs are the GenerationPlan item IDs of an aggregated overview
+	// query, sorted and deduplicated.
+	PlanIDs []string `json:"plan_ids,omitempty"`
 }
 
 // DatasourceRef is the controlled datasource reference; only the
@@ -202,9 +223,10 @@ type FieldConfig struct {
 
 // FieldConfigDefaults is the default field settings.
 type FieldConfigDefaults struct {
-	Unit string   `json:"unit,omitempty"`
-	Min  *float64 `json:"min,omitempty"`
-	Max  *float64 `json:"max,omitempty"`
+	Unit    string   `json:"unit,omitempty"`
+	NoValue string   `json:"noValue,omitempty"`
+	Min     *float64 `json:"min,omitempty"`
+	Max     *float64 `json:"max,omitempty"`
 }
 
 // FieldOverride overrides one field by matcher.
@@ -241,10 +263,10 @@ type Annotations struct {
 
 // Annotation is one controlled annotation query.
 type Annotation struct {
-	Name       string        `json:"name"`
+	Name       string         `json:"name"`
 	Datasource *DatasourceRef `json:"datasource,omitempty"`
-	Enable     bool          `json:"enable,omitempty"`
-	Hide       bool          `json:"hide,omitempty"`
-	IconColor  string        `json:"iconColor,omitempty"`
-	Target     *Target       `json:"target,omitempty"`
+	Enable     bool           `json:"enable,omitempty"`
+	Hide       bool           `json:"hide,omitempty"`
+	IconColor  string         `json:"iconColor,omitempty"`
+	Target     *Target        `json:"target,omitempty"`
 }

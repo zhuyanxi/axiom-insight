@@ -43,6 +43,7 @@
         "name": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,31}$" },
         "label": { "type": "string", "maxLength": 64 },
         "type": { "type": "string", "enum": ["query", "custom", "datasource"] },
+        "hide": { "type": "integer", "minimum": 0, "maximum": 2 },
         "datasource": { "$ref": "#/$defs/datasource" },
         "query": { "type": "string", "maxLength": 512 },
         "options": {
@@ -87,6 +88,7 @@
       "properties": {
         "id": { "type": "integer", "minimum": 1, "maximum": 999999 },
         "title": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "description": { "type": "string", "maxLength": 255 },
         "type": { "type": "string", "enum": ["timeseries", "stat", "gauge", "table", "row"] },
         "gridPos": { "$ref": "#/$defs/gridPos" },
         "datasource": { "$ref": "#/$defs/datasource" },
@@ -127,12 +129,18 @@
     "queryMetadata": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["plan_id", "target_id", "kind"],
       "properties": {
         "plan_id": { "type": "string", "minLength": 1, "maxLength": 128 },
         "target_id": { "type": "string", "minLength": 1, "maxLength": 128 },
-        "kind": { "type": "string", "minLength": 1, "maxLength": 32 }
-      }
+        "kind": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "categories": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 64 }, "minItems": 1, "maxItems": 16 },
+        "item_ids": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 128 }, "minItems": 1, "maxItems": 256 },
+        "plan_ids": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 128 }, "minItems": 1, "maxItems": 256 }
+      },
+      "oneOf": [
+        { "required": ["plan_id", "target_id", "kind"] },
+        { "required": ["kind", "categories", "item_ids", "plan_ids"] }
+      ]
     },
     "datasource": {
       "type": "object",
@@ -152,6 +160,7 @@
           "additionalProperties": false,
           "properties": {
             "unit": { "type": "string", "maxLength": 32 },
+            "noValue": { "type": "string", "maxLength": 64 },
             "min": { "type": "number" },
             "max": { "type": "number" }
           }

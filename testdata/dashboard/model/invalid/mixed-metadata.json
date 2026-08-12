@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 41,
+  "title": "mixed metadata",
+  "uid": "mixed-metadata-uid",
+  "id": null,
+  "version": 0,
+  "editable": true,
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "prometheus"
+      }
+    ]
+  },
+  "rows": [
+    {
+      "id": 1,
+      "title": "Service Overview",
+      "panels": [
+        {
+          "id": 10,
+          "title": "Rate",
+          "type": "timeseries",
+          "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum(rate(http_requests_total[$__rate_interval])) by (operation)",
+              "format": "time_series",
+              "metadata": {
+                "plan_id": "m_count",
+                "target_id": "ep:http:get",
+                "kind": "rate",
+                "categories": ["http"],
+                "item_ids": ["ep:http:get"],
+                "plan_ids": ["m_count"]
+              }
+            }
+          ],
+          "fieldConfig": { "defaults": {} }
+        }
+      ]
+    }
+  ],
+  "annotations": { "list": [] }
+}

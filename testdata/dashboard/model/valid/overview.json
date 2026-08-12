@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 41,
+  "title": "overview",
+  "uid": "overview-uid",
+  "id": null,
+  "version": 0,
+  "editable": true,
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "hide": 0
+      },
+      {
+        "name": "operation",
+        "type": "custom",
+        "options": [
+          { "text": "get", "value": "get" },
+          { "text": "post", "value": "post" }
+        ],
+        "current": { "text": "get", "value": "get" },
+        "multi": true,
+        "includeAll": true
+      }
+    ]
+  },
+  "rows": [
+    {
+      "id": 1,
+      "title": "Service Overview",
+      "panels": [
+        {
+          "id": 10,
+          "title": "Request Rate",
+          "description": "Rate of handled operations per second.",
+          "type": "stat",
+          "gridPos": { "x": 0, "y": 0, "w": 6, "h": 8 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": { "type": "prometheus", "uid": "${datasource}" },
+              "expr": "sum by (operation) (rate(http_requests_total{service=\"payment\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "rate",
+                "categories": ["http", "rpc"],
+                "item_ids": ["ep:http:get", "ep:rpc:charge"],
+                "plan_ids": ["m_http_count", "m_rpc_count"]
+              }
+            }
+          ],
+          "fieldConfig": { "defaults": { "unit": "ops/s", "noValue": "0" } }
+        }
+      ]
+    }
+  ],
+  "annotations": { "list": [] }
+}

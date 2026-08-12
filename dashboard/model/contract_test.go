@@ -20,7 +20,7 @@ func TestGoValidatorMatchesSchema(t *testing.T) {
 	}
 
 	validDir := filepath.Join("..", "..", "testdata", "dashboard", "model", "valid")
-	for _, name := range []string{"minimal.json", "full.json"} {
+	for _, name := range []string{"minimal.json", "full.json", "overview.json"} {
 		data, err := os.ReadFile(filepath.Join(validDir, name))
 		if err != nil {
 			t.Fatalf("read %s: %v", name, err)
@@ -121,4 +121,3 @@ func indexOf(haystack, needle string) int {
 	}
 	return -1
 }
-

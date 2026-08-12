@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 41,
+  "title": "bad metadata",
+  "uid": "bad-metadata-uid",
+  "id": null,
+  "version": 0,
+  "editable": true,
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "prometheus"
+      }
+    ]
+  },
+  "rows": [
+    {
+      "id": 1,
+      "title": "HTTP",
+      "panels": [
+        {
+          "id": 10,
+          "title": "Rate",
+          "type": "timeseries",
+          "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum(rate(http_requests_total[$__rate_interval])) by (operation)",
+              "format": "time_series",
+              "metadata": { "plan_id": "m_count", "kind": "rate" }
+            }
+          ],
+          "fieldConfig": { "defaults": {} }
+        }
+      ]
+    }
+  ],
+  "annotations": { "list": [] }
+}

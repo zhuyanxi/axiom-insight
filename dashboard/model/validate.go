@@ -111,10 +111,26 @@ func Validate(dashboard *Dashboard) []*ValidationError {
 		default:
 			emit(variableField+".type", variable.Name, "unsupported variable type")
 		}
+		if variable.Hide != nil && (*variable.Hide < 0 || *variable.Hide > 2) {
+			emit(variableField+".hide", variable.Name, "hide must be 0, 1 or 2")
+		}
 		if variable.Type == VariableTypeQuery || variable.Type == VariableTypeDatasource {
 			if variable.Datasource != nil {
 				validateDatasource(&violations, emit, variable.Datasource, variableField+".datasource")
 			}
+		}
+	}
+
+	for rowIndex, row := range dashboard.Rows {
+		for panelIndex, panel := range row.Panels {
+			if len(panel.FieldConfig.Defaults.NoValue) > MaxNoValueLength {
+				emit(fmt.Sprintf("rows[%d].panels[%d].fieldConfig.defaults.noValue", rowIndex, panelIndex), itoa(panel.ID), "no-value text is too long")
+			}
+		}
+	}
+	for panelIndex, panel := range dashboard.Panels {
+		if len(panel.FieldConfig.Defaults.NoValue) > MaxNoValueLength {
+			emit(fmt.Sprintf("panels[%d].fieldConfig.defaults.noValue", panelIndex), itoa(panel.ID), "no-value text is too long")
 		}
 	}
 
@@ -157,6 +173,9 @@ func validatePanel(violations *[]*ValidationError, emit func(string, string, str
 	}
 	if len(panel.Title) > MaxPanelTitleLength {
 		emit(field+".title", "", "panel title is too long")
+	}
+	if len(panel.Description) > MaxDescriptionLength {
+		emit(field+".description", itoa(panel.ID), "panel description is too long")
 	}
 	if !oneOf(panel.Type, PanelTypeTimeSeries, PanelTypeStat, PanelTypeGauge, PanelTypeTable, PanelTypeRow) {
 		emit(field+".type", panel.Type, "unsupported panel type")
@@ -211,8 +230,41 @@ func validateTarget(violations *[]*ValidationError, emit func(string, string, st
 		}
 	}
 	if target.Metadata != nil {
-		if target.Metadata.PlanID == "" || target.Metadata.TargetID == "" || target.Metadata.Kind == "" {
-			emit(field+".metadata", target.RefID, "query metadata must carry plan_id, target_id and kind")
+		validateQueryMetadata(violations, emit, target.Metadata, field+".metadata", target.RefID)
+	}
+}
+
+func validateQueryMetadata(violations *[]*ValidationError, emit func(string, string, string), metadata *QueryMetadata, field, refID string) {
+	if metadata.Kind == "" {
+		emit(field+".kind", refID, "query metadata must carry kind")
+	}
+	legacy := metadata.PlanID != "" && metadata.TargetID != ""
+	halfLegacy := (metadata.PlanID == "") != (metadata.TargetID == "")
+	overview := len(metadata.Categories) > 0 && len(metadata.ItemIDs) > 0 && len(metadata.PlanIDs) > 0
+	if halfLegacy {
+		emit(field, refID, "query metadata must set plan_id and target_id together")
+	}
+	if legacy && overview {
+		emit(field, refID, "query metadata must use exactly one of plan_id+target_id or categories+item_ids+plan_ids")
+	}
+	if !legacy && !overview {
+		emit(field, refID, "query metadata must carry plan_id+target_id or categories+item_ids+plan_ids")
+	}
+	if overview {
+		for _, category := range metadata.Categories {
+			if category == "" {
+				emit(field+".categories", refID, "category references must not be empty")
+			}
+		}
+		for _, itemID := range metadata.ItemIDs {
+			if itemID == "" {
+				emit(field+".item_ids", refID, "item references must not be empty")
+			}
+		}
+		for _, planID := range metadata.PlanIDs {
+			if planID == "" {
+				emit(field+".plan_ids", refID, "plan references must not be empty")
+			}
 		}
 	}
 }

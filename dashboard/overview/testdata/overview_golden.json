@@ -1,0 +1,518 @@
+{
+  "hash_version": "si-hash-v1",
+  "service_name": "payment",
+  "datasource_variable": {
+    "name": "datasource",
+    "type": "datasource",
+    "query": "prometheus",
+    "hide": 0
+  },
+  "operation_variable": {
+    "name": "operation",
+    "type": "custom",
+    "options": [
+      {
+        "text": "charge",
+        "value": "charge"
+      },
+      {
+        "text": "get",
+        "value": "get"
+      },
+      {
+        "text": "post",
+        "value": "post"
+      },
+      {
+        "text": "produce",
+        "value": "produce"
+      },
+      {
+        "text": "query",
+        "value": "query"
+      }
+    ],
+    "current": {
+      "text": "charge",
+      "value": "charge"
+    },
+    "multi": true,
+    "include_all": true
+  },
+  "panels": [
+    {
+      "purpose": "requests_rate",
+      "title": "Request Rate",
+      "description": "Rate of handled operations per second across all dashboard categories sharing the same metric family.",
+      "type": "stat",
+      "width": 6,
+      "height": 8,
+      "unit": "ops/s",
+      "no_value": "0",
+      "targets": [
+        {
+          "ref_id": "A",
+          "kind": "rate",
+          "categories": [
+            "http"
+          ],
+          "item_ids": [
+            "ep:http:create_order",
+            "ep:http:get_user"
+          ],
+          "plan_ids": [
+            "m_http_count",
+            "m_http_count2"
+          ],
+          "expr": "sum by (operation) (rate(http_requests_total{service=\"payment\"}[$__rate_interval]))",
+          "legend_format": "{{operation}}"
+        },
+        {
+          "ref_id": "B",
+          "kind": "rate",
+          "categories": [
+            "kafka"
+          ],
+          "item_ids": [
+            "dep:kafka:orders"
+          ],
+          "plan_ids": [
+            "m_kafka_count"
+          ],
+          "expr": "sum by (operation) (rate(kafka_messages_total{service=\"payment\"}[$__rate_interval]))",
+          "legend_format": "{{operation}}"
+        },
+        {
+          "ref_id": "C",
+          "kind": "rate",
+          "categories": [
+            "cache"
+          ],
+          "item_ids": [
+            "dep:redis:cache"
+          ],
+          "plan_ids": [
+            "m_redis_count"
+          ],
+          "expr": "sum by (operation) (rate(redis_commands_total{service=\"payment\"}[$__rate_interval]))",
+          "legend_format": "{{operation}}"
+        },
+        {
+          "ref_id": "D",
+          "kind": "rate",
+          "categories": [
+            "rpc"
+          ],
+          "item_ids": [
+            "ep:rpc:charge"
+          ],
+          "plan_ids": [
+            "m_rpc_count"
+          ],
+          "expr": "sum by (operation) (rate(rpc_requests_total{service=\"payment\"}[$__rate_interval]))",
+          "legend_format": "{{operation}}"
+        },
+        {
+          "ref_id": "E",
+          "kind": "rate",
+          "categories": [
+            "database"
+          ],
+          "item_ids": [
+            "dep:sql:orders"
+          ],
+          "plan_ids": [
+            "m_sql_count"
+          ],
+          "expr": "sum by (operation) (rate(sql_queries_total{service=\"payment\"}[$__rate_interval]))",
+          "legend_format": "{{operation}}"
+        }
+      ]
+    },
+    {
+      "purpose": "error_ratio",
+      "title": "Error Ratio",
+      "description": "Share of operations ending in the fixed error status pattern (5xx or error) across all metric families.",
+      "type": "stat",
+      "width": 6,
+      "height": 8,
+      "unit": "percent",
+      "no_value": "0",
+      "targets": [
+        {
+          "ref_id": "A",
+          "kind": "error_ratio",
+          "categories": [
+            "http"
+          ],
+          "item_ids": [
+            "ep:http:create_order",
+            "ep:http:get_user"
+          ],
+          "plan_ids": [
+            "m_http_count",
+            "m_http_count2"
+          ],
+          "expr": "(sum by (operation) (rate(http_requests_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(http_requests_total{service=\"payment\"}[$__rate_interval])))",
+          "legend_format": "{{operation}}"
+        },
+        {
+          "ref_id": "B",
+          "kind": "error_ratio",
+          "categories": [
+            "kafka"
+          ],
+          "item_ids": [
+            "dep:kafka:orders"
+          ],
+          "plan_ids": [
+            "m_kafka_count"
+          ],
+          "expr": "(sum by (operation) (rate(kafka_messages_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(kafka_messages_total{service=\"payment\"}[$__rate_interval])))",
+          "legend_format": "{{operation}}"
+        },
+        {
+          "ref_id": "C",
+          "kind": "error_ratio",
+          "categories": [
+            "cache"
+          ],
+          "item_ids": [
+            "dep:redis:cache"
+          ],
+          "plan_ids": [
+            "m_redis_count"
+          ],
+          "expr": "(sum by (operation) (rate(redis_commands_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(redis_commands_total{service=\"payment\"}[$__rate_interval])))",
+          "legend_format": "{{operation}}"
+        },
+        {
+          "ref_id": "D",
+          "kind": "error_ratio",
+          "categories": [
+            "rpc"
+          ],
+          "item_ids": [
+            "ep:rpc:charge"
+          ],
+          "plan_ids": [
+            "m_rpc_count"
+          ],
+          "expr": "(sum by (operation) (rate(rpc_requests_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(rpc_requests_total{service=\"payment\"}[$__rate_interval])))",
+          "legend_format": "{{operation}}"
+        },
+        {
+          "ref_id": "E",
+          "kind": "error_ratio",
+          "categories": [
+            "database"
+          ],
+          "item_ids": [
+            "dep:sql:orders"
+          ],
+          "plan_ids": [
+            "m_sql_count"
+          ],
+          "expr": "(sum by (operation) (rate(sql_queries_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(sql_queries_total{service=\"payment\"}[$__rate_interval])))",
+          "legend_format": "{{operation}}"
+        }
+      ]
+    },
+    {
+      "purpose": "p50",
+      "title": "p50 Duration",
+      "description": "Median operation duration in seconds (histogram_quantile 0.50) across all metric families.",
+      "type": "stat",
+      "width": 6,
+      "height": 8,
+      "unit": "s",
+      "no_value": "0",
+      "targets": [
+        {
+          "ref_id": "A",
+          "kind": "percentile",
+          "categories": [
+            "http"
+          ],
+          "item_ids": [
+            "ep:http:create_order",
+            "ep:http:get_user"
+          ],
+          "plan_ids": [
+            "m_http_dur",
+            "m_http_dur2"
+          ],
+          "expr": "histogram_quantile(0.5, sum by (le) (rate(http_request_duration{le!=\"+Inf\",service=\"payment\"}[$__rate_interval])))",
+          "legend_format": "http_request_duration"
+        },
+        {
+          "ref_id": "B",
+          "kind": "percentile",
+          "categories": [
+            "kafka"
+          ],
+          "item_ids": [
+            "dep:kafka:orders"
+          ],
+          "plan_ids": [
+            "m_kafka_dur"
+          ],
+          "expr": "histogram_quantile(0.5, sum by (le) (rate(kafka_message_duration{le!=\"+Inf\",service=\"payment\"}[$__rate_interval])))",
+          "legend_format": "kafka_message_duration"
+        },
+        {
+          "ref_id": "C",
+          "kind": "percentile",
+          "categories": [
+            "rpc"
+          ],
+          "item_ids": [
+            "ep:rpc:charge"
+          ],
+          "plan_ids": [
+            "m_rpc_dur"
+          ],
+          "expr": "histogram_quantile(0.5, sum by (le) (rate(rpc_request_duration{le!=\"+Inf\",service=\"payment\"}[$__rate_interval])))",
+          "legend_format": "rpc_request_duration"
+        }
+      ]
+    },
+    {
+      "purpose": "p95",
+      "title": "p95 Duration",
+      "description": "95th percentile operation duration in seconds across all metric families.",
+      "type": "stat",
+      "width": 6,
+      "height": 8,
+      "unit": "s",
+      "no_value": "0",
+      "targets": [
+        {
+          "ref_id": "A",
+          "kind": "percentile",
+          "categories": [
+            "http"
+          ],
+          "item_ids": [
+            "ep:http:create_order",
+            "ep:http:get_user"
+          ],
+          "plan_ids": [
+            "m_http_dur",
+            "m_http_dur2"
+          ],
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration{le!=\"+Inf\",service=\"payment\"}[$__rate_interval])))",
+          "legend_format": "http_request_duration"
+        },
+        {
+          "ref_id": "B",
+          "kind": "percentile",
+          "categories": [
+            "kafka"
+          ],
+          "item_ids": [
+            "dep:kafka:orders"
+          ],
+          "plan_ids": [
+            "m_kafka_dur"
+          ],
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(kafka_message_duration{le!=\"+Inf\",service=\"payment\"}[$__rate_interval])))",
+          "legend_format": "kafka_message_duration"
+        },
+        {
+          "ref_id": "C",
+          "kind": "percentile",
+          "categories": [
+            "rpc"
+          ],
+          "item_ids": [
+            "ep:rpc:charge"
+          ],
+          "plan_ids": [
+            "m_rpc_dur"
+          ],
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(rpc_request_duration{le!=\"+Inf\",service=\"payment\"}[$__rate_interval])))",
+          "legend_format": "rpc_request_duration"
+        }
+      ]
+    },
+    {
+      "purpose": "p99",
+      "title": "p99 Duration",
+      "description": "99th percentile operation duration in seconds across all metric families.",
+      "type": "stat",
+      "width": 6,
+      "height": 8,
+      "unit": "s",
+      "no_value": "0",
+      "targets": [
+        {
+          "ref_id": "A",
+          "kind": "percentile",
+          "categories": [
+            "http"
+          ],
+          "item_ids": [
+            "ep:http:create_order",
+            "ep:http:get_user"
+          ],
+          "plan_ids": [
+            "m_http_dur",
+            "m_http_dur2"
+          ],
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(http_request_duration{le!=\"+Inf\",service=\"payment\"}[$__rate_interval])))",
+          "legend_format": "http_request_duration"
+        },
+        {
+          "ref_id": "B",
+          "kind": "percentile",
+          "categories": [
+            "kafka"
+          ],
+          "item_ids": [
+            "dep:kafka:orders"
+          ],
+          "plan_ids": [
+            "m_kafka_dur"
+          ],
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(kafka_message_duration{le!=\"+Inf\",service=\"payment\"}[$__rate_interval])))",
+          "legend_format": "kafka_message_duration"
+        },
+        {
+          "ref_id": "C",
+          "kind": "percentile",
+          "categories": [
+            "rpc"
+          ],
+          "item_ids": [
+            "ep:rpc:charge"
+          ],
+          "plan_ids": [
+            "m_rpc_dur"
+          ],
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(rpc_request_duration{le!=\"+Inf\",service=\"payment\"}[$__rate_interval])))",
+          "legend_format": "rpc_request_duration"
+        }
+      ]
+    },
+    {
+      "purpose": "in_flight",
+      "title": "In-Flight Operations",
+      "description": "Number of operations currently in flight across all gauge families.",
+      "type": "stat",
+      "width": 6,
+      "height": 8,
+      "unit": "short",
+      "no_value": "0",
+      "targets": [
+        {
+          "ref_id": "A",
+          "kind": "in_flight",
+          "categories": [
+            "http"
+          ],
+          "item_ids": [
+            "ep:http:create_order",
+            "ep:http:get_user"
+          ],
+          "plan_ids": [
+            "m_http_inf",
+            "m_http_inf2"
+          ],
+          "expr": "sum by (operation) (http_in_flight{service=\"payment\"})",
+          "legend_format": "{{operation}}"
+        }
+      ]
+    },
+    {
+      "purpose": "top_failing",
+      "title": "Top Failing Operations",
+      "description": "Error rate per operation across all metric families; the table is client-sorted to surface the highest failure rate.",
+      "type": "table",
+      "width": 24,
+      "height": 8,
+      "unit": "ops/s",
+      "no_value": "0",
+      "targets": [
+        {
+          "ref_id": "A",
+          "kind": "top_failing",
+          "categories": [
+            "http"
+          ],
+          "item_ids": [
+            "ep:http:create_order",
+            "ep:http:get_user"
+          ],
+          "plan_ids": [
+            "m_http_count",
+            "m_http_count2"
+          ],
+          "expr": "sum by (operation) (rate(http_requests_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval]))",
+          "legend_format": "{{operation}}"
+        },
+        {
+          "ref_id": "B",
+          "kind": "top_failing",
+          "categories": [
+            "kafka"
+          ],
+          "item_ids": [
+            "dep:kafka:orders"
+          ],
+          "plan_ids": [
+            "m_kafka_count"
+          ],
+          "expr": "sum by (operation) (rate(kafka_messages_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval]))",
+          "legend_format": "{{operation}}"
+        },
+        {
+          "ref_id": "C",
+          "kind": "top_failing",
+          "categories": [
+            "cache"
+          ],
+          "item_ids": [
+            "dep:redis:cache"
+          ],
+          "plan_ids": [
+            "m_redis_count"
+          ],
+          "expr": "sum by (operation) (rate(redis_commands_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval]))",
+          "legend_format": "{{operation}}"
+        },
+        {
+          "ref_id": "D",
+          "kind": "top_failing",
+          "categories": [
+            "rpc"
+          ],
+          "item_ids": [
+            "ep:rpc:charge"
+          ],
+          "plan_ids": [
+            "m_rpc_count"
+          ],
+          "expr": "sum by (operation) (rate(rpc_requests_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval]))",
+          "legend_format": "{{operation}}"
+        },
+        {
+          "ref_id": "E",
+          "kind": "top_failing",
+          "categories": [
+            "database"
+          ],
+          "item_ids": [
+            "dep:sql:orders"
+          ],
+          "plan_ids": [
+            "m_sql_count"
+          ],
+          "expr": "sum by (operation) (rate(sql_queries_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval]))",
+          "legend_format": "{{operation}}"
+        }
+      ]
+    }
+  ],
+  "diagnostics": []
+}
