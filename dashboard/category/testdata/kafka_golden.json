@@ -1,0 +1,370 @@
+{
+  "hash_version": "si-hash-v1",
+  "service_name": "payment",
+  "rows": [
+    {
+      "category": "kafka",
+      "title": "Kafka",
+      "description": "Kafka producer and consumer calls identified by the Phase 1 Instrumentation Plan; data requires runtime instrumentation.",
+      "panels": [
+        {
+          "purpose": "error_ratio",
+          "item_id": "consumer",
+          "title": "Kafka consumer error ratio",
+          "description": "Share of Kafka consumer operations ending in the fixed error status pattern; requires runtime instrumentation.",
+          "type": "stat",
+          "width": 6,
+          "height": 8,
+          "unit": "percent",
+          "no_value": "0",
+          "links": [
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=consume\u0026var-span=Consume%2Fconsume"
+            }
+          ],
+          "targets": [
+            {
+              "ref_id": "A",
+              "kind": "error_ratio",
+              "plan_id": "dep:kafka:orders_consumer:count",
+              "target_id": "dep:kafka:orders_consumer",
+              "expr": "(sum by (operation) (rate(kafka_messages_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(kafka_messages_total{service=\"payment\"}[$__rate_interval])))",
+              "legend_format": "{{operation}}"
+            }
+          ]
+        },
+        {
+          "purpose": "operations",
+          "item_id": "consumer",
+          "title": "Kafka consumer operations",
+          "description": "Operation rate breakdown across the Kafka consumer counter metric families; requires runtime instrumentation.",
+          "type": "table",
+          "width": 24,
+          "height": 8,
+          "unit": "ops/s",
+          "no_value": "0",
+          "links": [
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=consume\u0026var-span=Consume%2Fconsume"
+            }
+          ],
+          "targets": [
+            {
+              "ref_id": "A",
+              "kind": "operation_breakdown",
+              "plan_id": "dep:kafka:orders_consumer:count",
+              "target_id": "dep:kafka:orders_consumer",
+              "expr": "sum by (operation) (rate(kafka_messages_total{service=\"payment\",operation=\"consume\"}[$__rate_interval]))",
+              "legend_format": "{{operation}}"
+            }
+          ]
+        },
+        {
+          "purpose": "p50",
+          "item_id": "consumer",
+          "title": "Kafka consumer p50 duration",
+          "description": "Median Kafka consumer operation duration in seconds; requires runtime instrumentation.",
+          "type": "stat",
+          "width": 6,
+          "height": 8,
+          "unit": "s",
+          "no_value": "0",
+          "links": [
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=consume\u0026var-span=Consume%2Fconsume"
+            }
+          ],
+          "targets": [
+            {
+              "ref_id": "A",
+              "kind": "percentile",
+              "plan_id": "dep:kafka:orders_consumer:dur",
+              "target_id": "dep:kafka:orders_consumer",
+              "expr": "histogram_quantile(0.5, sum by (le) (rate(kafka_message_duration{le!=\"+Inf\",service=\"payment\"}[$__rate_interval])))",
+              "legend_format": "kafka_message_duration"
+            }
+          ]
+        },
+        {
+          "purpose": "p95",
+          "item_id": "consumer",
+          "title": "Kafka consumer p95 duration",
+          "description": "95th percentile Kafka consumer operation duration in seconds; requires runtime instrumentation.",
+          "type": "stat",
+          "width": 6,
+          "height": 8,
+          "unit": "s",
+          "no_value": "0",
+          "links": [
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=consume\u0026var-span=Consume%2Fconsume"
+            }
+          ],
+          "targets": [
+            {
+              "ref_id": "A",
+              "kind": "percentile",
+              "plan_id": "dep:kafka:orders_consumer:dur",
+              "target_id": "dep:kafka:orders_consumer",
+              "expr": "histogram_quantile(0.95, sum by (le) (rate(kafka_message_duration{le!=\"+Inf\",service=\"payment\"}[$__rate_interval])))",
+              "legend_format": "kafka_message_duration"
+            }
+          ]
+        },
+        {
+          "purpose": "p99",
+          "item_id": "consumer",
+          "title": "Kafka consumer p99 duration",
+          "description": "99th percentile Kafka consumer operation duration in seconds; requires runtime instrumentation.",
+          "type": "stat",
+          "width": 6,
+          "height": 8,
+          "unit": "s",
+          "no_value": "0",
+          "links": [
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=consume\u0026var-span=Consume%2Fconsume"
+            }
+          ],
+          "targets": [
+            {
+              "ref_id": "A",
+              "kind": "percentile",
+              "plan_id": "dep:kafka:orders_consumer:dur",
+              "target_id": "dep:kafka:orders_consumer",
+              "expr": "histogram_quantile(0.99, sum by (le) (rate(kafka_message_duration{le!=\"+Inf\",service=\"payment\"}[$__rate_interval])))",
+              "legend_format": "kafka_message_duration"
+            }
+          ]
+        },
+        {
+          "purpose": "rate",
+          "item_id": "consumer",
+          "title": "Kafka consumer request rate",
+          "description": "Rate of Kafka consumer operations; requires runtime instrumentation from the Phase 1 Instrumentation Plan.",
+          "type": "stat",
+          "width": 6,
+          "height": 8,
+          "unit": "ops/s",
+          "no_value": "0",
+          "links": [
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=consume\u0026var-span=Consume%2Fconsume"
+            }
+          ],
+          "targets": [
+            {
+              "ref_id": "A",
+              "kind": "rate",
+              "plan_id": "dep:kafka:orders_consumer:count",
+              "target_id": "dep:kafka:orders_consumer",
+              "expr": "sum by (operation) (rate(kafka_messages_total{service=\"payment\"}[$__rate_interval]))",
+              "legend_format": "{{operation}}"
+            }
+          ]
+        },
+        {
+          "purpose": "error_ratio",
+          "item_id": "producer",
+          "title": "Kafka producer error ratio",
+          "description": "Share of Kafka producer operations ending in the fixed error status pattern; requires runtime instrumentation.",
+          "type": "stat",
+          "width": 6,
+          "height": 8,
+          "unit": "percent",
+          "no_value": "0",
+          "links": [
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=emit\u0026var-span=Publish%2Femit"
+            },
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=produce\u0026var-span=Publish%2Fproduce"
+            }
+          ],
+          "targets": [
+            {
+              "ref_id": "A",
+              "kind": "error_ratio",
+              "plan_id": "dep:kafka:audit:count",
+              "target_id": "dep:kafka:audit",
+              "expr": "(sum by (operation) (rate(kafka_messages_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(kafka_messages_total{service=\"payment\"}[$__rate_interval])))",
+              "legend_format": "{{operation}}"
+            }
+          ]
+        },
+        {
+          "purpose": "operations",
+          "item_id": "producer",
+          "title": "Kafka producer operations",
+          "description": "Operation rate breakdown across the Kafka producer counter metric families; requires runtime instrumentation.",
+          "type": "table",
+          "width": 24,
+          "height": 8,
+          "unit": "ops/s",
+          "no_value": "0",
+          "links": [
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=emit\u0026var-span=Publish%2Femit"
+            },
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=produce\u0026var-span=Publish%2Fproduce"
+            }
+          ],
+          "targets": [
+            {
+              "ref_id": "A",
+              "kind": "operation_breakdown",
+              "plan_id": "dep:kafka:audit:count",
+              "target_id": "dep:kafka:audit",
+              "expr": "sum by (operation) (rate(kafka_messages_total{service=\"payment\",operation=\"emit\"}[$__rate_interval]))",
+              "legend_format": "{{operation}}"
+            },
+            {
+              "ref_id": "B",
+              "kind": "operation_breakdown",
+              "plan_id": "dep:kafka:audit:count",
+              "target_id": "dep:kafka:audit",
+              "expr": "sum by (operation) (rate(kafka_messages_total{service=\"payment\",operation=\"produce\"}[$__rate_interval]))",
+              "legend_format": "{{operation}}"
+            }
+          ]
+        },
+        {
+          "purpose": "p50",
+          "item_id": "producer",
+          "title": "Kafka producer p50 duration",
+          "description": "Median Kafka producer operation duration in seconds; requires runtime instrumentation.",
+          "type": "stat",
+          "width": 6,
+          "height": 8,
+          "unit": "s",
+          "no_value": "0",
+          "links": [
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=emit\u0026var-span=Publish%2Femit"
+            },
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=produce\u0026var-span=Publish%2Fproduce"
+            }
+          ],
+          "targets": [
+            {
+              "ref_id": "A",
+              "kind": "percentile",
+              "plan_id": "dep:kafka:audit:dur",
+              "target_id": "dep:kafka:audit",
+              "expr": "histogram_quantile(0.5, sum by (le) (rate(kafka_message_duration{le!=\"+Inf\",service=\"payment\"}[$__rate_interval])))",
+              "legend_format": "kafka_message_duration"
+            }
+          ]
+        },
+        {
+          "purpose": "p95",
+          "item_id": "producer",
+          "title": "Kafka producer p95 duration",
+          "description": "95th percentile Kafka producer operation duration in seconds; requires runtime instrumentation.",
+          "type": "stat",
+          "width": 6,
+          "height": 8,
+          "unit": "s",
+          "no_value": "0",
+          "links": [
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=emit\u0026var-span=Publish%2Femit"
+            },
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=produce\u0026var-span=Publish%2Fproduce"
+            }
+          ],
+          "targets": [
+            {
+              "ref_id": "A",
+              "kind": "percentile",
+              "plan_id": "dep:kafka:audit:dur",
+              "target_id": "dep:kafka:audit",
+              "expr": "histogram_quantile(0.95, sum by (le) (rate(kafka_message_duration{le!=\"+Inf\",service=\"payment\"}[$__rate_interval])))",
+              "legend_format": "kafka_message_duration"
+            }
+          ]
+        },
+        {
+          "purpose": "p99",
+          "item_id": "producer",
+          "title": "Kafka producer p99 duration",
+          "description": "99th percentile Kafka producer operation duration in seconds; requires runtime instrumentation.",
+          "type": "stat",
+          "width": 6,
+          "height": 8,
+          "unit": "s",
+          "no_value": "0",
+          "links": [
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=emit\u0026var-span=Publish%2Femit"
+            },
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=produce\u0026var-span=Publish%2Fproduce"
+            }
+          ],
+          "targets": [
+            {
+              "ref_id": "A",
+              "kind": "percentile",
+              "plan_id": "dep:kafka:audit:dur",
+              "target_id": "dep:kafka:audit",
+              "expr": "histogram_quantile(0.99, sum by (le) (rate(kafka_message_duration{le!=\"+Inf\",service=\"payment\"}[$__rate_interval])))",
+              "legend_format": "kafka_message_duration"
+            }
+          ]
+        },
+        {
+          "purpose": "rate",
+          "item_id": "producer",
+          "title": "Kafka producer request rate",
+          "description": "Rate of Kafka producer operations; requires runtime instrumentation from the Phase 1 Instrumentation Plan.",
+          "type": "stat",
+          "width": 6,
+          "height": 8,
+          "unit": "ops/s",
+          "no_value": "0",
+          "links": [
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=emit\u0026var-span=Publish%2Femit"
+            },
+            {
+              "title": "Traces",
+              "url": "/d/${uid}?var-datasource=${datasource}\u0026var-service=payment\u0026var-operation=produce\u0026var-span=Publish%2Fproduce"
+            }
+          ],
+          "targets": [
+            {
+              "ref_id": "A",
+              "kind": "rate",
+              "plan_id": "dep:kafka:audit:count",
+              "target_id": "dep:kafka:audit",
+              "expr": "sum by (operation) (rate(kafka_messages_total{service=\"payment\"}[$__rate_interval]))",
+              "legend_format": "{{operation}}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "diagnostics": []
+}

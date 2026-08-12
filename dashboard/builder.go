@@ -279,18 +279,40 @@ func buildEndpointItem(endpoint *observabilityv1.Endpoint, _ int, category Categ
 func buildDependencyItem(dependency *observabilityv1.Dependency, _ int, category Category, metricIndex map[string][]*observabilityv1.MetricPlan, spanIndex map[string][]*observabilityv1.SpanPlan) DashboardItem {
 	operation := dependencyOperation(dependency)
 	item := DashboardItem{
-		ID:          stableItemID(category, dependency.GetId()),
-		Category:    category,
-		Target:      TargetRef{Kind: "dependency", ID: dependency.GetId()},
-		FunctionID:  dependency.GetFunctionId(),
-		DisplayName: safeDisplayName(dependency.GetName(), category, operation),
-		Operation:   operation,
-		Provenance:  []string{"dependencies[" + dependency.GetId() + "]"},
+		ID:             stableItemID(category, dependency.GetId()),
+		Category:       category,
+		DependencyKind: dependencyKindName(dependency.GetKind()),
+		Target:         TargetRef{Kind: "dependency", ID: dependency.GetId()},
+		FunctionID:     dependency.GetFunctionId(),
+		DisplayName:    safeDisplayName(dependency.GetName(), category, operation),
+		Operation:      operation,
+		Provenance:     []string{"dependencies[" + dependency.GetId() + "]"},
 	}
 	item.Metrics = metricReferences(metricIndex[dependency.GetId()])
 	item.Spans = spanReferences(spanIndex[dependency.GetId()])
 	item.Capabilities = capabilities(item.Metrics, item.Spans)
 	return item
+}
+
+// dependencyKindName maps a Phase 1 dependency kind onto its stable
+// catalog name. Producer/consumer classes stay distinct for P2-08.
+func dependencyKindName(kind observabilityv1.DependencyKind) string {
+	switch kind {
+	case observabilityv1.DependencyKind_KAFKA_PRODUCER:
+		return "kafka_producer"
+	case observabilityv1.DependencyKind_KAFKA_CONSUMER:
+		return "kafka_consumer"
+	case observabilityv1.DependencyKind_SQL:
+		return "sql"
+	case observabilityv1.DependencyKind_REDIS:
+		return "redis"
+	case observabilityv1.DependencyKind_HTTP_CLIENT:
+		return "http_client"
+	case observabilityv1.DependencyKind_RPC_CLIENT:
+		return "rpc_client"
+	default:
+		return ""
+	}
 }
 
 // endpointCategory maps every endpoint kind onto a dashboard category.

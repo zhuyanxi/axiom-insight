@@ -93,7 +93,17 @@ type operationFamily struct {
 // declares service and operation. Different metric name or label schemas
 // are never merged into one selector; each family keeps its own targets.
 func operationTable(items []dashboard.DashboardItem, category dashboard.Category, serviceName string, policy dashboard.DashboardPolicy, diagnostics *[]dashboard.Diagnostic) (Panel, error) {
-	families := operationFamilies(items, diagnostics)
+	targets, err := operationTableTargets(items, serviceName, policy, diagnostics)
+	if err != nil {
+		return Panel{}, err
+	}
+	if len(targets) > model.MaxTargetsPerPanel {
+		return Panel{}, &dashboard.CatalogError{
+			Code:    dashboard.CodePanelLimitExceeded,
+			Field:   "rows." + string(category) + ".operations.targets",
+			Message: fmt.Sprintf("operation table exceeds the fixed limit of %d targets", model.MaxTargetsPerPanel),
+		}
+	}
 	spec := specForPurpose("operations")
 	table := Panel{
 		Key:         dashboard.PanelIDKey(category, operationTableItemID, "operations"),
@@ -106,24 +116,36 @@ func operationTable(items []dashboard.DashboardItem, category dashboard.Category
 		Height:      spec.height,
 		Unit:        spec.unit,
 		NoValue:     spec.noValue,
+		Targets:     targets,
 	}
+	return table, nil
+}
+
+// operationTableTargets builds the per-operation targets shared by the
+// HTTP/RPC and Kafka operation tables: one query per controlled operation
+// value of every counter family that declares service and operation.
+// Different metric name or label schemas are never merged into one
+// selector; each family keeps its own targets.
+func operationTableTargets(items []dashboard.DashboardItem, serviceName string, policy dashboard.DashboardPolicy, diagnostics *[]dashboard.Diagnostic) ([]Target, error) {
+	families := operationFamilies(items, diagnostics)
+	var targets []Target
 	for _, family := range families {
 		plans, planDiagnostics, err := query.PlanOperationBreakdown(family.metric, family.operations, serviceName, policy)
 		if err != nil {
-			return Panel{}, err
+			return nil, err
 		}
 		*diagnostics = append(*diagnostics, planDiagnostics...)
 		for _, plan := range plans {
 			expression, err := query.Render(plan.Expression)
 			if err != nil {
-				return Panel{}, &dashboard.CatalogError{
+				return nil, &dashboard.CatalogError{
 					Code:    dashboard.CodeRenderError,
 					Field:   "queries[" + plan.CanonicalKey + "]",
 					Message: err.Error(),
 				}
 			}
 			if _, err := query.Parse(expression); err != nil {
-				return Panel{}, &dashboard.CatalogError{
+				return nil, &dashboard.CatalogError{
 					Code:    dashboard.CodeRenderError,
 					Field:   "queries[" + plan.CanonicalKey + "]",
 					Message: fmt.Sprintf("operation query is outside the supported PromQL subset: %v", err),
@@ -133,24 +155,17 @@ func operationTable(items []dashboard.DashboardItem, category dashboard.Category
 			if len(plan.PlanIDs) > 0 {
 				planID = plan.PlanIDs[0]
 			}
-			table.Targets = append(table.Targets, Target{
+			targets = append(targets, Target{
 				CanonicalKey: plan.CanonicalKey,
 				Kind:         string(plan.Kind),
 				PlanID:       planID,
 				TargetID:     family.itemIDs[0],
 				Expr:         expression,
-				LegendFormat: spec.legend,
+				LegendFormat: "{{operation}}",
 			})
 		}
 	}
-	if len(table.Targets) > model.MaxTargetsPerPanel {
-		return Panel{}, &dashboard.CatalogError{
-			Code:    dashboard.CodePanelLimitExceeded,
-			Field:   "rows." + string(category) + ".operations.targets",
-			Message: fmt.Sprintf("operation table exceeds the fixed limit of %d targets", model.MaxTargetsPerPanel),
-		}
-	}
-	return table, nil
+	return targets, nil
 }
 
 func operationFamilies(items []dashboard.DashboardItem, diagnostics *[]dashboard.Diagnostic) []operationFamily {

@@ -50,6 +50,11 @@ type DashboardItem struct {
 	ID string
 	// Category is the logical dashboard area.
 	Category Category
+	// DependencyKind is the Phase 1 dependency kind for dependency items
+	// (e.g. "kafka_producer", "kafka_consumer", "sql", "redis",
+	// "http_client", "rpc_client"); empty for endpoint items. P2-08 uses
+	// it to separate Kafka producer and consumer operation classes.
+	DependencyKind string
 	// Target references the IR entity this item is built from.
 	Target TargetRef
 	// FunctionID is the owning function's stable ID.
