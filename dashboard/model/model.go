@@ -133,6 +133,11 @@ type Row struct {
 	ID int `json:"id"`
 	// Title is the row title.
 	Title string `json:"title"`
+	// Description is the static row description (P2-07): it states the
+	// Phase 1 Instrumentation Plan origin and that data requires runtime
+	// instrumentation; it never carries user instructions or sensitive
+	// implementation details.
+	Description string `json:"description,omitempty"`
 	// Panels are the panels nested in this row.
 	Panels []Panel `json:"panels,omitempty"`
 }

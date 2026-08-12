@@ -82,6 +82,9 @@ func Validate(dashboard *Dashboard) []*ValidationError {
 		} else {
 			rowIDs[row.ID] = true
 		}
+		if len(row.Description) > MaxDescriptionLength {
+			emit(rowField+".description", itoa(row.ID), "row description is too long")
+		}
 		for panelIndex, panel := range row.Panels {
 			validatePanel(&violations, emit, panel, fmt.Sprintf("%s.panels[%d]", rowField, panelIndex), panelIDs, hasDatasourceVariable)
 		}

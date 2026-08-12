@@ -264,6 +264,12 @@ func TestExtendedFieldValidation(t *testing.T) {
 		t.Error("overlong description accepted")
 	}
 
+	tooLongRowDescription := base()
+	tooLongRowDescription.Rows[0].Description = long
+	if !violationAt(Validate(tooLongRowDescription), "description") {
+		t.Error("overlong row description accepted")
+	}
+
 	tooLongNoValue := base()
 	tooLongNoValue.Rows[0].Panels[0].FieldConfig.Defaults.NoValue = strings.Repeat("0", MaxNoValueLength+1)
 	if !violationAt(Validate(tooLongNoValue), "noValue") {

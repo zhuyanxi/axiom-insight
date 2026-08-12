@@ -14,6 +14,8 @@ Grafana dashboard API/export model 的离线子集，固定 Grafana Schema **41*
 - Panel 可携带静态 `description`（≤255 字符）与
   `fieldConfig.defaults.noValue`（≤64 字符）；datasource variable 可显式携带
   `hide: 0`（可见）。
+- Row 可携带静态 `description`（≤255 字符），说明 Phase 1 Instrumentation
+  Plan 来源与 runtime instrumentation 需求；不包含用户操作说明或敏感实现细节。
 - Query metadata 有两种受控形态：per-item 形态
   `{plan_id, target_id, kind}`，以及 Overview 聚合形态
   `{kind, categories, item_ids, plan_ids}`（P2-06 跨 category 聚合 Query 使用；
