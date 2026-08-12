@@ -201,6 +201,11 @@ func TestKafkaCanary(t *testing.T) {
 					metric("m_ok", "kafka_messages_total", "counter", "service", "operation", "status"),
 				},
 				[]dashboard.SignalReference{span("s_bad", `Publish";drop`)}),
+			kafkaItem("dep:kafka:bad_op", "kafka_producer", `emit";op`,
+				[]dashboard.SignalReference{
+					metric("m_op", "kafka_messages_op_total", "counter", "service", "operation", "status"),
+				},
+				[]dashboard.SignalReference{span("s_op", "Publish/emit")}),
 			fullKafkaConsumer("dep:kafka:orders_consumer", "consume"),
 		},
 	}
@@ -216,6 +221,18 @@ func TestKafkaCanary(t *testing.T) {
 			}
 		}
 	}
+	foundSpanDrop, foundOperationDrop := false, false
+	for _, diagnostic := range plan.Diagnostics {
+		if diagnostic.Code == dashboard.CodeSensitiveValueDropped && diagnostic.Field == "spans[].name" {
+			foundSpanDrop = true
+		}
+		if diagnostic.Code == dashboard.CodeSensitiveValueDropped && diagnostic.Field == "operation" {
+			foundOperationDrop = true
+		}
+	}
+	if !foundSpanDrop || !foundOperationDrop {
+		t.Errorf("expected span/operation sensitive-value diagnostics, got %v", plan.Diagnostics)
+	}
 	rows, err := Render(plan)
 	if err != nil {
 		t.Fatalf("Render failed: %v", err)
@@ -227,6 +244,15 @@ func TestKafkaCanary(t *testing.T) {
 	for _, canary := range []string{`alert(1)`, `";drop`, "topic", "group", "partition", "offset", "payload", "consumer_group"} {
 		if strings.Contains(string(rendered), canary) {
 			t.Errorf("rendered kafka output leaks %q", canary)
+		}
+	}
+	for _, row := range rows {
+		for _, panel := range row.Panels {
+			for _, link := range panel.Links {
+				if strings.Contains(link.URL, "var-operation=&") {
+					t.Errorf("trace link carries an empty operation: %s", link.URL)
+				}
+			}
 		}
 	}
 }

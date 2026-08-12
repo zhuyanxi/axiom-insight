@@ -207,7 +207,7 @@ func classItems(items []dashboard.DashboardItem, dependencyKind string) []dashbo
 
 func kafkaClassPanels(class kafkaClass, items []dashboard.DashboardItem, serviceName string, policy dashboard.DashboardPolicy, diagnostics *[]dashboard.Diagnostic) ([]Panel, int, error) {
 	families := kafkaFamilies(items, class.title, diagnostics)
-	links := kafkaTraceLinks(items, class, serviceName, policy)
+	links := kafkaTraceLinks(items, class, serviceName, policy, diagnostics)
 
 	specs := []struct {
 		purpose string
@@ -256,6 +256,8 @@ func kafkaClassPanels(class kafkaClass, items []dashboard.DashboardItem, service
 		table.Links = links
 		panels = append(panels, table)
 		total += len(table.Targets)
+	} else {
+		*diagnostics = append(*diagnostics, missingKafkaPanelDiagnostic(class, "operations"))
 	}
 	return panels, total, nil
 }
@@ -414,7 +416,7 @@ func kafkaPercentileTargets(families []metricFamily, quantile float64, serviceNa
 	return targets, nil
 }
 
-func kafkaTraceLinks(items []dashboard.DashboardItem, class kafkaClass, serviceName string, policy dashboard.DashboardPolicy) []model.Link {
+func kafkaTraceLinks(items []dashboard.DashboardItem, class kafkaClass, serviceName string, policy dashboard.DashboardPolicy, diagnostics *[]dashboard.Diagnostic) []model.Link {
 	if !policy.IncludeTraceLinks {
 		return nil
 	}
@@ -425,18 +427,25 @@ func kafkaTraceLinks(items []dashboard.DashboardItem, class kafkaClass, serviceN
 		}
 		span := item.Spans[0]
 		if !query.ValidSpanName(span.Name) {
+			*diagnostics = append(*diagnostics, dashboard.Diagnostic{
+				Code: dashboard.CodeSensitiveValueDropped, TargetID: item.ID,
+				Field: "spans[].name", Message: "span name is not a controlled value; the trace link was dropped",
+			})
 			continue
 		}
-		operation := item.Operation
-		if !query.ValidOperationValue(operation) {
-			operation = ""
+		if !query.ValidOperationValue(item.Operation) {
+			*diagnostics = append(*diagnostics, dashboard.Diagnostic{
+				Code: dashboard.CodeSensitiveValueDropped, TargetID: item.ID,
+				Field: "operation", Message: "operation value is not a controlled value; the trace link was dropped",
+			})
+			continue
 		}
 		links = append(links, model.Link{
 			Title: "Traces",
 			URL: traceLinkURL(query.TraceLinkPlan{
 				DatasourceVariable: policy.DatasourceVariableName,
 				ServiceName:        serviceName,
-				Operation:          operation,
+				Operation:          item.Operation,
 				SpanName:           span.Name,
 			}),
 			TargetBlank: true,

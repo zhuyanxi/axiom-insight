@@ -26,6 +26,21 @@ Planner 之上生成 Kafka category row。实现为 `dashboard/category` package
 - 不生成 consumer handler root、lag、offset 或 partition Panel。
 - label 仅限 `service`/`operation`/`status`；查询只引用 Plan metric/labels。
 
+## Capability / missing-panel matrix（AC1/AC3）
+
+按 producer / consumer 各自独立评估：
+
+| Plan 能力（metric family / span） | 生成 Panel | 缺失行为 |
+| --- | --- | --- |
+| Counter + `service` + `operation` | request rate、operations table | `DASHBOARD_MISSING_REQUIRED_METRIC`（`rows.kafka.<class>.rate/operations`） |
+| Counter + `service` + `status` | error ratio | `DASHBOARD_MISSING_REQUIRED_METRIC`（`rows.kafka.<class>.error_ratio`） |
+| Histogram + `service` | p50/p95/p99 duration | `DASHBOARD_MISSING_REQUIRED_METRIC`（`rows.kafka.<class>.p50/p95/p99`） |
+| PRODUCER/CONSUMER Span + `include_trace_links=true` | trace link | span/operation 非法 → `DASHBOARD_SENSITIVE_VALUE_DROPPED` 且省略 link；无 span → 省略 link |
+| 无任何可证明 panel | row 省略 | `DASHBOARD_EMPTY_CATEGORY` + 保留 catalog `DASHBOARD_UNSUPPORTED_TARGET` |
+
+Matrix 与 fixture（`dashboard/category/kafka_test.go`）同步维护：任何 capability
+规则变更必须同步更新本表与对应 fixture。
+
 ## 安全降级（AC3）
 
 - 无 Kafka entity：row 省略，`DASHBOARD_EMPTY_CATEGORY`；catalog 的
