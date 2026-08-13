@@ -11,6 +11,7 @@ env:
   # version pinning and a license/security review.
   GO_VERSION: "1.26.1"
   PROTOC_GEN_GO_VERSION: "v1.36.6"
+  PROTOC_GEN_GO_GRPC_VERSION: "v1.5.1"
 
 jobs:
   quality:
@@ -28,6 +29,25 @@ jobs:
       - name: Install protoc-gen-go (pinned)
         shell: bash
         run: go install google.golang.org/protobuf/cmd/protoc-gen-go@${{ env.PROTOC_GEN_GO_VERSION }}
+      - name: Install protoc-gen-go-grpc (pinned)
+        shell: bash
+        run: go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@${{ env.PROTOC_GEN_GO_GRPC_VERSION }}
+      - name: Install pinned Protocol Buffers compiler
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          case "${{ runner.os }}" in
+            Linux) URL="https://github.com/protocolbuffers/protobuf/releases/download/v29.3/protoc-29.3-linux-x86_64.zip" ;;
+            macOS) URL="https://github.com/protocolbuffers/protobuf/releases/download/v29.3/protoc-29.3-osx-universal_binary.zip" ;;
+            Windows) URL="https://github.com/protocolbuffers/protobuf/releases/download/v29.3/protoc-29.3-win64.zip" ;;
+          esac
+          curl -fsSL -o "$RUNNER_TEMP/protoc.zip" "$URL"
+          mkdir -p "$RUNNER_TEMP/protoc"
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            powershell -Command "Expand-Archive -LiteralPath '$RUNNER_TEMP/protoc.zip' -DestinationPath '$RUNNER_TEMP/protoc' -Force"
+          else
+            unzip -o "$RUNNER_TEMP/protoc.zip" -d "$RUNNER_TEMP/protoc"
+          fi
       - name: Build
         run: go build ./...
       - name: Vet
@@ -43,8 +63,9 @@ jobs:
       - name: Race
         run: go test -race ./generator/... ./cmd/... -count=1
       - name: Protobuf generation consistency
+        if: runner.os != 'Windows'
         run: |
-          PATH="$HOME/go/bin:$PATH" protoc --proto_path=. --go_out=. \
+          PATH="$RUNNER_TEMP/protoc/bin:$HOME/go/bin:$PATH" protoc --proto_path=. --go_out=. \
             --go_opt=paths=source_relative \
             --go-grpc_out=. --go-grpc_opt=paths=source_relative \
             ir/v1/observability.proto ir/v1/generation.proto ir/v1/language_analyzer.proto

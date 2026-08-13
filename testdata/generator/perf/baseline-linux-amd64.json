@@ -1,0 +1,6 @@
+{
+  "entities": 1000,
+  "max_nanoseconds": 2700000000,
+  "max_allocated_bytes": 3289972624,
+  "tolerance": 0.2
+}
