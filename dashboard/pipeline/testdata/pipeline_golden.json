@@ -1,0 +1,21 @@
+{
+  "hash_version": "si-hash-v1",
+  "service_name": "payment",
+  "title": "payment Observability",
+  "uid": "si-payment-v1",
+  "sha256": "5adebef998f8ce78f2ee8755265ab159b1e59aa4cee52f42b942acbab8cf061b",
+  "row_count": 8,
+  "panel_count": 51,
+  "query_count": 72,
+  "row_titles": [
+    "Service Overview",
+    "HTTP",
+    "RPC",
+    "Kafka",
+    "Database",
+    "Cache",
+    "HTTP Client Calls",
+    "RPC Client Calls"
+  ],
+  "diagnostics": []
+}

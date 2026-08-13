@@ -236,6 +236,19 @@ func DisambiguateTitles(items []TitleItem) ([]TitleResult, []Diagnostic) {
 	return results, diagnostics
 }
 
+// ComposeDashboardTitle derives the dashboard title from the service
+// name and the validated title suffix (P2-10). Both parts are sanitized
+// and the result is bounded by MaxTitleLength, so no control character,
+// path structure or raw IR value reaches the title.
+func ComposeDashboardTitle(serviceName, suffix string) string {
+	title := ServiceTitle(serviceName)
+	suffix = sanitizeTitle(suffix)
+	if suffix != "" {
+		title = title + " " + suffix
+	}
+	return clipTitle(title, "")
+}
+
 // basename returns the last "/" or "\" separated component, mirroring how
 // service names may embed module paths.
 func basename(value string) string {
