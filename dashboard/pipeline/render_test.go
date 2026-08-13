@@ -118,15 +118,15 @@ func TestRenderInvalidPlan(t *testing.T) {
 		rows: []model.Row{
 			{ID: 1, Title: "HTTP", Panels: []model.Panel{
 				{ID: 42, Title: "rate", Type: model.PanelTypeStat, GridPos: model.GridPos{X: 0, Y: 0, W: 6, H: 8},
-					Datasource: &model.DatasourceRef{Type: model.DatasourceTypePrometheus, UID: model.DatasourceVariable},
-					Targets:    []model.Target{{RefID: "A", Expr: "rate(x)", Format: "time_series", Datasource: &model.DatasourceRef{Type: model.DatasourceTypePrometheus, UID: model.DatasourceVariable}}},
+					Datasource:  &model.DatasourceRef{Type: model.DatasourceTypePrometheus, UID: model.DatasourceVariable},
+					Targets:     []model.Target{{RefID: "A", Expr: "rate(x)", Format: "time_series", Datasource: &model.DatasourceRef{Type: model.DatasourceTypePrometheus, UID: model.DatasourceVariable}}},
 					FieldConfig: model.FieldConfig{Defaults: model.FieldConfigDefaults{Unit: "ops/s"}},
 				},
 			}},
 			{ID: 2, Title: "RPC", Panels: []model.Panel{
 				{ID: 42, Title: "rate", Type: model.PanelTypeStat, GridPos: model.GridPos{X: 0, Y: 0, W: 6, H: 8},
-					Datasource: &model.DatasourceRef{Type: model.DatasourceTypePrometheus, UID: model.DatasourceVariable},
-					Targets:    []model.Target{{RefID: "A", Expr: "rate(y)", Format: "time_series", Datasource: &model.DatasourceRef{Type: model.DatasourceTypePrometheus, UID: model.DatasourceVariable}}},
+					Datasource:  &model.DatasourceRef{Type: model.DatasourceTypePrometheus, UID: model.DatasourceVariable},
+					Targets:     []model.Target{{RefID: "A", Expr: "rate(y)", Format: "time_series", Datasource: &model.DatasourceRef{Type: model.DatasourceTypePrometheus, UID: model.DatasourceVariable}}},
 					FieldConfig: model.FieldConfig{Defaults: model.FieldConfigDefaults{Unit: "ops/s"}},
 				},
 			}},

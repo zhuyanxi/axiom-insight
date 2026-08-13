@@ -47,17 +47,104 @@ func (plan *Plan) Refresh() string { return plan.refresh }
 
 // Variables returns a copy of the controlled templating variables.
 func (plan *Plan) Variables() []model.Variable {
-	return append([]model.Variable(nil), plan.variables...)
+	return deepCopyVariables(plan.variables)
 }
 
 // Rows returns a copy of the stacked category rows.
 func (plan *Plan) Rows() []model.Row {
-	return append([]model.Row(nil), plan.rows...)
+	return deepCopyRows(plan.rows)
 }
 
 // Diagnostics returns a copy of the sorted, deduplicated diagnostics.
 func (plan *Plan) Diagnostics() []dashboard.Diagnostic {
 	return append([]dashboard.Diagnostic(nil), plan.diagnostics...)
+}
+
+// deepCopyVariables copies every variable including its pointer fields
+// and option slices, so the returned slice never shares mutable storage
+// with the immutable plan.
+func deepCopyVariables(variables []model.Variable) []model.Variable {
+	result := make([]model.Variable, len(variables))
+	for index, variable := range variables {
+		result[index] = variable
+		if variable.Hide != nil {
+			hide := *variable.Hide
+			result[index].Hide = &hide
+		}
+		result[index].Datasource = deepCopyDatasource(variable.Datasource)
+		result[index].Options = append([]model.VariableOption(nil), variable.Options...)
+		if variable.Current != nil {
+			current := *variable.Current
+			result[index].Current = &current
+		}
+	}
+	return result
+}
+
+// deepCopyRows copies every row and its nested panels, targets, links and
+// field config so callers can never mutate the plan through an accessor.
+func deepCopyRows(rows []model.Row) []model.Row {
+	result := make([]model.Row, len(rows))
+	for index, row := range rows {
+		result[index] = row
+		result[index].Panels = deepCopyPanels(row.Panels)
+	}
+	return result
+}
+
+func deepCopyPanels(panels []model.Panel) []model.Panel {
+	result := make([]model.Panel, len(panels))
+	for index, panel := range panels {
+		result[index] = panel
+		result[index].Datasource = deepCopyDatasource(panel.Datasource)
+		result[index].Targets = deepCopyTargets(panel.Targets)
+		result[index].Links = append([]model.Link(nil), panel.Links...)
+		defaults := panel.FieldConfig.Defaults
+		if defaults.Min != nil {
+			min := *defaults.Min
+			defaults.Min = &min
+		}
+		if defaults.Max != nil {
+			max := *defaults.Max
+			defaults.Max = &max
+		}
+		result[index].FieldConfig.Defaults = defaults
+		result[index].FieldConfig.Overrides = deepCopyOverrides(panel.FieldConfig.Overrides)
+	}
+	return result
+}
+
+func deepCopyTargets(targets []model.Target) []model.Target {
+	result := make([]model.Target, len(targets))
+	for index, target := range targets {
+		result[index] = target
+		result[index].Datasource = deepCopyDatasource(target.Datasource)
+		if target.Metadata != nil {
+			metadata := *target.Metadata
+			metadata.Categories = append([]string(nil), target.Metadata.Categories...)
+			metadata.ItemIDs = append([]string(nil), target.Metadata.ItemIDs...)
+			metadata.PlanIDs = append([]string(nil), target.Metadata.PlanIDs...)
+			result[index].Metadata = &metadata
+		}
+	}
+	return result
+}
+
+func deepCopyDatasource(datasource *model.DatasourceRef) *model.DatasourceRef {
+	if datasource == nil {
+		return nil
+	}
+	copy := *datasource
+	return &copy
+}
+
+func deepCopyOverrides(overrides []model.FieldOverride) []model.FieldOverride {
+	result := make([]model.FieldOverride, len(overrides))
+	for index, override := range overrides {
+		result[index] = override
+		result[index].Properties = append([]model.FieldProperty(nil), override.Properties...)
+	}
+	return result
 }
 
 // Build runs the P2-06 overview, P2-07 HTTP/RPC, P2-08 Kafka and P2-09
@@ -102,7 +189,9 @@ func Build(catalog *dashboard.DashboardCatalog, policy dashboard.DashboardPolicy
 	}
 	// Row IDs are re-resolved over the whole key set so they stay unique
 	// across the independent sub-renderers and the overview row.
-	assignRowIDs(rows, rowKeys)
+	if err := assignRowIDs(rows, rowKeys); err != nil {
+		return nil, err
+	}
 	stackRows(rows)
 
 	diagnostics := aggregateDiagnostics(catalog, overviewPlan, httpRPCPlan, kafkaPlan, depsPlan)
@@ -137,12 +226,14 @@ func assembleRows(httpRPC, kafka, deps *category.Plan, overviewPanels []model.Pa
 	rows := make([]model.Row, 0, 1+len(httpRPC.Rows)+len(kafka.Rows)+len(deps.Rows))
 	keys := make([]string, 0, cap(rows))
 
-	rows = append(rows, model.Row{
-		Title:       dashboard.CategoryTitle(dashboard.CategoryServiceOverview),
-		Description: "Service-wide request, error and latency signals identified by the Phase 1 Instrumentation Plan; data requires runtime instrumentation.",
-		Panels:      overviewPanels,
-	})
-	keys = append(keys, dashboard.RowIDKey(dashboard.CategoryServiceOverview, category.RowPurpose))
+	if len(overviewPanels) > 0 {
+		rows = append(rows, model.Row{
+			Title:       dashboard.CategoryTitle(dashboard.CategoryServiceOverview),
+			Description: "Service-wide request, error and latency signals identified by the Phase 1 Instrumentation Plan; data requires runtime instrumentation.",
+			Panels:      overviewPanels,
+		})
+		keys = append(keys, dashboard.RowIDKey(dashboard.CategoryServiceOverview, category.RowPurpose))
+	}
 
 	for _, plan := range []*category.Plan{httpRPC, kafka, deps} {
 		rendered, err := category.Render(plan)
@@ -166,15 +257,21 @@ func assembleRows(httpRPC, kafka, deps *category.Plan, overviewPanels []model.Pa
 }
 
 // assignRowIDs re-resolves every row ID from its canonical key in one
-// domain, so no two rows (including the overview row) share an ID.
-func assignRowIDs(rows []model.Row, keys []string) {
+// domain, so no two rows (including the overview row) share an ID. A
+// length mismatch is a structural failure and surfaces at the assembly
+// boundary instead of leaving zero IDs for the model validator to trip on.
+func assignRowIDs(rows []model.Row, keys []string) error {
 	if len(rows) != len(keys) {
-		return
+		return &dashboard.CatalogError{
+			Code: dashboard.CodeRenderError, Field: "rows",
+			Message: fmt.Sprintf("row count %d does not match the row key set %d", len(rows), len(keys)),
+		}
 	}
 	ids := dashboard.ResolvePanelIDs(keys)
 	for index := range rows {
 		rows[index].ID = int(ids[index])
 	}
+	return nil
 }
 
 // stackRows offsets every row's nested panels below its row band so the

@@ -294,3 +294,35 @@ func TestNameFunctionsSanitize(t *testing.T) {
 		}
 	}
 }
+
+// TestComposeDashboardTitle pins the P2-10 title composition: basename
+// service part, sanitized suffix, empty/whitespace suffix handling and
+// the MaxTitleLength bound.
+func TestComposeDashboardTitle(t *testing.T) {
+	cases := []struct {
+		name    string
+		service string
+		suffix  string
+		want    string
+	}{
+		{name: "plain", service: "payment", suffix: "Observability", want: "payment Observability"},
+		{name: "basename", service: "pkg/http/handler", suffix: "Observability", want: "handler Observability"},
+		{name: "empty suffix", service: "payment", suffix: "", want: "payment"},
+		{name: "whitespace suffix", service: "payment", suffix: "   \t", want: "payment"},
+		{name: "control suffix", service: "payment", suffix: "Obs\x00ervability\x1b", want: "payment Obs ervability"},
+	}
+	for _, test := range cases {
+		t.Run(test.name, func(t *testing.T) {
+			got := ComposeDashboardTitle(test.service, test.suffix)
+			if got != test.want {
+				t.Errorf("ComposeDashboardTitle(%q, %q) = %q, want %q", test.service, test.suffix, got, test.want)
+			}
+			if len(got) > MaxTitleLength {
+				t.Errorf("title length %d exceeds %d", len(got), MaxTitleLength)
+			}
+		})
+	}
+	if got := ComposeDashboardTitle(strings.Repeat("s", 100), strings.Repeat("s", 100)); len(got) != MaxTitleLength {
+		t.Errorf("long composed title length = %d, want %d", len(got), MaxTitleLength)
+	}
+}

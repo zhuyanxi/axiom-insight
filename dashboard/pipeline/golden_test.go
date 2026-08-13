@@ -16,16 +16,16 @@ const updateSnapshotEnv = "SI_UPDATE_GOLDEN"
 // hash, counts, metadata and diagnostics of the composite fixture.
 // Regenerate with SI_UPDATE_GOLDEN=1.
 type pipelineGolden struct {
-	HashVersion  string             `json:"hash_version"`
-	ServiceName  string             `json:"service_name"`
-	Title        string             `json:"title"`
-	UID          string             `json:"uid"`
-	SHA256       string             `json:"sha256"`
-	RowCount     int                `json:"row_count"`
-	PanelCount   int                `json:"panel_count"`
-	QueryCount   int                `json:"query_count"`
-	RowTitles    []string           `json:"row_titles"`
-	Diagnostics  []goldenDiagnostic `json:"diagnostics"`
+	HashVersion string             `json:"hash_version"`
+	ServiceName string             `json:"service_name"`
+	Title       string             `json:"title"`
+	UID         string             `json:"uid"`
+	SHA256      string             `json:"sha256"`
+	RowCount    int                `json:"row_count"`
+	PanelCount  int                `json:"panel_count"`
+	QueryCount  int                `json:"query_count"`
+	RowTitles   []string           `json:"row_titles"`
+	Diagnostics []goldenDiagnostic `json:"diagnostics"`
 }
 
 type goldenDiagnostic struct {
