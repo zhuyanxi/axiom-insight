@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -144,7 +145,7 @@ func TestGenerateSignalSubsetAC3(t *testing.T) {
 		t.Error("otel.yaml must stay untouched")
 	}
 	info, _ := os.Stat(filepath.Join(outputDir, "otel.yaml"))
-	if info.Mode().Perm() != 0o600 {
+	if runtime.GOOS != "windows" && info.Mode().Perm() != 0o600 {
 		t.Errorf("otel.yaml metadata changed: %v", info.Mode().Perm())
 	}
 	notesContents, _ := os.ReadFile(filepath.Join(outputDir, "notes.txt"))
@@ -309,8 +310,8 @@ func TestGenerateJSONReportAC10(t *testing.T) {
 
 	t.Run("config error", func(t *testing.T) {
 		root := writeCLIProject(t, map[string]string{
-			"go.mod": "module example.com/gen-config\n\ngo 1.26.1\n",
-			"run.go": "package genconfig\n",
+			"go.mod":  "module example.com/gen-config\n\ngo 1.26.1\n",
+			"run.go":  "package genconfig\n",
 			"si.yaml": "generation:\n  signals: []\n",
 		})
 		var stdout, stderr bytes.Buffer
@@ -329,8 +330,8 @@ func TestGenerateJSONReportAC10(t *testing.T) {
 
 	t.Run("dashboard config error", func(t *testing.T) {
 		root := writeCLIProject(t, map[string]string{
-			"go.mod": "module example.com/gen-config\n\ngo 1.26.1\n",
-			"run.go": "package genconfig\n",
+			"go.mod":  "module example.com/gen-config\n\ngo 1.26.1\n",
+			"run.go":  "package genconfig\n",
 			"si.yaml": "generation:\n  output_dir: generate\ndashboard:\n  refresh: 45s\n",
 		})
 		var stdout, stderr bytes.Buffer
@@ -352,8 +353,8 @@ func TestGenerateJSONReportAC10(t *testing.T) {
 
 	t.Run("dashboard config scan rejection", func(t *testing.T) {
 		root := writeCLIProject(t, map[string]string{
-			"go.mod": "module example.com/gen-config\n\ngo 1.26.1\n",
-			"run.go": "package genconfig\n",
+			"go.mod":  "module example.com/gen-config\n\ngo 1.26.1\n",
+			"run.go":  "package genconfig\n",
 			"si.yaml": "dashboard:\n  refresh: s3cr3t-value\n",
 		})
 		var stdout, stderr bytes.Buffer
