@@ -206,29 +206,33 @@ func classItems(items []dashboard.DashboardItem, dependencyKind string) []dashbo
 }
 
 func kafkaClassPanels(class kafkaClass, items []dashboard.DashboardItem, serviceName string, policy dashboard.DashboardPolicy, diagnostics *[]dashboard.Diagnostic) ([]Panel, int, error) {
-	families := kafkaFamilies(items, class.title, diagnostics)
-	links := kafkaTraceLinks(items, class, serviceName, policy, diagnostics)
+	families := familyGroups(items, diagnostics)
+	links := familyTraceLinks(items, serviceName, policy, diagnostics)
 
 	specs := []struct {
 		purpose string
 		targets func() ([]Target, error)
 	}{
 		{purpose: "rate", targets: func() ([]Target, error) {
-			return kafkaFamilyTargets(families, func(capabilities familyCapabilities) bool { return capabilities.Rate },
-				kafkaRateQuery, serviceName, policy)
+			return familyTargets(families, func(capabilities familyCapabilities) bool { return capabilities.Rate },
+				func(family *metricFamily, svc string, pol dashboard.DashboardPolicy) (*query.QueryPlan, string) {
+					return familyRateQuery(family, "kafka", svc, pol)
+				}, serviceName, policy)
 		}},
 		{purpose: "error_ratio", targets: func() ([]Target, error) {
-			return kafkaFamilyTargets(families, func(capabilities familyCapabilities) bool { return capabilities.ErrorRatio },
-				kafkaErrorRatioQuery, serviceName, policy)
+			return familyTargets(families, func(capabilities familyCapabilities) bool { return capabilities.ErrorRatio },
+				func(family *metricFamily, svc string, pol dashboard.DashboardPolicy) (*query.QueryPlan, string) {
+					return familyErrorRatioQuery(family, "kafka", svc, pol)
+				}, serviceName, policy)
 		}},
 		{purpose: "p50", targets: func() ([]Target, error) {
-			return kafkaPercentileTargets(families, 0.50, serviceName, policy)
+			return familyPercentileTargets(families, "kafka", 0.50, serviceName, policy)
 		}},
 		{purpose: "p95", targets: func() ([]Target, error) {
-			return kafkaPercentileTargets(families, 0.95, serviceName, policy)
+			return familyPercentileTargets(families, "kafka", 0.95, serviceName, policy)
 		}},
 		{purpose: "p99", targets: func() ([]Target, error) {
-			return kafkaPercentileTargets(families, 0.99, serviceName, policy)
+			return familyPercentileTargets(families, "kafka", 0.99, serviceName, policy)
 		}},
 	}
 	var panels []Panel
@@ -334,7 +338,7 @@ func missingKafkaPanelDiagnostic(class kafkaClass, purpose string) dashboard.Dia
 	}
 }
 
-func kafkaFamilyTargets(
+func familyTargets(
 	families []metricFamily,
 	gate func(familyCapabilities) bool,
 	build func(*metricFamily, string, dashboard.DashboardPolicy) (*query.QueryPlan, string),
@@ -378,13 +382,13 @@ func kafkaFamilyTargets(
 	return targets, nil
 }
 
-func kafkaPercentileTargets(families []metricFamily, quantile float64, serviceName string, policy dashboard.DashboardPolicy) ([]Target, error) {
+func familyPercentileTargets(families []metricFamily, label string, quantile float64, serviceName string, policy dashboard.DashboardPolicy) ([]Target, error) {
 	var targets []Target
 	for _, family := range families {
 		if !family.Capabilities.Percentiles {
 			continue
 		}
-		plan := kafkaPercentileQuery(&family, serviceName, policy, quantile)
+		plan := familyPercentileQuery(&family, label, serviceName, policy, quantile)
 		if violations := query.ValidateOverviewPlan(plan, family.Items, serviceName); len(violations) > 0 {
 			return nil, &dashboard.CatalogError{
 				Code:    dashboard.CodeRenderError,
@@ -416,7 +420,7 @@ func kafkaPercentileTargets(families []metricFamily, quantile float64, serviceNa
 	return targets, nil
 }
 
-func kafkaTraceLinks(items []dashboard.DashboardItem, class kafkaClass, serviceName string, policy dashboard.DashboardPolicy, diagnostics *[]dashboard.Diagnostic) []model.Link {
+func familyTraceLinks(items []dashboard.DashboardItem, serviceName string, policy dashboard.DashboardPolicy, diagnostics *[]dashboard.Diagnostic) []model.Link {
 	if !policy.IncludeTraceLinks {
 		return nil
 	}
@@ -471,10 +475,11 @@ func kafkaOperationTable(items []dashboard.DashboardItem, class kafkaClass, serv
 	return panel, nil
 }
 
-// kafkaFamilies groups one operation class's metric references into
+// familyGroups groups one dependency class's metric references into
 // semantic families with overview-style capabilities. Topic, group,
-// payload and other raw dependency values never enter a key.
-func kafkaFamilies(items []dashboard.DashboardItem, class string, diagnostics *[]dashboard.Diagnostic) []metricFamily {
+// payload, SQL text, Redis keys and other raw dependency values never
+// enter a key.
+func familyGroups(items []dashboard.DashboardItem, diagnostics *[]dashboard.Diagnostic) []metricFamily {
 	byKey := make(map[string]*metricFamily)
 	for _, item := range items {
 		for _, metric := range item.Metrics {
@@ -530,15 +535,15 @@ func slicesConcat(values []string) string {
 	return result
 }
 
-func kafkaRateQuery(family *metricFamily, serviceName string, policy dashboard.DashboardPolicy) (*query.QueryPlan, string) {
+func familyRateQuery(family *metricFamily, label, serviceName string, policy dashboard.DashboardPolicy) (*query.QueryPlan, string) {
 	expression := &query.Aggregation{
 		By:   []string{"operation"},
 		Expr: &query.RateExpression{Selector: selectorForFamily(family, serviceName, nil), Interval: policy.RateInterval},
 	}
-	return kafkaOverviewPlan(family, "rate", expression, policy), "{{operation}}"
+	return familyPlan(family, "rate", label, expression, policy), "{{operation}}"
 }
 
-func kafkaErrorRatioQuery(family *metricFamily, serviceName string, policy dashboard.DashboardPolicy) (*query.QueryPlan, string) {
+func familyErrorRatioQuery(family *metricFamily, label, serviceName string, policy dashboard.DashboardPolicy) (*query.QueryPlan, string) {
 	numerator := selectorForFamily(family, serviceName, []query.LabelMatcher{{
 		Label: "status", Op: query.MatchRegex, Value: query.ErrorStatusPattern,
 	}})
@@ -551,10 +556,10 @@ func kafkaErrorRatioQuery(family *metricFamily, serviceName string, policy dashb
 		By:   []string{"operation"},
 		Expr: &query.RateExpression{Selector: denominator, Interval: policy.RateInterval},
 	}
-	return kafkaOverviewPlan(family, "error_ratio", &query.BinaryExpression{Op: query.BinaryDivide, Left: left, Right: right}, policy), "{{operation}}"
+	return familyPlan(family, "error_ratio", label, &query.BinaryExpression{Op: query.BinaryDivide, Left: left, Right: right}, policy), "{{operation}}"
 }
 
-func kafkaPercentileQuery(family *metricFamily, serviceName string, policy dashboard.DashboardPolicy, quantile float64) *query.QueryPlan {
+func familyPercentileQuery(family *metricFamily, label, serviceName string, policy dashboard.DashboardPolicy, quantile float64) *query.QueryPlan {
 	selector := selectorForFamily(family, serviceName, []query.LabelMatcher{{
 		Label: "le", Op: query.MatchNotEqual, Value: "+Inf",
 	}})
@@ -565,15 +570,15 @@ func kafkaPercentileQuery(family *metricFamily, serviceName string, policy dashb
 			Expr: &query.RateExpression{Selector: selector, Interval: policy.RateInterval},
 		},
 	}
-	return kafkaOverviewPlan(family, purposeForQuantile(quantile), expression, policy)
+	return familyPlan(family, purposeForQuantile(quantile), label, expression, policy)
 }
 
-func kafkaOverviewPlan(family *metricFamily, purpose string, expression query.Expression, policy dashboard.DashboardPolicy) *query.QueryPlan {
-	canonicalKey := "query:" + purpose + ":kafka:" + family.Key
+func familyPlan(family *metricFamily, purpose, label string, expression query.Expression, policy dashboard.DashboardPolicy) *query.QueryPlan {
+	canonicalKey := "query:" + purpose + ":" + label + ":" + family.Key
 	metadata := query.QueryMetadata{
 		Kind: query.QueryKindRate, CanonicalKey: canonicalKey,
 		PlanIDs:      append([]string(nil), family.PlanIDs...),
-		Provenance:   []string{"kafka:families[" + family.Key + "]"},
+		Provenance:   []string{label + ":families[" + family.Key + "]"},
 		RateInterval: policy.RateInterval,
 		HashVersion:  dashboard.HashVersion,
 	}
@@ -586,7 +591,7 @@ func kafkaOverviewPlan(family *metricFamily, purpose string, expression query.Ex
 		metadata.Quantiles = []float64{quantileForPurpose(purpose)}
 	}
 	return &query.QueryPlan{
-		CanonicalKey: canonicalKey, Kind: metadata.Kind, ItemID: "kafka:" + family.Key,
+		CanonicalKey: canonicalKey, Kind: metadata.Kind, ItemID: label + ":" + family.Key,
 		Purpose:    purpose,
 		PlanIDs:    append([]string(nil), family.PlanIDs...),
 		Expression: expression, Metadata: metadata,

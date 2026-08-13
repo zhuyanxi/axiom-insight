@@ -79,3 +79,10 @@
 
 - **直接且精准**：回答时直奔主题，避免无意义的客套话。直接给出重构后的完整代码块或精准的 Code Diff。
 - **主动风险提示**：如果给出的代码存在架构权衡（Trade-offs）、并发安全隐患或极端性能瓶颈，必须在代码下方使用简短的 Markdown Blockout 进行显式提示。
+
+
+# Workspace Rules
+
+- After completing any task in this workspace, always output a summary and description in English of the changes made (like a commit message: concise summary line + detailed description), placed inside a bash fenced code block so symbols and formatting are easy to copy.
+- Do NOT automatically run `git commit`. Only output the summary and description in your final response.
+- Always prefix CLI commands with `rtk` (see RTK.md: `rtk <command>`). Do not run raw commands.

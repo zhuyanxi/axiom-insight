@@ -1,7 +1,9 @@
 // Package category implements P2-07: the HTTP and gRPC category rows.
 // It consumes the P2-01 catalog, the P2-03 policy and the P2-05 query
 // planner, plans one row per endpoint category, and renders them into the
-// P2-02 model.
+// P2-02 model. BuildKafka (P2-08) and BuildDependencies (P2-09) extend
+// the same Plan/Render contract to Kafka and to Database, Cache and
+// client-dependency rows.
 //
 // Rules pinned by the story:
 //
