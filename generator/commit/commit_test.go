@@ -34,10 +34,11 @@ func (writer *faultWriter) CreateExclusive(path string, perm os.FileMode) (Write
 	writer.created = append(writer.created, path)
 	// The lock file must never fail; faults target the temporary files
 	// written during Commit.
-	if !strings.Contains(path, ".si-generate.lock") {
-		if writer.failCreate != nil {
-			return nil, writer.failCreate
-		}
+	if strings.Contains(path, ".si-generate.lock") {
+		return writer.FileWriter.CreateExclusive(path, perm)
+	}
+	if writer.failCreate != nil {
+		return nil, writer.failCreate
 	}
 	handle, err := writer.FileWriter.CreateExclusive(path, perm)
 	if err != nil {

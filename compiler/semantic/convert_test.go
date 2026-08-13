@@ -1,6 +1,8 @@
 package semantic
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	observabilityv1 "github.com/zhuyanxi/axiom-insight/ir/v1"
@@ -94,6 +96,15 @@ func TestToIRGeneratesDeterministicIDsAndOrdering(t *testing.T) {
 }
 
 func TestToIRDiagnostics(t *testing.T) {
+	outsideRoot := filepath.Join(t.TempDir(), "run.go")
+	if err := os.WriteFile(outsideRoot, []byte("package main\n"), 0o644); err != nil {
+		t.Fatalf("seed outside-root source file: %v", err)
+	}
+	sourceRoot := filepath.Join(t.TempDir(), "workspace", "orders")
+	if err := os.MkdirAll(sourceRoot, 0o755); err != nil {
+		t.Fatalf("create source root: %v", err)
+	}
+
 	tests := []struct {
 		name string
 		doc  Document
@@ -117,8 +128,8 @@ func TestToIRDiagnostics(t *testing.T) {
 		{
 			name: "absolute path outside root",
 			doc: Document{
-				Service:   Service{SourceRoot: "/workspace/orders"},
-				Functions: []Function{{Name: "Run", SourceLocation: SourceLocation{RelativePath: "/tmp/run.go", StartLine: 1}}},
+				Service:   Service{SourceRoot: sourceRoot},
+				Functions: []Function{{Name: "Run", SourceLocation: SourceLocation{RelativePath: outsideRoot, StartLine: 1}}},
 			},
 			want: []string{"INVALID_SOURCE_PATH"},
 		},
