@@ -96,11 +96,15 @@ func TestToIRGeneratesDeterministicIDsAndOrdering(t *testing.T) {
 }
 
 func TestToIRDiagnostics(t *testing.T) {
-	outsideRoot := filepath.Join(t.TempDir(), "run.go")
+	base := t.TempDir()
+	outsideRoot := filepath.Join(base, "outside", "run.go")
+	if err := os.MkdirAll(filepath.Dir(outsideRoot), 0o755); err != nil {
+		t.Fatalf("create outside-root directory: %v", err)
+	}
 	if err := os.WriteFile(outsideRoot, []byte("package main\n"), 0o644); err != nil {
 		t.Fatalf("seed outside-root source file: %v", err)
 	}
-	sourceRoot := filepath.Join(t.TempDir(), "workspace", "orders")
+	sourceRoot := filepath.Join(base, "workspace", "orders")
 	if err := os.MkdirAll(sourceRoot, 0o755); err != nil {
 		t.Fatalf("create source root: %v", err)
 	}
