@@ -168,6 +168,7 @@ func newRootCommand(stdout, stderr io.Writer) *cobra.Command {
 	scan.Flags().BoolVar(&options.version, "version", false, "print CLI and IR schema versions")
 	root.AddCommand(scan)
 	root.AddCommand(newGenerateCommand())
+	root.AddCommand(newDashboardCommand())
 	return root
 }
 

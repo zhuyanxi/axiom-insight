@@ -200,6 +200,43 @@ Exit codes: `0` success; `1` scan, plan, render, validate, or commit failure
 With `--format json`, stdout carries exactly one `cli.generate_report/v1`
 document (success or failure) and stderr stays empty.
 
+## CLI Dashboard
+
+Generate one offline Grafana dashboard definition from the analyzed source:
+
+```sh
+bin/si dashboard
+bin/si dashboard ./path/to/service
+bin/si dashboard ./path/to/service --output-dir dashboards --dry-run
+bin/si dashboard ./path/to/service --strict --format json
+bin/si dashboard --version
+```
+
+The default target is `<source-root>/dashboards/dashboard.json`. The command
+runs the complete Analyze -> Phase 1 Plan -> Dashboard Catalog -> Query/Panel
+Plan -> Render/Validate pipeline before committing anything. It does not
+connect to Grafana, Prometheus, or any other remote service. Dashboard policy
+is read from the optional `dashboard` node in `si.yaml`; CLI `--output-dir`
+and `--strict` overrides take precedence.
+
+`--dry-run` reports the deterministic SHA-256 and panel/query/row counts
+without creating the output directory, lock, temporary file, or dashboard.
+Existing `dashboard.json` is refused unless `--force` is supplied. Symlinks,
+non-regular files, and hard-linked targets are always rejected. A write uses
+an exclusive per-directory lock, exclusive temporary file, file and directory
+sync, and atomic rename; failures clean up temporary and lock files.
+
+`--format json` emits one controlled `cli.dashboard_report/v1` document on
+stdout. Text mode prints only a short summary and never prints the full
+dashboard JSON. `--strict` promotes dashboard warnings to exit code `1`
+before any output write. Exit code `2` means invalid path, flag, format, or
+configuration.
+
+Crash limitation: atomic rename protects the single managed file from
+truncation, but process termination, kernel failure, or power loss can still
+leave either the complete old file or the complete new file. The command
+does not import, deploy, or provision the dashboard in Grafana.
+
 ## Offline Fixture Tests
 
 Persistent Phase 0 fixtures live under `testdata/fixtures/`. Each fixture is
