@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/zhuyanxi/axiom-insight/dashboard"
 	"github.com/zhuyanxi/axiom-insight/dashboard/model"
+	"github.com/zhuyanxi/axiom-insight/generator/schemacheck"
 )
 
 func TestDashboardDefaultAC1(t *testing.T) {
@@ -102,6 +104,213 @@ func TestDashboardJSONReportAndVersion(t *testing.T) {
 			t.Fatalf("stderr = %q, want empty", stderr.String())
 		}
 	})
+
+	t.Run("written report", func(t *testing.T) {
+		root := generateFixture(t)
+		var stdout, stderr bytes.Buffer
+		code := run([]string{"dashboard", root, "--format", "json"}, &stdout, &stderr)
+		if code != 0 {
+			t.Fatalf("exit code = %d, want 0; stderr = %s", code, stderr.String())
+		}
+		report := parseDashboardReport(t, stdout.Bytes())
+		if report.Status != "success" || report.DryRun || len(report.Written) != 1 || report.Written[0] != dashboardFileName {
+			t.Fatalf("report = %+v", report)
+		}
+		if report.Diagnostics == nil {
+			t.Fatal("diagnostics must be explicit empty array")
+		}
+		if stderr.Len() != 0 {
+			t.Fatalf("stderr = %q, want empty", stderr.String())
+		}
+	})
+
+	t.Run("overwrite failure report", func(t *testing.T) {
+		root := generateFixture(t)
+		var stdout, stderr bytes.Buffer
+		if code := run([]string{"dashboard", root}, &stdout, &stderr); code != 0 {
+			t.Fatalf("initial exit code = %d; stderr = %s", code, stderr.String())
+		}
+		stdout.Reset()
+		stderr.Reset()
+		code := run([]string{"dashboard", root, "--format", "json"}, &stdout, &stderr)
+		if code != exitScanError {
+			t.Fatalf("exit code = %d, want %d", code, exitScanError)
+		}
+		report := parseDashboardReport(t, stdout.Bytes())
+		if report.Status != "failure" || report.Error == nil || report.Error.Code != dashboard.CodeOutputExists || report.Error.Stage != "commit" {
+			t.Fatalf("report = %+v", report)
+		}
+		if len(report.Written) != 0 || stderr.Len() != 0 {
+			t.Fatalf("written=%v stderr=%q", report.Written, stderr.String())
+		}
+	})
+}
+
+func TestDashboardJSONReportFailureMatrix(t *testing.T) {
+	t.Run("non-strict warning", func(t *testing.T) {
+		root := writeCLIProject(t, map[string]string{
+			"go.mod": "module example.com/report-warning\n\ngo 1.26.1\n",
+			"main.go": `package main
+
+import "net/http"
+
+func Call(target string) {
+	_, _ = http.Get(target)
+}
+`,
+			"si.yaml": "service:\n  name: bad service\n",
+		})
+		var stdout, stderr bytes.Buffer
+		code := run([]string{"dashboard", root, "--dry-run", "--format", "json"}, &stdout, &stderr)
+		if code != 0 {
+			t.Fatalf("exit code = %d, want 0; stderr = %s", code, stderr.String())
+		}
+		report := parseDashboardReport(t, stdout.Bytes())
+		if report.Status != "warning" || report.Error != nil || len(report.Diagnostics) == 0 || len(report.Written) != 0 {
+			t.Fatalf("report = %+v", report)
+		}
+		if stderr.Len() != 0 {
+			t.Fatalf("stderr = %q, want empty", stderr.String())
+		}
+	})
+
+	t.Run("invalid dashboard config", func(t *testing.T) {
+		root := writeCLIProject(t, map[string]string{
+			"go.mod":  "module example.com/report-config\n\ngo 1.26.1\n",
+			"main.go": "package main\n",
+			"si.yaml": "dashboard:\n  refresh: 45s\n",
+		})
+		var stdout, stderr bytes.Buffer
+		code := run([]string{"dashboard", root, "--format", "json"}, &stdout, &stderr)
+		if code != exitUsageError {
+			t.Fatalf("exit code = %d, want %d", code, exitUsageError)
+		}
+		report := parseDashboardReport(t, stdout.Bytes())
+		if report.Status != "failure" || report.Error == nil || report.Error.Code != dashboard.CodeInvalidConfig || report.Error.Stage != "flags" {
+			t.Fatalf("report = %+v", report)
+		}
+		if len(report.Written) != 0 || stderr.Len() != 0 {
+			t.Fatalf("written=%v stderr=%q", report.Written, stderr.String())
+		}
+	})
+
+	t.Run("strict warning", func(t *testing.T) {
+		root := writeCLIProject(t, map[string]string{
+			"go.mod": "module example.com/report-strict\n\ngo 1.26.1\n",
+			"main.go": `package main
+
+import "net/http"
+
+func Call(target string) {
+	_, _ = http.Get(target)
+}
+`,
+			"si.yaml": "service:\n  name: bad service\n",
+		})
+		var stdout, stderr bytes.Buffer
+		code := run([]string{"dashboard", root, "--strict", "--format", "json"}, &stdout, &stderr)
+		if code != exitScanError {
+			t.Fatalf("exit code = %d, want %d", code, exitScanError)
+		}
+		report := parseDashboardReport(t, stdout.Bytes())
+		if report.Status != "failure" || report.Error == nil || report.Error.Stage != "validate" || !strings.HasPrefix(report.Error.Code, "DASHBOARD_") {
+			t.Fatalf("report = %+v", report)
+		}
+		if report.DryRun || len(report.Written) != 0 || stderr.Len() != 0 {
+			t.Fatalf("dry_run=%v written=%v stderr=%q", report.DryRun, report.Written, stderr.String())
+		}
+	})
+}
+
+func TestDashboardReportContract(t *testing.T) {
+	root := generateFixture(t)
+	var stdout, stderr bytes.Buffer
+	if code := run([]string{"dashboard", root, "--dry-run", "--format", "json"}, &stdout, &stderr); code != 0 {
+		t.Fatalf("exit code = %d; stderr = %s", code, stderr.String())
+	}
+	schemaPath := filepath.Join("..", "..", "schemas", "dashboard", "v1", "cli-dashboard-report.schema.json")
+	schema, err := os.ReadFile(schemaPath)
+	if err != nil {
+		t.Fatalf("read report schema: %v", err)
+	}
+	if err := schemacheck.Validate(schema, stdout.Bytes()); err != nil {
+		t.Fatalf("report schema validation failed: %v\n%s", err, stdout.String())
+	}
+}
+
+func TestDashboardReportGolden(t *testing.T) {
+	root := filepath.Join("..", "..", "testdata", "fixtures", "http")
+	var stdout, stderr bytes.Buffer
+	if code := run([]string{"dashboard", root, "--dry-run", "--format", "json"}, &stdout, &stderr); code != 0 {
+		t.Fatalf("exit code = %d; stderr = %s", code, stderr.String())
+	}
+	goldenPath := filepath.Join("..", "..", "testdata", "dashboard", "cli", "expected-report.json")
+	expected, err := os.ReadFile(goldenPath)
+	if err != nil {
+		t.Fatalf("read report golden: %v", err)
+	}
+	if !bytes.Equal(stdout.Bytes(), append(expected, '\n')) && !bytes.Equal(stdout.Bytes(), expected) {
+		t.Fatalf("dashboard report differs from %s", goldenPath)
+	}
+}
+
+func TestDashboardReportOrderingRedactionAndLimit(t *testing.T) {
+	report := &dashboardReport{
+		SchemaVersion:          dashboardReportSchema,
+		Status:                 "warning",
+		CLIVersion:             cliVersion,
+		IRSchemaVersion:        "v1",
+		GeneratorSchemaVersion: "v0.2.0",
+		DashboardSchemaVersion: model.ContractVersion,
+		GrafanaSchemaVersion:   model.SchemaVersion,
+		CompletedStage:         "validate",
+		Written:                []string{},
+		Diagnostics: []dashboardReportDiagnostic{
+			{Code: dashboard.CodeEmptyCategory, Severity: "info", Category: "http", TargetID: "z"},
+			{Code: dashboard.CodeMissingRequiredMetric, Severity: "warning", Category: "catalog", TargetID: "b"},
+			{Code: dashboard.CodeMissingRequiredMetric, Severity: "warning", Category: "catalog", TargetID: "a"},
+		},
+	}
+	contents, err := marshalDashboardReport(report)
+	if err != nil {
+		t.Fatalf("marshal report: %v", err)
+	}
+	var decoded dashboardReport
+	if err := json.Unmarshal(contents, &decoded); err != nil {
+		t.Fatalf("decode report: %v", err)
+	}
+	if got := decoded.Diagnostics[0].TargetID; got != "a" {
+		t.Fatalf("first diagnostic target = %q, want a", got)
+	}
+	if got := decoded.Diagnostics[2].Severity; got != "info" {
+		t.Fatalf("last diagnostic severity = %q, want info", got)
+	}
+	canary := "canary-password-hunter2"
+	redacted := makeDashboardReportError(errors.New(canary), "render")
+	if strings.Contains(redacted.Message, canary) {
+		t.Fatalf("report error leaks canary: %q", redacted.Message)
+	}
+
+	large := *report
+	large.Diagnostics = make([]dashboardReportDiagnostic, 300)
+	for index := range large.Diagnostics {
+		large.Diagnostics[index] = dashboardReportDiagnostic{
+			Code: dashboard.CodeSensitiveValueDropped, Severity: "warning",
+			Message: strings.Repeat("x", maxDashboardReportText),
+		}
+	}
+	if _, err := marshalDashboardReport(&large); err == nil {
+		t.Fatal("oversized report accepted")
+	}
+}
+
+func parseDashboardReport(t *testing.T, contents []byte) dashboardReport {
+	t.Helper()
+	var report dashboardReport
+	if err := json.Unmarshal(contents, &report); err != nil {
+		t.Fatalf("parse dashboard report: %v\n%s", err, contents)
+	}
+	return report
 }
 
 func TestDashboardOutputProtectionAC3(t *testing.T) {

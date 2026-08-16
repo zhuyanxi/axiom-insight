@@ -1,0 +1,72 @@
+{
+  "schema_version": "cli.dashboard_report/v1",
+  "status": "success",
+  "cli_version": "v0.2.0",
+  "ir_schema_version": "v1",
+  "generator_schema_version": "v0.2.0",
+  "dashboard_schema_version": "grafana.dashboard/v1",
+  "grafana_schema_version": 41,
+  "service": "p0-http",
+  "completed_stage": "commit",
+  "dashboard": {
+    "name": "p0-http Observability",
+    "policy_digest": "794da3860d1bea59c56be5871e72fdd7ac52b60e9376ec3eb3b949d0d32284c6",
+    "sha256": "3e34fd640ca1602a5ca5b3cced60eeb0d3de545d8527d8d31354ee3cd226d0d8",
+    "panel_count": 20,
+    "query_count": 28,
+    "row_count": 2,
+    "existed_before": false
+  },
+  "dry_run": true,
+  "written": [],
+  "diagnostics": [
+    {
+      "code": "DASHBOARD_EMPTY_CATEGORY",
+      "severity": "info",
+      "category": "cache",
+      "target_id": "cache",
+      "field": "rows.cache.panels",
+      "message": "no redis dependency entities; the row is omitted"
+    },
+    {
+      "code": "DASHBOARD_EMPTY_CATEGORY",
+      "severity": "info",
+      "category": "database",
+      "target_id": "database",
+      "field": "rows.database.panels",
+      "message": "no sql dependency entities; the row is omitted"
+    },
+    {
+      "code": "DASHBOARD_EMPTY_CATEGORY",
+      "severity": "info",
+      "category": "http",
+      "target_id": "http",
+      "field": "rows.http.clients",
+      "message": "no http_client dependency entities; the row is omitted"
+    },
+    {
+      "code": "DASHBOARD_EMPTY_CATEGORY",
+      "severity": "info",
+      "category": "kafka",
+      "target_id": "kafka",
+      "field": "rows.kafka",
+      "message": "no Kafka producer or consumer entities; the row is omitted"
+    },
+    {
+      "code": "DASHBOARD_EMPTY_CATEGORY",
+      "severity": "info",
+      "category": "rpc",
+      "target_id": "rpc",
+      "field": "rows.rpc",
+      "message": "no rpc endpoint entities; the row is omitted"
+    },
+    {
+      "code": "DASHBOARD_EMPTY_CATEGORY",
+      "severity": "info",
+      "category": "rpc",
+      "target_id": "rpc",
+      "field": "rows.rpc.clients",
+      "message": "no rpc_client dependency entities; the row is omitted"
+    }
+  ]
+}

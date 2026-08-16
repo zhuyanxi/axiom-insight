@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -25,6 +26,8 @@ const (
 	dashboardFileName       = "dashboard.json"
 	dashboardLockName       = ".si-dashboard.lock"
 	dashboardTempName       = ".si-dashboard-tmp-dashboard.json"
+	maxDashboardReportBytes = 256 << 10
+	maxDashboardReportText  = 1024
 )
 
 type dashboardOptions struct {
@@ -52,8 +55,8 @@ type dashboardReport struct {
 	CompletedStage         string                      `json:"completed_stage"`
 	Dashboard              *dashboardReportSummary     `json:"dashboard,omitempty"`
 	DryRun                 bool                        `json:"dry_run"`
-	Written                []string                    `json:"written,omitempty"`
-	Diagnostics            []dashboardReportDiagnostic `json:"diagnostics,omitempty"`
+	Written                []string                    `json:"written"`
+	Diagnostics            []dashboardReportDiagnostic `json:"diagnostics"`
 	Error                  *dashboardReportError       `json:"error,omitempty"`
 }
 
@@ -70,14 +73,15 @@ type dashboardReportSummary struct {
 type dashboardReportDiagnostic struct {
 	Code     string `json:"code"`
 	Severity string `json:"severity"`
+	Category string `json:"category,omitempty"`
 	TargetID string `json:"target_id,omitempty"`
 	Field    string `json:"field,omitempty"`
 	Message  string `json:"message"`
 }
 
 type dashboardReportError struct {
-	Code    string `json:"code,omitempty"`
-	Stage   string `json:"stage,omitempty"`
+	Code    string `json:"code"`
+	Stage   string `json:"stage"`
 	Message string `json:"message"`
 }
 
@@ -132,6 +136,9 @@ func executeDashboard(command *cobra.Command, args []string, options dashboardOp
 		DashboardSchemaVersion: model.ContractVersion,
 		GrafanaSchemaVersion:   model.SchemaVersion,
 		CompletedStage:         "flags",
+		DryRun:                 options.dryRun,
+		Written:                []string{},
+		Diagnostics:            []dashboardReportDiagnostic{},
 	}
 
 	if options.version {
@@ -152,11 +159,21 @@ func executeDashboard(command *cobra.Command, args []string, options dashboardOp
 			report.Status = "failure"
 			report.Error = makeDashboardReportError(err, report.CompletedStage)
 		}
-		contents, marshalErr := json.MarshalIndent(report, "", "  ")
+		contents, marshalErr := marshalDashboardReport(report)
 		if marshalErr != nil {
-			return internalFailure(fmt.Errorf("marshal dashboard report: %w", marshalErr))
+			failure := internalFailure(fmt.Errorf("marshal dashboard report: %w", marshalErr))
+			report.Status = "failure"
+			report.Error = &dashboardReportError{
+				Code: cliInternalMessageCode, Stage: report.CompletedStage,
+				Message: "dashboard report could not be encoded within its size limit",
+			}
+			report.Diagnostics = []dashboardReportDiagnostic{}
+			contents, _ = marshalDashboardReport(report)
+			if len(contents) == 0 {
+				return failure
+			}
+			err = failure
 		}
-		contents = append(contents, '\n')
 		if _, writeErr := command.OutOrStdout().Write(contents); writeErr != nil {
 			return internalFailure(writeErr)
 		}
@@ -243,9 +260,11 @@ func executeDashboard(command *cobra.Command, args []string, options dashboardOp
 	for _, diagnostic := range dashboardPlan.Diagnostics() {
 		report.Diagnostics = append(report.Diagnostics, dashboardReportDiagnostic{
 			Code: diagnostic.Code, Severity: dashboardDiagnosticSeverity(diagnostic.Code),
+			Category: dashboardDiagnosticCategory(diagnostic),
 			TargetID: diagnostic.TargetID, Field: diagnostic.Field, Message: diagnostic.Message,
 		})
 	}
+	report.CompletedStage = "validate"
 	if firstDashboardWarningCode(dashboardPlan.Diagnostics()) != "" {
 		report.Status = "warning"
 	}
@@ -306,7 +325,101 @@ func makeDashboardReportError(err error, stage string) *dashboardReportError {
 			code = failure.messageCode
 		}
 	}
-	return &dashboardReportError{Code: code, Stage: stage, Message: err.Error()}
+	return &dashboardReportError{Code: code, Stage: stage, Message: dashboardReportMessage(code, stage)}
+}
+
+func dashboardReportMessage(code, stage string) string {
+	if code == "" {
+		return stage + " stage failed"
+	}
+	return fmt.Sprintf("%s stage failed (%s)", stage, code)
+}
+
+func marshalDashboardReport(report *dashboardReport) ([]byte, error) {
+	normalizeDashboardReport(report)
+	contents, err := json.MarshalIndent(report, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+	contents = append(contents, '\n')
+	if len(contents) > maxDashboardReportBytes {
+		return nil, fmt.Errorf("report exceeds %d-byte limit", maxDashboardReportBytes)
+	}
+	return contents, nil
+}
+
+func normalizeDashboardReport(report *dashboardReport) {
+	if report.Written == nil {
+		report.Written = []string{}
+	}
+	if report.Diagnostics == nil {
+		report.Diagnostics = []dashboardReportDiagnostic{}
+	}
+	for index := range report.Diagnostics {
+		report.Diagnostics[index].Code = trimDashboardReportText(report.Diagnostics[index].Code)
+		report.Diagnostics[index].Severity = trimDashboardReportText(report.Diagnostics[index].Severity)
+		report.Diagnostics[index].Category = trimDashboardReportText(report.Diagnostics[index].Category)
+		report.Diagnostics[index].TargetID = trimDashboardReportText(report.Diagnostics[index].TargetID)
+		report.Diagnostics[index].Field = trimDashboardReportText(report.Diagnostics[index].Field)
+		report.Diagnostics[index].Message = trimDashboardReportText(report.Diagnostics[index].Message)
+	}
+	sort.SliceStable(report.Diagnostics, func(left, right int) bool {
+		leftDiagnostic, rightDiagnostic := report.Diagnostics[left], report.Diagnostics[right]
+		if dashboardSeverityRank(leftDiagnostic.Severity) != dashboardSeverityRank(rightDiagnostic.Severity) {
+			return dashboardSeverityRank(leftDiagnostic.Severity) < dashboardSeverityRank(rightDiagnostic.Severity)
+		}
+		if leftDiagnostic.Category != rightDiagnostic.Category {
+			return leftDiagnostic.Category < rightDiagnostic.Category
+		}
+		if leftDiagnostic.TargetID != rightDiagnostic.TargetID {
+			return leftDiagnostic.TargetID < rightDiagnostic.TargetID
+		}
+		if leftDiagnostic.Code != rightDiagnostic.Code {
+			return leftDiagnostic.Code < rightDiagnostic.Code
+		}
+		if leftDiagnostic.Field != rightDiagnostic.Field {
+			return leftDiagnostic.Field < rightDiagnostic.Field
+		}
+		return leftDiagnostic.Message < rightDiagnostic.Message
+	})
+	if report.Error != nil {
+		report.Error.Code = trimDashboardReportText(report.Error.Code)
+		report.Error.Stage = trimDashboardReportText(report.Error.Stage)
+		report.Error.Message = trimDashboardReportText(report.Error.Message)
+	}
+}
+
+func trimDashboardReportText(value string) string {
+	value = strings.Map(func(character rune) rune {
+		if character < 0x20 || character == 0x7f {
+			return ' '
+		}
+		return character
+	}, value)
+	if len(value) <= maxDashboardReportText {
+		return value
+	}
+	return value[:maxDashboardReportText-3] + "..."
+}
+
+func dashboardSeverityRank(severity string) int {
+	switch severity {
+	case "error":
+		return 0
+	case "warning":
+		return 1
+	default:
+		return 2
+	}
+}
+
+func dashboardDiagnosticCategory(diagnostic dashboard.Diagnostic) string {
+	for _, category := range []string{"overview", "http", "rpc", "kafka", "database", "cache"} {
+		if strings.Contains(diagnostic.Field, category) {
+			return category
+		}
+	}
+	return "catalog"
 }
 
 func dashboardFailure(stage string, err error) error {

@@ -1,4 +1,4 @@
-# Dashboard CLI Contract (P2-11)
+# Dashboard CLI Contract (P2-11/P2-12)
 
 `si dashboard` converts one analyzed source tree into one deterministic,
 validated Grafana Dashboard JSON file. Generation is local and offline. The
@@ -63,9 +63,25 @@ validation failure.
 
 Text output is a short status line containing file name, counts, and SHA-256.
 It never prints the complete dashboard JSON. JSON output contains exactly one
-`cli.dashboard_report/v1` object after flags are accepted. The report carries
-schema versions, completed stage, dashboard name and policy digest, hash,
-counts, diagnostics, written names, and a redacted error summary when needed.
+`cli.dashboard_report/v1` object after flags are accepted. The report schema is
+[`schemas/dashboard/v1/cli-dashboard-report.schema.json`](../schemas/dashboard/v1/cli-dashboard-report.schema.json).
+
+Report fields include:
+
+- schema versions, service, completed stage, and `dry_run`;
+- dashboard name, policy digest, SHA-256, panel/query/row counts, and
+   `existed_before` when planning reached validation;
+- `written` and `diagnostics`, always encoded as arrays, including empty arrays;
+- diagnostics sorted by severity, category, target ID, code, field, then
+   message;
+- a short, stage/code-only error summary on failure. Complete dashboard JSON,
+   source paths, raw query data, and rejected values never enter the report.
+
+Report status is `success` for a clean run, `warning` for non-strict output
+with dashboard warnings, and `failure` for strict warnings or any pipeline
+failure. JSON reports are bounded at 256 KiB; an oversized report becomes a
+small `CLI_INTERNAL_ERROR` failure report rather than being emitted without a
+contract. JSON encoding failures never fall back to human text.
 
 Exit codes:
 

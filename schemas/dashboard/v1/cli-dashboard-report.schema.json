@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://axiom-insight.dev/schemas/dashboard/v1/cli-dashboard-report.schema.json",
+  "title": "Axiom Insight dashboard CLI report v1",
+  "description": "Closed machine-readable report emitted by si dashboard --format json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "cli_version",
+    "ir_schema_version",
+    "generator_schema_version",
+    "dashboard_schema_version",
+    "grafana_schema_version",
+    "completed_stage",
+    "dry_run",
+    "written",
+    "diagnostics"
+  ],
+  "properties": {
+    "schema_version": { "const": "cli.dashboard_report/v1" },
+    "status": { "type": "string", "enum": ["success", "warning", "failure"] },
+    "cli_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "ir_schema_version": { "type": "string", "const": "v1" },
+    "generator_schema_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "dashboard_schema_version": { "type": "string", "const": "grafana.dashboard/v1" },
+    "grafana_schema_version": { "type": "integer", "const": 41 },
+    "service": { "type": "string", "minLength": 1, "maxLength": 255 },
+    "completed_stage": {
+      "type": "string",
+      "enum": ["flags", "scan", "catalog", "plan", "render", "validate", "commit"]
+    },
+    "dashboard": { "$ref": "#/$defs/dashboard" },
+    "dry_run": { "type": "boolean" },
+    "written": {
+      "type": "array",
+      "maxItems": 1,
+      "items": { "const": "dashboard.json" }
+    },
+    "diagnostics": {
+      "type": "array",
+      "maxItems": 512,
+      "items": { "$ref": "#/$defs/diagnostic" }
+    },
+    "error": { "$ref": "#/$defs/error" }
+  },
+  "$defs": {
+    "dashboard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "policy_digest", "sha256", "panel_count", "query_count", "row_count", "existed_before"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "policy_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "panel_count": { "type": "integer", "minimum": 1 },
+        "query_count": { "type": "integer", "minimum": 0 },
+        "row_count": { "type": "integer", "minimum": 1 },
+        "existed_before": { "type": "boolean" }
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "severity", "message"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^(DASHBOARD_|CLI_)[A-Z0-9_]+$", "maxLength": 96 },
+        "severity": { "type": "string", "enum": ["info", "warning", "error"] },
+        "category": { "type": "string", "enum": ["catalog", "overview", "http", "rpc", "kafka", "database", "cache"] },
+        "target_id": { "type": "string", "maxLength": 1024 },
+        "field": { "type": "string", "maxLength": 1024 },
+        "message": { "type": "string", "minLength": 1, "maxLength": 1024 }
+      }
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "stage", "message"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^(DASHBOARD_|CLI_)[A-Z0-9_]+$", "maxLength": 96 },
+        "stage": { "type": "string", "enum": ["flags", "scan", "catalog", "plan", "render", "validate", "commit"] },
+        "message": { "type": "string", "minLength": 1, "maxLength": 1024 }
+      }
+    }
+  }
+}
