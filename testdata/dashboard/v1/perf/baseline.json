@@ -1,0 +1,6 @@
+{
+  "items": 1000,
+  "max_nanoseconds": 2000000000,
+  "max_allocated_bytes": 100663296,
+  "tolerance": 0.2
+}

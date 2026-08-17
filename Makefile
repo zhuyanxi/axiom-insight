@@ -1,5 +1,5 @@
 .PHONY: build test lint generate check-generated fixture-test race perf quality
-.PHONY: dashboard-test dashboard-contract-test dashboard-golden-test dashboard-compat-test dashboard-race phase2-quality
+.PHONY: dashboard-test dashboard-contract-test dashboard-golden-test dashboard-compat-test dashboard-race dashboard-perf dashboard-offline-test phase2-quality
 
 build:
 	go build ./...
@@ -91,7 +91,7 @@ dashboard-contract-test:
 
 # Every committed dashboard/CLI golden snapshot test.
 dashboard-golden-test:
-	go test ./dashboard/model ./dashboard/pipeline ./cmd/si-cli -run '^Test.*Golden$$' -count=1
+	go test ./dashboard/... ./cmd/si-cli -run 'Golden|P213DashboardGoldens' -count=1
 
 # Grafana Schema 41 compatibility corpus (model + pipeline).
 dashboard-compat-test:
@@ -100,12 +100,21 @@ dashboard-compat-test:
 dashboard-race:
 	go test -race ./dashboard/... ./cmd/si-cli -count=1
 
+dashboard-perf:
+	SI_ENFORCE_PERF_BUDGET=1 go test ./dashboard/pipeline -run TestP214DashboardPerformanceBudget1000 -count=1 -v
+	go test ./dashboard/pipeline -run '^$$' -bench BenchmarkP214Dashboard1000 -benchmem -count=1
+	go test ./cmd/si-cli -run '^$$' -bench BenchmarkP214DashboardScanToWrite -benchmem -count=1
+
+dashboard-offline-test:
+	GOPROXY=off GOSUMDB=off go test ./dashboard/... ./cmd/si-cli -count=1
+
 phase2-quality:
-	$(MAKE) build
-	$(MAKE) lint
+	$(MAKE) phase1-quality
 	$(MAKE) dashboard-test
 	$(MAKE) dashboard-contract-test
 	$(MAKE) dashboard-golden-test
 	$(MAKE) dashboard-compat-test
 	$(MAKE) dashboard-race
+	$(MAKE) dashboard-offline-test
+	$(MAKE) dashboard-perf
 	@echo "phase2-quality: all checks passed"
