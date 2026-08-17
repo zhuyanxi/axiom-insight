@@ -21,13 +21,14 @@ import (
 )
 
 const (
-	cliDashboardMessageCode = "CLI_DASHBOARD_ERROR"
-	dashboardReportSchema   = "cli.dashboard_report/v1"
-	dashboardFileName       = "dashboard.json"
-	dashboardLockName       = ".si-dashboard.lock"
-	dashboardTempName       = ".si-dashboard-tmp-dashboard.json"
-	maxDashboardReportBytes = 256 << 10
-	maxDashboardReportText  = 1024
+	cliDashboardMessageCode       = "CLI_DASHBOARD_ERROR"
+	dashboardReportSchema         = "cli.dashboard_report/v1"
+	dashboardFileName             = "dashboard.json"
+	dashboardLockName             = ".si-dashboard.lock"
+	dashboardTempName             = ".si-dashboard-tmp-dashboard.json"
+	maxDashboardReportBytes       = 256 << 10
+	maxDashboardReportDiagnostics = 512
+	maxDashboardReportText        = 1024
 )
 
 type dashboardOptions struct {
@@ -100,12 +101,6 @@ func newDashboardCommand() *cobra.Command {
 	command := &cobra.Command{
 		Use:   "dashboard [path]",
 		Short: "Generate an offline Grafana dashboard",
-		Args: func(_ *cobra.Command, args []string) error {
-			if len(args) > 1 {
-				return usageFailure(fmt.Errorf("dashboard accepts at most one path"))
-			}
-			return nil
-		},
 		RunE: func(command *cobra.Command, args []string) error {
 			return executeDashboard(command, args, options)
 		},
@@ -162,14 +157,10 @@ func executeDashboard(command *cobra.Command, args []string, options dashboardOp
 		contents, marshalErr := marshalDashboardReport(report)
 		if marshalErr != nil {
 			failure := internalFailure(fmt.Errorf("marshal dashboard report: %w", marshalErr))
-			report.Status = "failure"
-			report.Error = &dashboardReportError{
-				Code: cliInternalMessageCode, Stage: report.CompletedStage,
-				Message: "dashboard report could not be encoded within its size limit",
-			}
-			report.Diagnostics = []dashboardReportDiagnostic{}
-			contents, _ = marshalDashboardReport(report)
-			if len(contents) == 0 {
+			resetDashboardReportForEncodingFailure(report)
+			var fallbackErr error
+			contents, fallbackErr = marshalDashboardReport(report)
+			if fallbackErr != nil {
 				return failure
 			}
 			err = failure
@@ -185,6 +176,9 @@ func executeDashboard(command *cobra.Command, args []string, options dashboardOp
 			return failure
 		}
 		return &commandError{exitCode: exitScanError, messageCode: cliDashboardMessageCode, err: err, reported: true}
+	}
+	if len(args) > 1 {
+		return finish(usageFailure(fmt.Errorf("dashboard accepts at most one path")))
 	}
 
 	sourceRoot := "."
@@ -355,8 +349,13 @@ func normalizeDashboardReport(report *dashboardReport) {
 	if report.Diagnostics == nil {
 		report.Diagnostics = []dashboardReportDiagnostic{}
 	}
+	report.CLIVersion = trimDashboardReportField(report.CLIVersion, 64)
+	report.IRSchemaVersion = trimDashboardReportField(report.IRSchemaVersion, 64)
+	report.GeneratorSchemaVersion = trimDashboardReportField(report.GeneratorSchemaVersion, 64)
+	report.DashboardSchemaVersion = trimDashboardReportField(report.DashboardSchemaVersion, 64)
+	report.Service = trimDashboardReportField(report.Service, 255)
 	for index := range report.Diagnostics {
-		report.Diagnostics[index].Code = trimDashboardReportText(report.Diagnostics[index].Code)
+		report.Diagnostics[index].Code = trimDashboardReportField(report.Diagnostics[index].Code, 96)
 		report.Diagnostics[index].Severity = trimDashboardReportText(report.Diagnostics[index].Severity)
 		report.Diagnostics[index].Category = trimDashboardReportText(report.Diagnostics[index].Category)
 		report.Diagnostics[index].TargetID = trimDashboardReportText(report.Diagnostics[index].TargetID)
@@ -382,10 +381,38 @@ func normalizeDashboardReport(report *dashboardReport) {
 		}
 		return leftDiagnostic.Message < rightDiagnostic.Message
 	})
+	if len(report.Diagnostics) > maxDashboardReportDiagnostics {
+		report.Diagnostics = report.Diagnostics[:maxDashboardReportDiagnostics]
+	}
+	if report.Dashboard != nil {
+		report.Dashboard.Name = trimDashboardReportField(report.Dashboard.Name, 255)
+		report.Dashboard.PolicyDigest = trimDashboardReportField(report.Dashboard.PolicyDigest, 64)
+		report.Dashboard.SHA256 = trimDashboardReportField(report.Dashboard.SHA256, 64)
+	}
 	if report.Error != nil {
-		report.Error.Code = trimDashboardReportText(report.Error.Code)
+		report.Error.Code = trimDashboardReportField(report.Error.Code, 96)
 		report.Error.Stage = trimDashboardReportText(report.Error.Stage)
 		report.Error.Message = trimDashboardReportText(report.Error.Message)
+	}
+}
+
+func trimDashboardReportField(value string, limit int) string {
+	value = trimDashboardReportText(value)
+	if len(value) <= limit {
+		return value
+	}
+	return value[:limit]
+}
+
+func resetDashboardReportForEncodingFailure(report *dashboardReport) {
+	report.Status = "failure"
+	report.Service = ""
+	report.Dashboard = nil
+	report.Written = []string{}
+	report.Diagnostics = []dashboardReportDiagnostic{}
+	report.Error = &dashboardReportError{
+		Code: cliInternalMessageCode, Stage: report.CompletedStage,
+		Message: "dashboard report could not be encoded within its size limit",
 	}
 }
 

@@ -8,7 +8,7 @@
 // properties, additionalProperties (boolean), required, items (single
 // schema), enum, const, minItems, uniqueItems, minLength, pattern,
 // minimum, maximum, exclusiveMinimum, exclusiveMaximum, oneOf, anyOf,
-// allOf. Anything else in a schema is ignored; the generator schemas are
+// allOf, not. Anything else in a schema is ignored; the generator schemas are
 // tested to only use these keywords.
 package schemacheck
 
@@ -123,6 +123,11 @@ func (checker *validator) validate(schema map[string]any, document any, path str
 	for _, keyword := range []string{"allOf", "anyOf", "oneOf"} {
 		if err := checker.validateCombinators(keyword, schema, document, path); err != nil {
 			return err
+		}
+	}
+	if raw, ok := schema["not"].(map[string]any); ok {
+		if checker.validate(raw, document, path) == nil {
+			return fmt.Errorf("%s: value matches forbidden schema", path)
 		}
 	}
 	return nil

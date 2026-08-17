@@ -64,6 +64,21 @@ func TestDashboardDryRunAC2(t *testing.T) {
 }
 
 func TestDashboardJSONReportAndVersion(t *testing.T) {
+	t.Run("argument failure report", func(t *testing.T) {
+		var stdout, stderr bytes.Buffer
+		code := run([]string{"dashboard", "one", "two", "--format", "json"}, &stdout, &stderr)
+		if code != exitUsageError {
+			t.Fatalf("exit code = %d, want %d", code, exitUsageError)
+		}
+		report := parseDashboardReport(t, stdout.Bytes())
+		if report.Status != "failure" || report.Error == nil || report.Error.Code != cliUsageMessageCode || report.Error.Stage != "flags" {
+			t.Fatalf("report = %+v", report)
+		}
+		if stderr.Len() != 0 {
+			t.Fatalf("stderr = %q, want empty", stderr.String())
+		}
+	})
+
 	t.Run("success", func(t *testing.T) {
 		root := generateFixture(t)
 		var stdout, stderr bytes.Buffer
@@ -301,6 +316,53 @@ func TestDashboardReportOrderingRedactionAndLimit(t *testing.T) {
 	}
 	if _, err := marshalDashboardReport(&large); err == nil {
 		t.Fatal("oversized report accepted")
+	}
+	tooMany := *report
+	tooMany.Diagnostics = make([]dashboardReportDiagnostic, maxDashboardReportDiagnostics+1)
+	contents, err = marshalDashboardReport(&tooMany)
+	if err != nil {
+		t.Fatalf("bounded report: %v", err)
+	}
+	if len(tooMany.Diagnostics) != maxDashboardReportDiagnostics {
+		t.Fatalf("diagnostics = %d, want %d", len(tooMany.Diagnostics), maxDashboardReportDiagnostics)
+	}
+
+	oversized := &dashboardReport{
+		SchemaVersion:  dashboardReportSchema,
+		Status:         "failure",
+		CompletedStage: "flags",
+		Written:        []string{},
+		Diagnostics:    make([]dashboardReportDiagnostic, 300),
+	}
+	for index := range oversized.Diagnostics {
+		oversized.Diagnostics[index] = dashboardReportDiagnostic{
+			Code: dashboard.CodeSensitiveValueDropped, Severity: "warning",
+			Message: strings.Repeat("x", maxDashboardReportText),
+		}
+	}
+	if _, err := marshalDashboardReport(oversized); err == nil {
+		t.Fatal("oversized report accepted before fallback")
+	}
+	resetDashboardReportForEncodingFailure(oversized)
+	contents, err = marshalDashboardReport(oversized)
+	if err != nil || len(contents) > maxDashboardReportBytes {
+		t.Fatalf("fallback report err=%v size=%d", err, len(contents))
+	}
+}
+
+func TestDashboardReportSchemaStateRules(t *testing.T) {
+	schemaPath := filepath.Join("..", "..", "schemas", "dashboard", "v1", "cli-dashboard-report.schema.json")
+	schema, err := os.ReadFile(schemaPath)
+	if err != nil {
+		t.Fatalf("read report schema: %v", err)
+	}
+	valid := []byte(`{"schema_version":"cli.dashboard_report/v1","status":"failure","cli_version":"v0.2.0","ir_schema_version":"v1","generator_schema_version":"v0.2.0","dashboard_schema_version":"grafana.dashboard/v1","grafana_schema_version":41,"completed_stage":"flags","dry_run":false,"written":[],"diagnostics":[],"error":{"code":"CLI_INVALID_ARGUMENT","stage":"flags","message":"flags stage failed (CLI_INVALID_ARGUMENT)"}}`)
+	if err := schemacheck.Validate(schema, valid); err != nil {
+		t.Fatalf("valid failure report rejected: %v", err)
+	}
+	invalid := []byte(`{"schema_version":"cli.dashboard_report/v1","status":"failure","cli_version":"v0.2.0","ir_schema_version":"v1","generator_schema_version":"v0.2.0","dashboard_schema_version":"grafana.dashboard/v1","grafana_schema_version":41,"completed_stage":"flags","dry_run":true,"written":["dashboard.json"],"diagnostics":[]}`)
+	if err := schemacheck.Validate(schema, invalid); err == nil {
+		t.Fatal("invalid report state accepted")
 	}
 }
 

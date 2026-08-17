@@ -45,6 +45,33 @@
     },
     "error": { "$ref": "#/$defs/error" }
   },
+  "allOf": [
+    {
+      "oneOf": [
+        {
+          "properties": { "status": { "const": "failure" } },
+          "required": ["error"]
+        },
+        {
+          "properties": { "status": { "enum": ["success", "warning"] } },
+          "not": { "required": ["error"] }
+        }
+      ]
+    },
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "dry_run": { "const": true },
+            "written": { "maxItems": 0 }
+          }
+        },
+        {
+          "properties": { "dry_run": { "const": false } }
+        }
+      ]
+    }
+  ],
   "$defs": {
     "dashboard": {
       "type": "object",
