@@ -226,14 +226,15 @@ func p213DegradeCatalog(catalog *dashboard.DashboardCatalog) {
 		catalog.Items[itemIndex].Metrics = filtered
 		catalog.Items[itemIndex].Spans = nil
 		catalog.Items[itemIndex].Capabilities = dashboard.Capabilities{}
-		for metricIndex := range filtered {
-			metric := filtered[metricIndex]
-			if metric.Type != "counter" {
-				continue
-			}
-			catalog.Items[itemIndex].Capabilities.Rate = dashboard.QueryCapability{Available: hasP213Attributes(metric.Attributes, "service", "operation")}
-			catalog.Items[itemIndex].Capabilities.ErrorRatio = dashboard.QueryCapability{Available: hasP213Attributes(metric.Attributes, "status")}
+		// filtered holds only counter metrics; a capability is available
+		// when any surviving counter carries the required attributes.
+		rateAvailable, errorRatioAvailable := false, false
+		for _, metric := range filtered {
+			rateAvailable = rateAvailable || hasP213Attributes(metric.Attributes, "service", "operation")
+			errorRatioAvailable = errorRatioAvailable || hasP213Attributes(metric.Attributes, "status")
 		}
+		catalog.Items[itemIndex].Capabilities.Rate = dashboard.QueryCapability{Available: rateAvailable}
+		catalog.Items[itemIndex].Capabilities.ErrorRatio = dashboard.QueryCapability{Available: errorRatioAvailable}
 	}
 }
 

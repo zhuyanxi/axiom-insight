@@ -11,5 +11,10 @@ Committed Dashboard outputs:
 - `golden/no-client-dependencies/dashboard.json`
 - `golden/degraded/dashboard.json`
 
+Committed config fixtures (consumed by `dashboard.TestP213ConfigFixtures`):
+
+- `config/default.yaml`
+- `config/invalid-refresh.yaml`
+
 `testdata/dashboard/corpus` holds Grafana Schema 41 compatibility fixtures.
 See `docs/22-dashboard-fixtures.md` for update and contribution rules.

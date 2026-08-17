@@ -16,7 +16,8 @@ import (
 
 // TestP213SensitiveCanaryFullChain checks IR -> GenerationPlan -> Catalog ->
 // Dashboard render. Raw dependency values must not reach any dashboard
-// artifact, diagnostic or error string.
+// artifact or diagnostic. Stage errors abort via t.Fatalf; their messages
+// are not scanned for canaries here.
 func TestP213SensitiveCanaryFullChain(t *testing.T) {
 	document := p213SensitiveDocument()
 	plan, err := p213PlanDocument(t, document)

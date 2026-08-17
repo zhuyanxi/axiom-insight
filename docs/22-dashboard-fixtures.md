@@ -11,8 +11,9 @@ Catalog builder, so one IR fixture cannot drift from Phase 1 semantics.
 | Composite IR and all entity kinds | `testdata/generator/ir/composite.json` |
 | Dynamic targets | `testdata/generator/ir/dynamic-targets.json` |
 | Naming collisions | `testdata/generator/ir/naming-collisions.json` |
-| Sensitive values | `dashboard/sensitiveDocument` and `TestP213SensitiveCanaryFullChain` |
+| Sensitive values | `dashboard/pipeline.p213SensitiveDocument` and `TestP213SensitiveCanaryFullChain` |
 | Invalid references | `testdata/generator/ir/invalid-references.json` |
+| Dashboard config (valid + invalid refresh) | `testdata/dashboard/v1/config/default.yaml` and `invalid-refresh.yaml` |
 | Grafana Schema 41 corpus | `testdata/dashboard/corpus/*.json` |
 | Dashboard Goldens | `testdata/dashboard/v1/golden/*/dashboard.json` |
 

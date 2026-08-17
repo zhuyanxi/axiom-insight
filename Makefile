@@ -80,20 +80,25 @@ phase1-quality:
 
 # --- Phase 2 quality gates (P2-13) --------------------------------------
 
+# Full dashboard suite (unit, golden, contract, canary, P2-13): no -run
+# filter, so every dashboard and CLI test runs in the phase2 gate.
 dashboard-test:
-	go test ./dashboard/... ./cmd/si-cli -run 'P213|Dashboard' -count=1
+	go test ./dashboard/... ./cmd/si-cli -count=1
 
+# Report contract and schema-state rules only (cmd/si-cli package).
 dashboard-contract-test:
-	go test ./dashboard/model ./dashboard/pipeline -run 'Contract|Corpus|P213' -count=1
+	go test ./cmd/si-cli -run '^TestDashboardReport(Contract|SchemaStateRules)$$' -count=1
 
+# Every committed dashboard/CLI golden snapshot test.
 dashboard-golden-test:
-	go test ./dashboard/... ./cmd/si-cli -run 'Golden|P213DashboardGoldens' -count=1
+	go test ./dashboard/model ./dashboard/pipeline ./cmd/si-cli -run '^Test.*Golden$$' -count=1
 
+# Grafana Schema 41 compatibility corpus (model + pipeline).
 dashboard-compat-test:
-	go test ./dashboard/model ./dashboard/pipeline -run 'Corpus|Compatibility' -count=1
+	go test ./dashboard/model ./dashboard/pipeline -run '^Test(CorpusAC4|P213CompatibilityCorpus)$$' -count=1
 
 dashboard-race:
-	go test -race ./dashboard/... ./cmd/si-cli -run 'P213|Dashboard' -count=1
+	go test -race ./dashboard/... ./cmd/si-cli -count=1
 
 phase2-quality:
 	$(MAKE) build
