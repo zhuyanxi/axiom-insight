@@ -1,0 +1,23 @@
+{
+  "schema_version": "cli.dashboard_report/v1",
+  "status": "success",
+  "cli_version": "v0.3.0",
+  "ir_schema_version": "v1",
+  "generator_schema_version": "v0.2.0",
+  "dashboard_schema_version": "grafana.dashboard/v1",
+  "grafana_schema_version": 41,
+  "service": "checkout",
+  "completed_stage": "commit",
+  "dashboard": {
+    "name": "checkout Observability",
+    "policy_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "panel_count": 1,
+    "query_count": 1,
+    "row_count": 1,
+    "existed_before": false
+  },
+  "dry_run": false,
+  "written": ["dashboard.json"],
+  "diagnostics": []
+}

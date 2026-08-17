@@ -1,0 +1,12 @@
+dashboard:
+  output_dir: dashboards
+  title_suffix: Observability
+  datasource_variable_name: datasource
+  include_trace_links: true
+  include_client_dependencies: true
+  rate_interval: $__rate_interval
+  timezone: browser
+  refresh: 30s
+  max_panels: 200
+  max_queries: 500
+  strict: false

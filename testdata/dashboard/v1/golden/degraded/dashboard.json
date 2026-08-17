@@ -1,0 +1,1468 @@
+{
+  "schemaVersion": 41,
+  "title": "payment Observability",
+  "uid": "si-payment-v1",
+  "id": null,
+  "version": 0,
+  "editable": true,
+  "timezone": "browser",
+  "refresh": "30s",
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "hide": 0,
+        "query": "prometheus"
+      },
+      {
+        "name": "operation",
+        "type": "custom",
+        "options": [
+          {
+            "text": "call",
+            "value": "call"
+          },
+          {
+            "text": "charge",
+            "value": "charge"
+          },
+          {
+            "text": "get",
+            "value": "get"
+          },
+          {
+            "text": "invoke",
+            "value": "invoke"
+          },
+          {
+            "text": "produce",
+            "value": "produce"
+          },
+          {
+            "text": "query",
+            "value": "query"
+          }
+        ],
+        "current": {
+          "text": "call",
+          "value": "call"
+        },
+        "multi": true,
+        "includeAll": true
+      }
+    ]
+  },
+  "rows": [
+    {
+      "id": 976124474,
+      "title": "Service Overview",
+      "description": "Service-wide request, error and latency signals identified by the Phase 1 Instrumentation Plan; data requires runtime instrumentation.",
+      "panels": [
+        {
+          "id": 427730621,
+          "title": "Request Rate",
+          "description": "Rate of handled operations per second across all dashboard categories sharing the same metric family.",
+          "type": "stat",
+          "gridPos": {
+            "x": 0,
+            "y": 9,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(client_http_requests_total{service=\"payment\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "rate",
+                "categories": [
+                  "http"
+                ],
+                "item_ids": [
+                  "dep:http:gateway"
+                ],
+                "plan_ids": [
+                  "m:client:http"
+                ]
+              }
+            },
+            {
+              "refId": "B",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(client_rpc_requests_total{service=\"payment\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "rate",
+                "categories": [
+                  "rpc"
+                ],
+                "item_ids": [
+                  "dep:rpc:ledger"
+                ],
+                "plan_ids": [
+                  "m:client:rpc"
+                ]
+              }
+            },
+            {
+              "refId": "C",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(http_requests_total{service=\"payment\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "rate",
+                "categories": [
+                  "http"
+                ],
+                "item_ids": [
+                  "ep:http:get"
+                ],
+                "plan_ids": [
+                  "m:http:count"
+                ]
+              }
+            },
+            {
+              "refId": "D",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(kafka_messages_total{service=\"payment\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "rate",
+                "categories": [
+                  "kafka"
+                ],
+                "item_ids": [
+                  "dep:kafka:orders"
+                ],
+                "plan_ids": [
+                  "m:kafka:count"
+                ]
+              }
+            },
+            {
+              "refId": "E",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(redis_commands_total{service=\"payment\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "rate",
+                "categories": [
+                  "cache"
+                ],
+                "item_ids": [
+                  "dep:redis:session"
+                ],
+                "plan_ids": [
+                  "m:redis:count"
+                ]
+              }
+            },
+            {
+              "refId": "F",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(rpc_requests_total{service=\"payment\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "rate",
+                "categories": [
+                  "rpc"
+                ],
+                "item_ids": [
+                  "ep:rpc:charge"
+                ],
+                "plan_ids": [
+                  "m:rpc:count"
+                ]
+              }
+            },
+            {
+              "refId": "G",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(sql_queries_total{service=\"payment\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "rate",
+                "categories": [
+                  "database"
+                ],
+                "item_ids": [
+                  "dep:sql:orders"
+                ],
+                "plan_ids": [
+                  "m:sql:count"
+                ]
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 2135365780,
+          "title": "Error Ratio",
+          "description": "Share of operations ending in the fixed error status pattern (5xx or error) across all metric families.",
+          "type": "stat",
+          "gridPos": {
+            "x": 6,
+            "y": 9,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "(sum by (operation) (rate(client_http_requests_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(client_http_requests_total{service=\"payment\"}[$__rate_interval])))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "error_ratio",
+                "categories": [
+                  "http"
+                ],
+                "item_ids": [
+                  "dep:http:gateway"
+                ],
+                "plan_ids": [
+                  "m:client:http"
+                ]
+              }
+            },
+            {
+              "refId": "B",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "(sum by (operation) (rate(client_rpc_requests_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(client_rpc_requests_total{service=\"payment\"}[$__rate_interval])))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "error_ratio",
+                "categories": [
+                  "rpc"
+                ],
+                "item_ids": [
+                  "dep:rpc:ledger"
+                ],
+                "plan_ids": [
+                  "m:client:rpc"
+                ]
+              }
+            },
+            {
+              "refId": "C",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "(sum by (operation) (rate(http_requests_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(http_requests_total{service=\"payment\"}[$__rate_interval])))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "error_ratio",
+                "categories": [
+                  "http"
+                ],
+                "item_ids": [
+                  "ep:http:get"
+                ],
+                "plan_ids": [
+                  "m:http:count"
+                ]
+              }
+            },
+            {
+              "refId": "D",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "(sum by (operation) (rate(kafka_messages_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(kafka_messages_total{service=\"payment\"}[$__rate_interval])))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "error_ratio",
+                "categories": [
+                  "kafka"
+                ],
+                "item_ids": [
+                  "dep:kafka:orders"
+                ],
+                "plan_ids": [
+                  "m:kafka:count"
+                ]
+              }
+            },
+            {
+              "refId": "E",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "(sum by (operation) (rate(redis_commands_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(redis_commands_total{service=\"payment\"}[$__rate_interval])))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "error_ratio",
+                "categories": [
+                  "cache"
+                ],
+                "item_ids": [
+                  "dep:redis:session"
+                ],
+                "plan_ids": [
+                  "m:redis:count"
+                ]
+              }
+            },
+            {
+              "refId": "F",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "(sum by (operation) (rate(rpc_requests_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(rpc_requests_total{service=\"payment\"}[$__rate_interval])))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "error_ratio",
+                "categories": [
+                  "rpc"
+                ],
+                "item_ids": [
+                  "ep:rpc:charge"
+                ],
+                "plan_ids": [
+                  "m:rpc:count"
+                ]
+              }
+            },
+            {
+              "refId": "G",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "(sum by (operation) (rate(sql_queries_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(sql_queries_total{service=\"payment\"}[$__rate_interval])))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "error_ratio",
+                "categories": [
+                  "database"
+                ],
+                "item_ids": [
+                  "dep:sql:orders"
+                ],
+                "plan_ids": [
+                  "m:sql:count"
+                ]
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 36511138,
+          "title": "Top Failing Operations",
+          "description": "Error rate per operation across all metric families; the table is client-sorted to surface the highest failure rate.",
+          "type": "table",
+          "gridPos": {
+            "x": 0,
+            "y": 1,
+            "w": 24,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(client_http_requests_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "top_failing",
+                "categories": [
+                  "http"
+                ],
+                "item_ids": [
+                  "dep:http:gateway"
+                ],
+                "plan_ids": [
+                  "m:client:http"
+                ]
+              }
+            },
+            {
+              "refId": "B",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(client_rpc_requests_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "top_failing",
+                "categories": [
+                  "rpc"
+                ],
+                "item_ids": [
+                  "dep:rpc:ledger"
+                ],
+                "plan_ids": [
+                  "m:client:rpc"
+                ]
+              }
+            },
+            {
+              "refId": "C",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(http_requests_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "top_failing",
+                "categories": [
+                  "http"
+                ],
+                "item_ids": [
+                  "ep:http:get"
+                ],
+                "plan_ids": [
+                  "m:http:count"
+                ]
+              }
+            },
+            {
+              "refId": "D",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(kafka_messages_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "top_failing",
+                "categories": [
+                  "kafka"
+                ],
+                "item_ids": [
+                  "dep:kafka:orders"
+                ],
+                "plan_ids": [
+                  "m:kafka:count"
+                ]
+              }
+            },
+            {
+              "refId": "E",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(redis_commands_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "top_failing",
+                "categories": [
+                  "cache"
+                ],
+                "item_ids": [
+                  "dep:redis:session"
+                ],
+                "plan_ids": [
+                  "m:redis:count"
+                ]
+              }
+            },
+            {
+              "refId": "F",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(rpc_requests_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "top_failing",
+                "categories": [
+                  "rpc"
+                ],
+                "item_ids": [
+                  "ep:rpc:charge"
+                ],
+                "plan_ids": [
+                  "m:rpc:count"
+                ]
+              }
+            },
+            {
+              "refId": "G",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(sql_queries_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "kind": "top_failing",
+                "categories": [
+                  "database"
+                ],
+                "item_ids": [
+                  "dep:sql:orders"
+                ],
+                "plan_ids": [
+                  "m:sql:count"
+                ]
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 99148781,
+      "title": "HTTP",
+      "description": "HTTP endpoints identified by the Phase 1 Instrumentation Plan; data requires runtime instrumentation.",
+      "panels": [
+        {
+          "id": 1712525249,
+          "title": "HTTP get error ratio",
+          "description": "Share of requests ending in the fixed error status pattern (5xx or error); requires runtime instrumentation.",
+          "type": "stat",
+          "gridPos": {
+            "x": 6,
+            "y": 18,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "(sum by (operation) (rate(http_requests_total{operation=\"get\",service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(http_requests_total{service=\"payment\",operation=\"get\"}[$__rate_interval])))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:http:count",
+                "target_id": "ep:http:get",
+                "kind": "error_ratio"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 1279680777,
+          "title": "HTTP get request rate",
+          "description": "Request rate of this endpoint; requires runtime instrumentation from the Phase 1 Instrumentation Plan.",
+          "type": "stat",
+          "gridPos": {
+            "x": 0,
+            "y": 18,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(http_requests_total{operation=\"get\",service=\"payment\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:http:count",
+                "target_id": "ep:http:get",
+                "kind": "rate"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 2040599638,
+          "title": "HTTP operations",
+          "description": "Request rate per operation across the counter metric families of this category; requires runtime instrumentation.",
+          "type": "table",
+          "gridPos": {
+            "x": 0,
+            "y": 26,
+            "w": 24,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(http_requests_total{service=\"payment\",operation=\"get\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:http:count",
+                "target_id": "ep:http:get",
+                "kind": "operation_breakdown"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 466486556,
+      "title": "RPC",
+      "description": "gRPC endpoints identified by the Phase 1 Instrumentation Plan; data requires runtime instrumentation.",
+      "panels": [
+        {
+          "id": 1388764381,
+          "title": "RPC charge error ratio",
+          "description": "Share of requests ending in the fixed error status pattern (5xx or error); requires runtime instrumentation.",
+          "type": "stat",
+          "gridPos": {
+            "x": 0,
+            "y": 35,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "(sum by (operation) (rate(rpc_requests_total{operation=\"charge\",service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(rpc_requests_total{service=\"payment\",operation=\"charge\"}[$__rate_interval])))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:rpc:count",
+                "target_id": "ep:rpc:charge",
+                "kind": "error_ratio"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 1475492501,
+          "title": "RPC charge request rate",
+          "description": "Request rate of this endpoint; requires runtime instrumentation from the Phase 1 Instrumentation Plan.",
+          "type": "stat",
+          "gridPos": {
+            "x": 6,
+            "y": 35,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(rpc_requests_total{operation=\"charge\",service=\"payment\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:rpc:count",
+                "target_id": "ep:rpc:charge",
+                "kind": "rate"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 1933754889,
+          "title": "RPC operations",
+          "description": "Request rate per operation across the counter metric families of this category; requires runtime instrumentation.",
+          "type": "table",
+          "gridPos": {
+            "x": 0,
+            "y": 43,
+            "w": 24,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(rpc_requests_total{service=\"payment\",operation=\"charge\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:rpc:count",
+                "target_id": "ep:rpc:charge",
+                "kind": "operation_breakdown"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 1748340841,
+      "title": "Kafka",
+      "description": "Kafka producer and consumer calls identified by the Phase 1 Instrumentation Plan; data requires runtime instrumentation.",
+      "panels": [
+        {
+          "id": 2013289640,
+          "title": "Kafka producer error ratio",
+          "description": "Share of Kafka producer operations ending in the fixed error status pattern; requires runtime instrumentation.",
+          "type": "stat",
+          "gridPos": {
+            "x": 6,
+            "y": 60,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "(sum by (operation) (rate(kafka_messages_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(kafka_messages_total{service=\"payment\"}[$__rate_interval])))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:kafka:count",
+                "target_id": "dep:kafka:orders",
+                "kind": "error_ratio"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 1165120018,
+          "title": "Kafka producer operations",
+          "description": "Operation rate breakdown across the Kafka producer counter metric families; requires runtime instrumentation.",
+          "type": "table",
+          "gridPos": {
+            "x": 0,
+            "y": 52,
+            "w": 24,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(kafka_messages_total{service=\"payment\",operation=\"produce\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:kafka:count",
+                "target_id": "dep:kafka:orders",
+                "kind": "operation_breakdown"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 1177380818,
+          "title": "Kafka producer request rate",
+          "description": "Rate of Kafka producer operations; requires runtime instrumentation from the Phase 1 Instrumentation Plan.",
+          "type": "stat",
+          "gridPos": {
+            "x": 0,
+            "y": 60,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(kafka_messages_total{service=\"payment\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:kafka:count",
+                "target_id": "dep:kafka:orders",
+                "kind": "rate"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 531791476,
+      "title": "Database",
+      "description": "SQL database calls identified by the Phase 1 Instrumentation Plan; data requires runtime instrumentation.",
+      "panels": [
+        {
+          "id": 1460863891,
+          "title": "Database error ratio",
+          "description": "Share of database operations ending in the fixed error status pattern; requires runtime instrumentation.",
+          "type": "stat",
+          "gridPos": {
+            "x": 0,
+            "y": 77,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "(sum by (operation) (rate(sql_queries_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(sql_queries_total{service=\"payment\"}[$__rate_interval])))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:sql:count",
+                "target_id": "dep:sql:orders",
+                "kind": "error_ratio"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 689759171,
+          "title": "Database operations",
+          "description": "Operation rate breakdown across the database counter metric families; requires runtime instrumentation.",
+          "type": "table",
+          "gridPos": {
+            "x": 0,
+            "y": 69,
+            "w": 24,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(sql_queries_total{service=\"payment\",operation=\"query\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:sql:count",
+                "target_id": "dep:sql:orders",
+                "kind": "operation_breakdown"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 2116602647,
+          "title": "Database operation rate",
+          "description": "Rate of database operations; requires runtime instrumentation from the Phase 1 Instrumentation Plan.",
+          "type": "stat",
+          "gridPos": {
+            "x": 6,
+            "y": 77,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(sql_queries_total{service=\"payment\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:sql:count",
+                "target_id": "dep:sql:orders",
+                "kind": "rate"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 57035041,
+      "title": "Cache",
+      "description": "Redis cache calls identified by the Phase 1 Instrumentation Plan; data requires runtime instrumentation.",
+      "panels": [
+        {
+          "id": 1300999069,
+          "title": "Cache error ratio",
+          "description": "Share of cache operations ending in the fixed error status pattern; requires runtime instrumentation.",
+          "type": "stat",
+          "gridPos": {
+            "x": 6,
+            "y": 86,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "(sum by (operation) (rate(redis_commands_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(redis_commands_total{service=\"payment\"}[$__rate_interval])))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:redis:count",
+                "target_id": "dep:redis:session",
+                "kind": "error_ratio"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 2010375761,
+          "title": "Cache operations",
+          "description": "Operation rate breakdown across the cache counter metric families; requires runtime instrumentation.",
+          "type": "table",
+          "gridPos": {
+            "x": 0,
+            "y": 94,
+            "w": 24,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(redis_commands_total{service=\"payment\",operation=\"get\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:redis:count",
+                "target_id": "dep:redis:session",
+                "kind": "operation_breakdown"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 867374933,
+          "title": "Cache command rate",
+          "description": "Rate of cache operations; requires runtime instrumentation from the Phase 1 Instrumentation Plan.",
+          "type": "stat",
+          "gridPos": {
+            "x": 0,
+            "y": 86,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(redis_commands_total{service=\"payment\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:redis:count",
+                "target_id": "dep:redis:session",
+                "kind": "rate"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 365255334,
+      "title": "HTTP Client Calls",
+      "description": "HTTP client calls identified by the Phase 1 Instrumentation Plan; data requires runtime instrumentation.",
+      "panels": [
+        {
+          "id": 1495064383,
+          "title": "HTTP client error ratio",
+          "description": "Share of HTTP client operations ending in the fixed error status pattern; requires runtime instrumentation.",
+          "type": "stat",
+          "gridPos": {
+            "x": 0,
+            "y": 111,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "(sum by (operation) (rate(client_http_requests_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(client_http_requests_total{service=\"payment\"}[$__rate_interval])))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:client:http",
+                "target_id": "dep:http:gateway",
+                "kind": "error_ratio"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 532906935,
+          "title": "HTTP client operations",
+          "description": "Operation rate breakdown across the HTTP client counter metric families; requires runtime instrumentation.",
+          "type": "table",
+          "gridPos": {
+            "x": 0,
+            "y": 103,
+            "w": 24,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(client_http_requests_total{service=\"payment\",operation=\"call\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:client:http",
+                "target_id": "dep:http:gateway",
+                "kind": "operation_breakdown"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 1880698067,
+          "title": "HTTP client request rate",
+          "description": "Rate of HTTP client operations; requires runtime instrumentation from the Phase 1 Instrumentation Plan.",
+          "type": "stat",
+          "gridPos": {
+            "x": 6,
+            "y": 111,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(client_http_requests_total{service=\"payment\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:client:http",
+                "target_id": "dep:http:gateway",
+                "kind": "rate"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 770092101,
+      "title": "RPC Client Calls",
+      "description": "RPC client calls identified by the Phase 1 Instrumentation Plan; data requires runtime instrumentation.",
+      "panels": [
+        {
+          "id": 1974640238,
+          "title": "RPC client error ratio",
+          "description": "Share of RPC client operations ending in the fixed error status pattern; requires runtime instrumentation.",
+          "type": "stat",
+          "gridPos": {
+            "x": 6,
+            "y": 128,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "(sum by (operation) (rate(client_rpc_requests_total{service=\"payment\",status=~\"5[0-9]{2}|error\"}[$__rate_interval])) / sum by (operation) (rate(client_rpc_requests_total{service=\"payment\"}[$__rate_interval])))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:client:rpc",
+                "target_id": "dep:rpc:ledger",
+                "kind": "error_ratio"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 661219140,
+          "title": "RPC client operations",
+          "description": "Operation rate breakdown across the RPC client counter metric families; requires runtime instrumentation.",
+          "type": "table",
+          "gridPos": {
+            "x": 0,
+            "y": 120,
+            "w": 24,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(client_rpc_requests_total{service=\"payment\",operation=\"invoke\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:client:rpc",
+                "target_id": "dep:rpc:ledger",
+                "kind": "operation_breakdown"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        },
+        {
+          "id": 1860391188,
+          "title": "RPC client call rate",
+          "description": "Rate of RPC client operations; requires runtime instrumentation from the Phase 1 Instrumentation Plan.",
+          "type": "stat",
+          "gridPos": {
+            "x": 0,
+            "y": 128,
+            "w": 6,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "expr": "sum by (operation) (rate(client_rpc_requests_total{service=\"payment\"}[$__rate_interval]))",
+              "format": "time_series",
+              "legendFormat": "{{operation}}",
+              "metadata": {
+                "plan_id": "m:client:rpc",
+                "target_id": "dep:rpc:ledger",
+                "kind": "rate"
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "ops/s",
+              "noValue": "0"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "annotations": {}
+}
