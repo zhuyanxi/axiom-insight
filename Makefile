@@ -1,5 +1,5 @@
 .PHONY: build test lint generate check-generated fixture-test race perf quality
-.PHONY: dashboard-test dashboard-contract-test dashboard-golden-test dashboard-compat-test dashboard-race dashboard-perf dashboard-offline-test phase2-quality
+.PHONY: dashboard-test dashboard-contract-test dashboard-golden-test dashboard-compat-test dashboard-race dashboard-perf dashboard-offline-test phase2-quality release-quality
 
 build:
 	go build ./...
@@ -78,10 +78,10 @@ phase1-quality:
 	$(MAKE) generator-perf
 	@echo "phase1-quality: all checks passed"
 
-# --- Phase 2 quality gates (P2-13) --------------------------------------
+# --- Phase 2 quality gates (P2-14) --------------------------------------
 
-# Full dashboard suite (unit, golden, contract, canary, P2-13): no -run
-# filter, so every dashboard and CLI test runs in the phase2 gate.
+# Full dashboard suite (unit, golden, contract, canary, P2-13/P2-14): no
+# -run filter, so every dashboard and CLI test runs in the phase2 gate.
 dashboard-test:
 	go test ./dashboard/... ./cmd/si-cli -count=1
 
@@ -89,9 +89,10 @@ dashboard-test:
 dashboard-contract-test:
 	go test ./cmd/si-cli -run '^TestDashboardReport(Contract|SchemaStateRules)$$' -count=1
 
-# Every committed dashboard/CLI golden snapshot test.
+# Every committed dashboard/CLI golden snapshot test (anchored, so only
+# golden tests run and dashboard subpackages without goldens are skipped).
 dashboard-golden-test:
-	go test ./dashboard/... ./cmd/si-cli -run 'Golden|P213DashboardGoldens' -count=1
+	go test ./dashboard/model ./dashboard/pipeline ./cmd/si-cli -run '^Test.*Golden$$' -count=1
 
 # Grafana Schema 41 compatibility corpus (model + pipeline).
 dashboard-compat-test:
@@ -108,8 +109,11 @@ dashboard-perf:
 dashboard-offline-test:
 	GOPROXY=off GOSUMDB=off go test ./dashboard/... ./cmd/si-cli -count=1
 
+# Dashboard-only release gate: full dashboard suite, report contract,
+# goldens, Grafana Schema 41 compatibility, race, offline cache and the
+# opt-in-enforced performance budget. Phase 1 is NOT part of this gate;
+# the full repository release gate is `release-quality`.
 phase2-quality:
-	$(MAKE) phase1-quality
 	$(MAKE) dashboard-test
 	$(MAKE) dashboard-contract-test
 	$(MAKE) dashboard-golden-test
@@ -118,3 +122,11 @@ phase2-quality:
 	$(MAKE) dashboard-offline-test
 	$(MAKE) dashboard-perf
 	@echo "phase2-quality: all checks passed"
+
+# Full repository release gate: Phase 1 quality (incl. generated-code
+# checks that require a clean tree and the pinned protoc toolchain) plus
+# the Phase 2 dashboard gates.
+release-quality:
+	$(MAKE) phase1-quality
+	$(MAKE) phase2-quality
+	@echo "release-quality: all checks passed"

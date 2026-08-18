@@ -18,10 +18,18 @@ checkout. Network access is not part of any Phase 2 gate.
 make phase2-quality
 ```
 
-This command runs the Phase 1 quality gate, full regression, Dashboard unit and
-CLI tests, report contract tests, Goldens, Grafana Schema 41 compatibility,
-race, offline tests, and the opt-in-enforced Dashboard performance gate.
-Any failure returns non-zero and stops the release check.
+This command runs the Dashboard unit and CLI tests, report contract tests,
+Goldens, Grafana Schema 41 compatibility, race, offline tests, and the
+opt-in-enforced Dashboard performance gate. Any failure returns non-zero and
+stops the release check.
+
+The full repository release gate additionally runs the Phase 1 quality gate
+first (including generated-code checks that require a clean tree and the
+pinned protoc toolchain):
+
+```sh
+make release-quality
+```
 
 ## 2. Offline Reproducibility
 
@@ -87,8 +95,10 @@ make dashboard-perf
 `BenchmarkP214Dashboard1000` reports catalog construction, query planning and
 layout, render/validate, and combined Dashboard work for exactly 1,000 Catalog
 Items. The enforced reference budget for combined catalog + plan/layout +
-render/validate is under `2s` and under `96 MiB` added allocation, with an
-approved `20%` tolerance. Enforcement is explicit:
+render/validate is under `100ms` and under `64 MiB` added allocation, with an
+approved `20%` tolerance. Reference measurement (Apple M4, go1.26.1,
+`go test ./dashboard/pipeline -run '^$' -bench BenchmarkP214Dashboard1000/catalog-plan-render -benchmem -count=3`):
+≈ `29ms` / `32 MiB` per op. Enforcement is explicit:
 
 ```sh
 SI_ENFORCE_PERF_BUDGET=1 go test ./dashboard/pipeline -run TestP214DashboardPerformanceBudget1000 -count=1 -v

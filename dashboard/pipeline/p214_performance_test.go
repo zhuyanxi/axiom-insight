@@ -49,7 +49,7 @@ func p214PerformancePolicy(t testing.TB) dashboard.DashboardPolicy {
 	policy, err := dashboard.Resolve(&dashboard.DashboardConfig{
 		MaxPanels:         &maxPanels,
 		MaxQueries:        &maxQueries,
-		IncludeTraceLinks: boolPointer(false),
+		IncludeTraceLinks: p214BoolPtr(false),
 	}, nil)
 	if err != nil {
 		t.Fatalf("resolve performance policy: %v", err)
@@ -57,21 +57,21 @@ func p214PerformancePolicy(t testing.TB) dashboard.DashboardPolicy {
 	return *policy
 }
 
-func boolPointer(value bool) *bool { return &value }
+func p214BoolPtr(value bool) *bool { return &value }
 
 func p214CatalogFixture() *dashboard.DashboardCatalog {
 	items := make([]dashboard.DashboardItem, 0, p214CatalogItems)
 	for index := 0; index < p214CatalogItems; index++ {
-		itemID := "item:overview:" + zeroPad(index)
+		itemID := "item:overview:" + p214ZeroPad(index)
 		items = append(items, dashboard.DashboardItem{
 			ID:        itemID,
 			Category:  dashboard.CategoryServiceOverview,
-			Operation: "operation-" + zeroPad(index),
+			Operation: "operation-" + p214ZeroPad(index),
 			Target:    dashboard.TargetRef{Kind: "endpoint", ID: itemID},
 			Metrics: []dashboard.SignalReference{
-				{PlanID: "metric:count:" + zeroPad(index), Name: "requests_total", Type: "counter", Attributes: []string{"service", "operation", "status"}},
-				{PlanID: "metric:duration:" + zeroPad(index), Name: "request_duration", Type: "histogram", Attributes: []string{"service"}},
-				{PlanID: "metric:inflight:" + zeroPad(index), Name: "in_flight", Type: "gauge", Attributes: []string{"service"}},
+				{PlanID: "metric:count:" + p214ZeroPad(index), Name: "requests_total", Type: "counter", Attributes: []string{"service", "operation", "status"}},
+				{PlanID: "metric:duration:" + p214ZeroPad(index), Name: "request_duration", Type: "histogram", Attributes: []string{"service"}},
+				{PlanID: "metric:inflight:" + p214ZeroPad(index), Name: "in_flight", Type: "gauge", Attributes: []string{"service"}},
 			},
 		})
 	}
@@ -84,7 +84,7 @@ func p214CatalogFixture() *dashboard.DashboardCatalog {
 	}
 }
 
-func zeroPad(value int) string {
+func p214ZeroPad(value int) string {
 	return fmt.Sprintf("%04d", value)
 }
 
